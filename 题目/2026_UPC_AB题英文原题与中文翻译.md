@@ -1,20 +1,6 @@
-# 2026 UPC AB题英文原题与中文翻译
+# 2026 UPC AB题英文原题与中文翻译（只保留B题）
 
 每题先列英文原题，随后给出中文译文。中文用于辅助理解，题意以英文原文为准。
-
-## Problem A: Landing a First-Stage Rocket Booster
-
-### 英文原题
-
-Consider a rocket system in which, after booster separation, the first-stage booster performs a controlled descent to land vertically on a ship, so the booster can be refurbished and used again. Booster separation occurs at an altitude of 70 km and a velocity of 6,000 km/h. The first-stage booster has a dry mass of 130,000 kg, a height of 65 m, a diameter of 7.0 m, and uses liquid oxygen and methane fuel. Analyze the physics of making a safe descent and controlled vertical landing. How much fuel must the booster contain when separation occurs? Assume that the ship can be placed at a convenient location.
-
-### 中文翻译
-
-**A题 一级火箭助推器着陆**
-
-考虑这样一种火箭系统：助推器分离后，一级助推器（first-stage booster）进行受控下降（controlled descent），竖直着陆在船上，以便整修后再次使用。助推器分离时的高度为 70 km，速度为 6,000 km/h。该一级助推器的干质量（dry mass）为 130,000 kg，高度为 65 m，直径为 7.0 m，采用液氧与甲烷作为推进剂。
-
-分析实现安全下降和受控竖直着陆所涉及的物理过程。助推器在分离时必须携带多少燃料？假定可以将船布置在一个合适的位置。
 
 ## Problem B: Predicting FIFA Penalty Trajectories
 

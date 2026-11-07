@@ -1,102 +1,114 @@
 {
-  "generatedAt": "2026-11-07 15:55:19",
+  "generatedAt": "2026-11-07 19:34:48",
   "exportMode": "export",
-  "params": {
-    "windX": 0,
+  "parameters": {
     "windY": 0,
-    "windZ": 0,
-    "gustY": 0,
-    "gustZ": 0,
-    "gustStart": 0.16,
-    "gustDuration": 0.16,
-    "turbulence": 0,
-    "CdScale": 1,
-    "cdExponent": 0,
-    "spinScale": 1,
-    "bx": 0,
-    "spinTau": 0,
     "density": 1.225,
-    "mode": "conditioned",
-    "speedScale": 1,
-    "yawDeg": 0,
-    "elevationDeg": 0,
-    "mass": 0.43,
-    "radius": 0.11,
-    "buoyancy": false,
+    "Cd": 0.370687007714691,
+    "tolerance": 0.005,
     "maxStep": 0.002
   },
-  "status": "plane",
-  "endpoint": {
-    "t_s": 0.40050348611508624,
-    "state": [
-      11,
-      2.5994405492387216,
-      1.9670046154799856,
-      24.882014498277364,
-      3.96780265792549,
-      2.5555360605750641
-    ]
-  },
-  "edits": {
-    "time": 0.1,
-    "params": {
-      "windX": 0,
-      "windY": 0,
-      "windZ": 0,
-      "gustY": 0,
-      "gustZ": 0,
-      "gustStart": 0.16,
-      "gustDuration": 0.16,
-      "turbulence": 0,
-      "CdScale": 1,
-      "cdExponent": 0,
-      "spinScale": 1,
-      "bx": 0,
-      "spinTau": 0,
-      "density": 1.225,
-      "mode": "conditioned",
-      "speedScale": 1,
-      "yawDeg": 0,
-      "elevationDeg": 0,
-      "mass": 0.43,
-      "radius": 0.11,
-      "buoyancy": false,
-      "maxStep": 0.002
+  "theta": [
+    30.415459092690071,
+    9.416724781434624,
+    6.9080141806201354,
+    0.370687007714691,
+    -0.060325644049176494,
+    -0.35712778153052682
+  ],
+  "admissibility": {
+    "accepted": true,
+    "reasons": [],
+    "maxTransverseCoefficient": 0.26202746759182366,
+    "initialSpeed": 32.580600322094078,
+    "initialElevationDegrees": 12.24125112972364,
+    "coefficientCheckMaxSpacing": 0.00099876181076549676,
+    "limits": {
+      "speedMin": 10,
+      "speedMax": 40,
+      "maxTransverseCoefficient": 0.5,
+      "massRange": [
+        0.41,
+        0.45
+      ],
+      "circumferenceRange": [
+        0.68,
+        0.7
+      ],
+      "windRange": [
+        -8,
+        8
+      ],
+      "densityRange": [
+        1.1,
+        1.35
+      ],
+      "CdRange": [
+        0.15,
+        0.6
+      ],
+      "classification": "球规格为官方要求；速度/气动上限为保守模型筛选，非人体或流体绝对上限。",
+      "sources": [
+        "https://www.theifab.com/laws/latest/the-ball/",
+        "https://doi.org/10.1007/BF02844207",
+        "https://doi.org/10.1080/02640410400021450"
+      ]
     }
   },
-  "referenceEndpoint": {
-    "t_s": 0.40050348611508618,
-    "state": [
-      11,
-      2.599440549238722,
-      1.9670046154799827,
-      24.882014498277385,
-      3.9678026579254917,
-      2.5555360605750614
-    ]
-  },
-  "observations": {
-    "times_s": [
-      0.05,
-      0.1
-    ],
-    "positions_m": [
+  "initialSpeed": 32.580600322094078,
+  "fit": {
+    "maxResidual": 9.3114405075311879E-13,
+    "feasible": true,
+    "residual": [
       [
-        1.5,
-        0.45,
-        0.44
+        8.4487972173974413E-13,
+        6.564193633096238E-13,
+        2.8060886947400832E-13
       ],
       [
-        2.96,
-        0.86,
-        0.74
+        6.03073146976385E-13,
+        9.3114405075311879E-13,
+        3.1585845050585704E-13
       ]
-    ]
+    ],
+    "observedPositions": [
+      [
+        1.5000000000008449,
+        0.45000000000065643,
+        0.44000000000028061
+      ],
+      [
+        2.960000000000603,
+        0.86000000000093113,
+        0.74000000000031585
+      ]
+    ],
+    "exitflag": 1,
+    "elapsedSeconds": 0.0255802,
+    "kineticEnergy": 228.22153622982793
   },
+  "endpoint": [
+    11,
+    2.5994405492085213,
+    1.967004615467743,
+    24.882014498150237,
+    3.9678026578764274,
+    2.5555360605280697
+  ],
+  "status": "plane",
+  "tEnd": 0.40050348611696418,
+  "isOpening": true,
+  "referenceEndpoint": [
+    11,
+    2.5994405492085213,
+    1.967004615467743,
+    24.882014498150237,
+    3.9678026578764274,
+    2.5555360605280697
+  ],
   "outputs": {
     "gif": "C:\\Users\\lhl87\\Documents\\MATLAB\\UPC\\仿真\\Matlab版\\img\\点球物理仿真.gif",
     "png": "C:\\Users\\lhl87\\Documents\\MATLAB\\UPC\\仿真\\Matlab版\\img\\点球仿真全景.png"
   },
-  "units": "位置 m；速度 m/s；时间 s；力 N；风箭头 0.05 m/(m/s)；力箭头 0.25 m/N",
-  "note": "参数与事件来自 penalty_scenario；历史力按当时参数采样。b 为有效 Magnus 系数，不代表已测角速度；球皮图案不表示真实自旋。"
+  "note": "参数、拟合与末端来自 penalty_scenario 的全程联合反演；环境从出脚 t=0 起全程生效。"
 }

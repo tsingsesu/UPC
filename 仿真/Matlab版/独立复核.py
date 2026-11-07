@@ -76,9 +76,67 @@ def main():
         report['matlab_difference_yz_m']=(point[2:]-np.array([matlab_point['yGoal'],matlab_point['zGoal']])).tolist()
         assert np.max(np.abs(report['matlab_difference_yz_m']))<1e-7
         assert np.max(np.abs(np.array(main_data['fit']['theta'])-fit.x))<1e-6
+    report['trajectory_family']=verify_family(main_data['trajectoryFamily'])
     target=ROOT/'data'/'派生数据'/'独立复核结果.json'
     target.parent.mkdir(parents=True,exist_ok=True)
     target.write_text(json.dumps(report,ensure_ascii=False,indent=2),encoding='utf-8')
     print(json.dumps(report,ensure_ascii=False,indent=2))
+
+def verify_family(family):
+    """逐候选独立积分；另对两端代表独立重拟合，无绘图。"""
+    max_obs=0.; max_goal=0.; max_refit=0.; disagreements=0
+    details=[]
+    for index,a in enumerate(family['members'],1):
+        if a['exitflag']<=0:
+            continue
+        th=np.asarray(a['theta']); wind=np.array([0.,a['windY'],0.])
+        k=a['density']*np.pi*.11**2/(2*.43)
+        def force(t,s,theta=th):
+            u=s[3:]-wind
+            return np.r_[s[3:], [0.,0.,-G]] + np.r_[np.zeros(3),
+                -k*theta[3]*np.linalg.norm(u)*u+np.cross([0.,theta[4],theta[5]],u)]
+        def plane(t,s): return s[0]-11.
+        def ground(t,s): return s[2]-.11 if t>1e-9 else 1e-8
+        plane.terminal=True;plane.direction=1
+        ground.terminal=True;ground.direction=-1
+        sol=solve_ivp(force,(0,2),np.r_[R0,th[:3]],method='DOP853',
+                      events=[plane,ground],dense_output=True,rtol=2e-12,atol=2e-13,max_step=.004)
+        assert sol.success
+        observed=sol.sol([.05,.1])[:3].T
+        residual=observed-OBS
+        error=float(np.max(np.abs(residual)))
+        max_obs=max(max_obs,abs(error-a['maxResidual']))
+        times=np.linspace(0.,sol.t[-1],max(2,int(np.ceil(sol.t[-1]/.001))+1))
+        vel=sol.sol(times)[3:].T-wind
+        cl=np.linalg.norm(np.cross([0.,th[4],th[5]],vel),axis=1)/(k*np.maximum(np.sum(vel**2,axis=1),1e-16))
+        limits=family['physicalLimits']; speed=np.linalg.norm(th[:3])
+        physical=(limits['speedMin']<=speed<=limits['speedMax'] and th[0]>0 and th[2]>=0
+                  and np.max(cl)<=limits['maxTransverseCoefficient'] and sol.t[-1]>=.1)
+        assert physical==a['physicalAdmissible']
+        assert abs(np.max(cl)-a['maxTransverseCoefficient'])<1e-8
+        accepted=error<=family['defaultTolerance'] and physical
+        disagreements+=int(accepted != a['accepted'])
+        expected='plane' if len(sol.t_events[0]) else ('ground' if len(sol.t_events[1]) else 'timeout')
+        assert expected==a['status']
+        max_goal=max(max_goal,float(np.linalg.norm(sol.y[:3,-1]-np.array(a['endpoint']))))
+        if index in family['exampleIndices']:
+            def residual_fun(q):
+                par=np.r_[q[:3],a['Cd'],q[3:]]
+                trial=solve_ivp(lambda t,y:force(t,y,par),(0,.1),np.r_[R0,q[:3]],
+                                method='DOP853',t_eval=[.05,.1],rtol=2e-12,atol=2e-13)
+                assert trial.success
+                return 1000*(trial.y[:3].T-OBS).ravel()
+            fit=least_squares(residual_fun,[30.4,9.4,6.9,-.06,-.36],
+                              bounds=([10,-20,0,-1.5,-1.5],[40,20,25,1.5,1.5]),
+                              xtol=1e-12,ftol=1e-12,gtol=1e-10,x_scale='jac')
+            assert fit.success
+            delta=float(np.max(np.abs(fit.x-th[[0,1,2,4,5]])))
+            max_refit=max(max_refit,delta)
+            details.append({'index':index,'independent_q':fit.x.tolist(),'max_parameter_difference':delta})
+    assert max_obs<1e-8 and max_goal<1e-7 and disagreements==0 and max_refit<1e-5
+    return {'n_checked':len(family['members']),'max_observation_residual_difference_m':max_obs,
+            'max_goal_difference_m':max_goal,'acceptance_disagreements':disagreements,
+            'independent_refits':details,'max_refit_parameter_difference':max_refit,
+            'scope':'Numerical consistency only; no experimental confirmation.'}
 
 if __name__=='__main__': main()

@@ -12,11 +12,11 @@
 {\large Team: TEAM NUMBER REQUIRED}\par\vspace{12mm}
 {\Large Problem B}\par\vspace{10mm}
 {\LARGE Predicting a Penalty Kick from 0.10 Seconds of Motion}\par\vspace{8mm}
-{\large A physics-constrained estimate and its uncertainty}
+{\large Full-flight inverse constraints and compatible trajectories}
 \end{center}
 \vspace{10mm}
 \begin{abstract}
-Two short-time position measurements constrain a football's velocity and curvature but do not uniquely determine its future motion without assumptions about aerodynamic forces. We construct a bounded maximum-likelihood estimator using gravity, quadratic drag, and an effective Magnus term. The fitted trajectory is propagated to its first crossing of the goal plane, with ground contact treated as a competing event. For the specified observations, the nominal model predicts a crossing at approximately $(11,2.60,1.97)$ m at $0.401$ s after the kick. A constant-acceleration interpolant instead gives $(11,2.49,1.92)$ m, illustrating the effect of extrapolation assumptions. Measurement uncertainty is amplified strongly: assuming independent 1 cm coordinate errors, local 95\% marginal half-widths are approximately 0.97 m in each goal-plane coordinate. We separate this conditional sampling uncertainty from structural uncertainty due to wind, unobserved spin components, speed-dependent drag, and spin decay. Numerical validation uses analytical limiting cases, step-size refinement, independent integration, and synthetic forecast tests. No independent experimental trajectory is available, so these checks establish numerical consistency rather than experimental validity. A useful goalkeeper forecast is therefore a point together with an uncertainty region and a failure classification; a highly precise unconditional landing point is not justified by the information supplied.
+Two position measurements do not uniquely identify a penalty kick when aerodynamic conditions are unknown. We apply gravity, quadratic drag relative to steady lateral wind, and an effective Magnus term from release throughout the flight. For prescribed wind, air density and drag coefficient, bounded nonlinear least squares jointly estimates initial velocity and two transverse-force coefficients. The six observation equations are relaxed to explicit componentwise tolerances. A grid of 231 parameter profiles yields 107 compatible representatives at a chosen 5 mm tolerance; their goal-plane coordinates span $y\in[2.5342,2.6812]$ m and $z\in[1.9451,1.9867]$ m, with two acceptable shots differing by 0.1513 m. This family is a sampled inner subset of feasible solutions, not an exhaustive uncertainty envelope or a probability distribution. Density and drag are structurally confounded through their product. A calm-air conditional reference remains $(11,2.60,1.97)$ m at $0.401$ s; the observations alone do not define an unconditional most-likely point. We separately retain a 1 cm Gaussian-noise diagnostic, which gives approximately 0.97 m marginal 95\% half-widths and must not be confused with the bounded-error family's spread. Analytical limiting cases, integration refinement, independent Python calculations and synthetic tests establish numerical consistency. No independent experimental flight is available. The method returns a conditional point, compatible full-flight trajectories, observation residuals and terminal-event classifications, while making its physical and statistical assumptions explicit.
 \end{abstract}
 \newpage
 \section{Problem interpretation and deliverables}
@@ -98,7 +98,92 @@ In still air the mechanical energy satisfies
 \end{equation}
 because $\mathbf v\cdot(\mathbf b\times\mathbf v)=0$. This is the appropriate dissipative balance. Ground-frame mechanical energy need not decrease monotonically when moving air performs work.
 
-\section{Inference, event detection and uncertainty}
+% FULL_FLIGHT_FAMILY_BEGIN
+\section{Full-flight constrained trajectory family: primary method}
+\subsection{Coupled parameters and observation constraints}
+The same force law acts from release, $t=0$, until the first terminal event. There is no ideal initial segment and no activation of wind or drag at $0.10$ s. For this reduced extension we retain steady lateral wind $\mathbf w=(0,w_y,0)$, constant density, constant drag coefficient and constant effective transverse coefficients, with $b_x=0$. Gusts, spin decay, drag crisis and camera bias are excluded from this family; they require additional information. The later structural stress tests remain separate comparisons.
+
+Let $\eta=(w_y,\rho,C_D)$ and $q=(v_{0x},v_{0y},v_{0z},b_y,b_z)$. The ideal observation equations are
+\begin{equation}
+ \mathbf r(t_i;q,\eta)=\mathbf r_i,\quad i=1,2.
+\end{equation}
+We relax them to componentwise constraints,
+\begin{equation}
+ \mathcal F_\epsilon=\{(q,\eta)\in\mathcal B:\max_{i,j}|r_j(t_i;q,\eta)-r_{ij}|\le\epsilon\},
+ \qquad \epsilon=0.005\ \mathrm m.
+\end{equation}
+The initial centre remains exactly the problem's $(0,0,0.11)$ m. The 5 mm tolerance is a chosen bounded-error scenario, not an inferred camera accuracy or a Gaussian standard deviation. It would match half a centimetre rounding interval only if rounding were the sole error. Results are also screened at 2, 10 and 20 mm. Exact numerical interpolation can occur; it does not establish exact physical knowledge.
+
+Changing $\eta$ requires solving for $q$ again. A stronger aerodynamic deceleration can be compensated by a different launch velocity and transverse coefficient while the observations remain acceptable. The ball's launch kinetic energy, $E_0=m|\mathbf v_0|^2/2$, is a useful comparison of kicks. It is not the foot's force: that would additionally require contact duration and ball deformation. The full problem has eight scalar unknowns and six measured coordinates. Moreover, only the product $\rho C_D$ appears in the drag term, so these two quantities cannot be separately identified in this reduced model. Effective $b_y,b_z$ already absorb lift efficiency and spin; we do not also multiply them by an independently varied density factor.
+
+\subsection{Reproducible sampling of compatible solutions}
+We use seven equally spaced $w_y$ values on $[-8,8]$ m s$^{-1}$, three densities $\{1.1,1.225,1.35\}$ kg m$^{-3}$, and eleven drag values: ten equally spaced points on $[0.15,0.60]$ plus the calm-air fitted value. These are illustrative search settings, not measured wind or ball distributions. For each of the 231 profiles, bounded nonlinear least squares estimates $q$ from two starts:
+\begin{equation}
+ q^*(\eta)=\arg\min_{q\in\mathcal B_q}\sum_{i=1}^2
+ \|\mathbf r(t_i;q,\eta)-\mathbf r_i\|^2.
+\end{equation}
+The effective transverse-coefficient bounds follow the reference model; launch bounds are tightened by the admissibility checks below. We evaluate the residual during fitting with RK4, step $0.0025$ s, and independently re-evaluate acceptance with \texttt{ode45} from $t=0$ (RelTol $10^{-11}$, AbsTol $10^{-12}$). Whole-flight propagation uses RelTol $10^{-9}$, AbsTol $10^{-11}$ and maximum step $0.002$ s. A release-contact guard avoids reporting the initial ground contact as a landing; the descending ground event and forward goal event are both localized.
+
+We retain a profile representative only when every coordinate residual is within tolerance. Solver failures and rejected representatives are recorded. A failed least-squares representative is not proof that its entire profile has no feasible point: an $L_2$ minimizer need not minimize the largest residual. Likewise, two starts do not establish global optimality. Our displayed family is a sampled \emph{inner subset} of $\mathcal F_\epsilon$, with one representative per sampled profile; it is neither a full feasible envelope nor a confidence region. We do not attach probability weights, and a fraction of candidates crossing the opening is not a scoring probability.
+
+\subsection{Physical admissibility is distinct from observation fit}
+A small residual is necessary but insufficient. We additionally require a forward, initially non-descending launch, $10\le|\mathbf v_0|\le40$ m s$^{-1}$, and compliance with the declared environment domain. Optimizer component bounds are tightened to $v_{0x}\in[10,40]$ and $v_{0z}\in[0,25]$ m s$^{-1}$; $v_{0y}$ and $b_y,b_z$ retain their previous bounds. IFAB specifies mass 0.410--0.450 kg and circumference 0.68--0.70 m~\cite{ifab}; the fixed 0.43 kg, 0.11 m radius satisfy these requirements. A study of nine experienced players observed ball speeds of 19.2--32.6 m s$^{-1}$~\cite{nunome}. The adopted 40 m s$^{-1}$ cap includes a margin and is an explicit plausibility choice, not a universal human speed limit. No unsupported numerical upper bound on launch angle is imposed.
+
+To prevent unrealistically large effective side forces, we screen
+\begin{equation}
+ C_{\perp}(t)=\frac{\|\mathbf b\times\mathbf u(t)\|}{K\|\mathbf u(t)\|^2}\le0.50.
+\end{equation}
+This converts the fitted coefficient to a dimensionless transverse-force measure rather than pretending to recover true spin. Football wind-tunnel experiments provide the force-coefficient definition and show dependence on rotation~\cite{asai}. The 0.50 cap and broad $C_D\in[0.15,0.60]$ domain are conservative modelling guards, not experimentally established limits for every football. Density and wind ranges remain unmeasured scenario bounds. The force check samples the dense solution at spacings no larger than 0.001 s; it is a numerical admissibility check, not a proof of a continuous-time bound.
+
+Candidates must also remain above the ground before their terminal event, survive beyond the last observation and produce a localized terminal event within 2 s. We do \emph{not} constrain the inferred crossing to lie inside the goal: misses are legitimate outcomes. Observational compatibility, physical-screen acceptance and solver status are stored separately. A guard violation can indicate missing constraints, weak identifiability, a restricted search or a mismatch of assumptions; it does not by itself falsify Newton's equations.
+
+At the default tolerance the maximum transverse coefficient among accepted representatives is 0.4538. All 107 pass the 0.50 guard. Tightening only this guard to 0.40 retains 98, and to 0.30 retains 66; relaxing to 0.60 retains 107. Speed caps 35, 40 and 45 m s$^{-1}$ give the same counts on this fixed sample. This is screening sensitivity, not a reoptimized global feasible envelope. Rejected candidates and reasons remain in the output.
+
+\subsection{Computed family and coupled-kick example}
+All 231 optimizations converged without parameter-bound hits. At 5 mm, 107 representatives pass the six-coordinate test. They all reach the goal plane before the ground and clear the finite-radius opening in this chosen set. Their launch speeds span 32.323--32.849 m s$^{-1}$. Plane-coordinate ranges are $y\in[2.5342,2.6812]$ m and $z\in[1.9451,1.9867]$ m. The separate extrema need not belong to the same shot, and these sampled ranges do not bound untested solutions.
+\begin{table}[H]\centering
+\caption{Tolerance screening of the same profile representatives. Ranges are sampled spreads, not uncertainty bounds.}
+\begin{tabular}{rrrr}\toprule
+$\epsilon$ (mm) & Accepted & $y_g$ (m) & $z_g$ (m)\\\midrule
+2 & 51/231 & [2.570,2.623] & [1.955,1.975] \\
+5 & 107/231 & [2.534,2.681] & [1.945,1.987] \\
+10 & 189/231 & [2.445,2.756] & [1.918,2.005] \\
+20 & 231/231 & [2.280,2.815] & [1.885,2.013] \\
+\bottomrule\end{tabular}\end{table}
+\begin{table}[H]\centering\small
+\caption{Two compatible full-flight solutions, selected for largest pairwise separation within the 5 mm sample. Wind is present from release in both.}
+\begin{tabular}{lrrrrrrr}\toprule
+ & $w_y$ & $\rho$ & $C_D$ & $|v_0|$ & Error (mm) & $y_g$ & $z_g$\\\midrule
+A & -8.0 & 1.225 & 0.2500 & 32.323 & 4.834 & 2.6812 & 1.9847 \\
+B & -8.0 & 1.350 & 0.3707 & 32.791 & 3.828 & 2.5342 & 1.9492 \\
+\bottomrule\end{tabular}
+\par\smallskip\footnotesize Units: wind and speed in m s$^{-1}$; density in kg m$^{-3}$; plane coordinates in m.
+\end{table}
+The two plane crossings differ by 0.1513 m despite both meeting the same observation tolerance. Their residuals, velocity vectors, effective force coefficients and complete trajectories are retained with the numerical output. This demonstrates non-uniqueness within the stated physical family without inventing an unobserved force switch. The observed spread is modest because these are steady, reduced-force profiles refitted to the observations; complexity alone would not justify a larger or more accurate result.
+\begin{figure}[H]\centering
+\includegraphics[width=.87\linewidth]{全程约束轨迹簇.png}
+\caption{Accepted full-flight trajectories at 5 mm, with two contrasting representatives. Gray curves show selected physical possibilities, not probability density.}
+\end{figure}
+\begin{figure}[H]\centering
+\includegraphics[width=.76\linewidth]{全程约束球门散点.png}
+\caption{Zoomed goal-plane scatter for compatible profile representatives; color indicates prescribed $C_D$.}
+\end{figure}
+
+\subsection{Numerical evidence and interpretation of ``most likely''}
+Python independently integrated all 231 candidates using DOP853 and reproduced the acceptance decisions without disagreements; maximum plane-point difference from MATLAB was $1e-13$ m. Independent refits of the two displayed representatives also agreed. Tests additionally verify wind at release, compensating initial-velocity changes, invariance under fixed $\rho C_D$, three maximum-step settings, drag dissipation relative to air, transverse-force orthogonality, ground-event localization and the ground-frame work balance
+\begin{equation}
+ \frac{d}{dt}\left(\frac12m|\mathbf v|^2+mgz\right)
+ =(\mathbf F_D+\mathbf F_M)\cdot\mathbf v.
+\end{equation}
+These are numerical checks, not experimental confirmation. The earlier conditional baseline and synthetic tests below serve as additional diagnostics; their Gaussian confidence estimates must not be substituted for the bounded-error family's sampled spread.
+
+Without a measurement likelihood and a probability model for the unknown environment, these data do not specify an unconditional most-likely crossing. To give the requested point estimate, we retain the calm-air maximum-likelihood reference $(11,2.60,1.97)$ m at $0.401$ s, explicitly conditional on its assumptions, alongside the compatible family. A predictive mode marginalized over nuisance parameters is not identified by these two observations alone. The interactive MATLAB view implements the same inverse model: releasing a parameter slider recomputes the entire shot and restarts its animation, while reporting fitted launch conditions and residual acceptance. It does not splice distinct shots into one trajectory.
+
+% FULL_FLIGHT_FAMILY_END
+
+
+
+\section{Conditional reference: likelihood and measurement diagnostics}
 \subsection{Bounded maximum likelihood}
 For a chosen $\sigma$, we minimize
 \begin{equation}
@@ -129,7 +214,7 @@ Parametric bootstrap generates noisy observations from the fitted model, refits 
 
 Structural tests change one mechanism at a time: fixed $b_x=\pm1$ s$^{-1}$, transverse wind $w_y=\pm3$ m s$^{-1}$, $C_D=C_{D0}(|\mathbf u|/30)^p$ with $p=\pm0.5$, and $\mathbf b(t)=\mathbf b_0e^{-t/\tau}$ with $\tau=0.5,1$ s. Each is refitted to the same observations. These deliberately chosen stress cases are not assigned occurrence probabilities and must not be pooled into a statistical confidence interval.
 
-\section{Numerical results and verification}
+\section{Additional reference-model results and verification}
 % VERIFIED_RESULTS_BEGIN
 \subsection{Point forecast and competing baselines}
 The four independent starts converge to the same interior solution, with parameters
@@ -209,7 +294,7 @@ Constant effective Magnus force structure cannot resolve non-stationary wakes, a
 Independent implementations and synthetic validation check equations and algorithms. They do not establish that this particular football, field and camera obey the chosen model. There is no independent measured full trajectory here; experimental confirmation remains outstanding. Bounds and synthetic sampling ranges are explicit scenario choices, not universal football statistics.
 
 \section{Conclusions}
-The supplied observations support a conditional nominal forecast near $(11,2.60,1.97)$ m at $0.401$ s. A six-parameter gravity--drag--Magnus model gives a reproducible route from positions to event-localized forecasts, while analytical baselines expose the effect of extrapolation assumptions. Uncertainty must be part of the answer: a 1 cm coordinate-error scenario produces approximately 1 m marginal 95\% half-widths, much larger than numerical integration error. Structural stress cases must be reported separately. The general method therefore returns a point, a conditional uncertainty region, diagnostics and an outcome category, rather than an unsupported precise universal prediction.
+The primary answer is a coupled full-flight inverse problem: environmental parameters and launch conditions must be inferred together under the two observation constraints. At a stated 5 mm coordinate tolerance, 107 of 231 sampled profile representatives are compatible, and two differ by 0.1513 m at the goal. These ranges demonstrate non-uniqueness but are not global bounds or probabilities. The calm-air point $(11,2.60,1.97)$ m at $0.401$ s remains a conditional reference, not a uniquely established truth or an unconditional predictive mode. Gaussian measurement-error diagnostics are reported separately. Further observations, environmental measurements and independent flight data are needed to narrow the feasible set and calibrate probabilistic forecasts.
 
 \begin{thebibliography}{9}
 \bibitem{upc} University Physics Competition. 2026 contest, Problem B. \url{https://www.uphysicsc.com/2026contest.html}. Accessed 7 November 2026.
@@ -218,6 +303,7 @@ The supplied observations support a conditional nominal forecast near $(11,2.60,
 \bibitem{ode} MathWorks. \texttt{ode45}: Solve nonstiff differential equations. \url{https://www.mathworks.com/help/matlab/ref/ode45.html}. Implementation run with MATLAB R2024a.
 \bibitem{lsq} MathWorks. \texttt{lsqnonlin}: Solve nonlinear least-squares problems. \url{https://www.mathworks.com/help/optim/ug/lsqnonlin.html}.
 \bibitem{rules} University Physics Competition. Contest rules, including generative-AI disclosure. \url{https://www.uphysicsc.com/contestrules.html}. Accessed 7 November 2026.
+\bibitem{nunome} H. Nunome, M. Lake, A. Georgakis and L. K. Stergioulas. Impact phase kinematics of instep kicking in soccer. \emph{Journal of Sports Sciences} 24(1), 11--22 (2006). \url{https://doi.org/10.1080/02640410400021450}.
 \end{thebibliography}
 
 \section*{Report on the Use of AI}

@@ -1,8 +1,16 @@
 {
-  "liveEditLatency_s": 0.0165311,
   "passed": true,
   "singleAxes": true,
-  "causalLiveEdit": true,
-  "modeResetAndObservationConstraint": true,
-  "invalidInputRejected": true
+  "fourParameters": true,
+  "feasibleAfterEdit": true,
+  "rebuildFromZero": true,
+  "v0Changed": true,
+  "earlyWithinTolerance": true,
+  "oldHistoryNotAppended": true,
+  "invalidInputRestored": true,
+  "outOfRangeClamped": true,
+  "playbackPreservedAfterEdit": true,
+  "infeasibleMarkedRed": true,
+  "replayReturnsToZero": true,
+  "timerClearedOnClose": true
 }

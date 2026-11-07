@@ -52,7 +52,39 @@
   "scope": "独立程序数值复核，不是实验确认；噪声标准差为假设。",
   "energy_balance_max_residual_J": 1.1368683772161603e-13,
   "matlab_difference_yz_m": [
-    -1.2633005752604731e-11,
-    -4.086730953645201e-12
-  ]
+    -1.2633893931024431e-11,
+    -4.085398686015651e-12
+  ],
+  "trajectory_family": {
+    "n_checked": 231,
+    "max_observation_residual_difference_m": 1.1102230246251565e-15,
+    "max_goal_difference_m": 9.953147867767999e-14,
+    "acceptance_disagreements": 0,
+    "independent_refits": [
+      {
+        "index": 14,
+        "independent_q": [
+          30.190870602646484,
+          9.288327149461464,
+          6.858661900605164,
+          -0.060424191133952705,
+          -0.18612775807564844
+        ],
+        "max_parameter_difference": 3.9290397779723207e-07
+      },
+      {
+        "index": 28,
+        "independent_q": [
+          30.599583276593386,
+          9.520774105241577,
+          6.947539623151295,
+          -0.0604985240031722,
+          -0.1860969904565799
+        ],
+        "max_parameter_difference": 2.288415915430164e-06
+      }
+    ],
+    "max_refit_parameter_difference": 2.288415915430164e-06,
+    "scope": "Numerical consistency only; no experimental confirmation."
+  }
 }

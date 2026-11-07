@@ -595,7 +595,9 @@ result.bootstrap = struct('summary',bsSummary, 'samples',bsSamples);
 result.verification = ver;
 result.modelScenarios = scenarios;
 result.synthetic = struct('summary',synSummary, 'samples',synSamples);
-result.figures = figFiles;
+result.trajectoryFamily = penalty_family(obs,thetaHat(4),mode);
+result.primaryInterpretation = '全程物理约束下的可接受轨迹簇；prediction/uncertainty保留为无风条件基准及其高斯噪声诊断。';
+result.figures = [figFiles, {fullfile(imgDir,'全程约束轨迹簇.png'),fullfile(imgDir,'全程约束球门散点.png')}];
 result.timing = struct('elapsedSeconds', toc(tStart));
 result.notes = { ...
     '本结果由MATLAB实际运行生成；仍未完成实验确认。'; ...

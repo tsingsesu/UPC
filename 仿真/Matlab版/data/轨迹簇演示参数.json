@@ -1,0 +1,215 @@
+{
+  "generatedAt": "2026-11-07 19:35:01",
+  "exportMode": "demo",
+  "tolerance": 0.005,
+  "family": {
+    "qualified": 107,
+    "drawn": 80,
+    "note": "等间隔抽样绘制，不是概率，也不是置信区间。"
+  },
+  "groups": [
+    {
+      "parameters": {
+        "windY": -8,
+        "density": 1.225,
+        "Cd": 0.25,
+        "tolerance": 0.005,
+        "maxStep": 0.002
+      },
+      "theta": [
+        30.190870677399122,
+        9.28832716328646,
+        6.8586615077011865,
+        0.25,
+        -0.060424475823914289,
+        -0.18612776567287556
+      ],
+      "admissibility": {
+        "accepted": true,
+        "reasons": [],
+        "maxTransverseCoefficient": 0.11978833307450773,
+        "initialSpeed": 32.323411506660385,
+        "initialElevationDegrees": 12.250644468253403,
+        "coefficientCheckMaxSpacing": 0.00099901691785533419,
+        "limits": {
+          "speedMin": 10,
+          "speedMax": 40,
+          "maxTransverseCoefficient": 0.5,
+          "massRange": [
+            0.41,
+            0.45
+          ],
+          "circumferenceRange": [
+            0.68,
+            0.7
+          ],
+          "windRange": [
+            -8,
+            8
+          ],
+          "densityRange": [
+            1.1,
+            1.35
+          ],
+          "CdRange": [
+            0.15,
+            0.6
+          ],
+          "classification": "球规格为官方要求；速度/气动上限为保守模型筛选，非人体或流体绝对上限。",
+          "sources": [
+            "https://www.theifab.com/laws/latest/the-ball/",
+            "https://doi.org/10.1007/BF02844207",
+            "https://doi.org/10.1080/02640410400021450"
+          ]
+        }
+      },
+      "initialSpeed": 32.323411506660385,
+      "kineticEnergy": 224.6326302572146,
+      "fit": {
+        "maxResidual": 0.00483352387942082,
+        "feasible": true,
+        "residual": [
+          [
+            -0.00483352387942082,
+            -0.0027095614398594536,
+            -0.0010281475041019061
+          ],
+          [
+            0.0024787852990812986,
+            0.0013752129221347165,
+            0.00052974386692317132
+          ]
+        ],
+        "observedPositions": [
+          [
+            1.4951664761205792,
+            0.44729043856014056,
+            0.4389718524958981
+          ],
+          [
+            2.9624787852990813,
+            0.8613752129221347,
+            0.74052974386692316
+          ]
+        ],
+        "exitflag": 3,
+        "elapsedSeconds": 0.0209482
+      },
+      "endpoint": [
+        11,
+        2.6812318304626972,
+        1.9847249979171524,
+        26.350111624093973,
+        4.6961805569549053,
+        2.8643436004950074
+      ],
+      "status": "plane",
+      "tEnd": 0.39061561488143565,
+      "isOpening": true
+    },
+    {
+      "parameters": {
+        "windY": -8,
+        "density": 1.35,
+        "Cd": 0.370687007714691,
+        "tolerance": 0.005,
+        "maxStep": 0.002
+      },
+      "theta": [
+        30.599581731985609,
+        9.5207763936574921,
+        6.9475407080907265,
+        0.370687007714691,
+        -0.06049771389802451,
+        -0.18609860840544371
+      ],
+      "admissibility": {
+        "accepted": true,
+        "reasons": [],
+        "maxTransverseCoefficient": 0.11986188004777661,
+        "initialSpeed": 32.790972952949581,
+        "initialElevationDegrees": 12.232171234719035,
+        "coefficientCheckMaxSpacing": 0.000998723236046884,
+        "limits": {
+          "speedMin": 10,
+          "speedMax": 40,
+          "maxTransverseCoefficient": 0.5,
+          "massRange": [
+            0.41,
+            0.45
+          ],
+          "circumferenceRange": [
+            0.68,
+            0.7
+          ],
+          "windRange": [
+            -8,
+            8
+          ],
+          "densityRange": [
+            1.1,
+            1.35
+          ],
+          "CdRange": [
+            0.15,
+            0.6
+          ],
+          "classification": "球规格为官方要求；速度/气动上限为保守模型筛选，非人体或流体绝对上限。",
+          "sources": [
+            "https://www.theifab.com/laws/latest/the-ball/",
+            "https://doi.org/10.1007/BF02844207",
+            "https://doi.org/10.1080/02640410400021450"
+          ]
+        }
+      },
+      "initialSpeed": 32.790972952949581,
+      "kineticEnergy": 231.17830004823026,
+      "fit": {
+        "maxResidual": 0.0038277598707174842,
+        "feasible": true,
+        "residual": [
+          [
+            0.0038277598707174842,
+            0.0021452298539121339,
+            0.00081391038419581507
+          ],
+          [
+            -0.0019912272349800197,
+            -0.001104623635247215,
+            -0.0004253706621575315
+          ]
+        ],
+        "observedPositions": [
+          [
+            1.5038277598707175,
+            0.45214522985391215,
+            0.44081391038419582
+          ],
+          [
+            2.95800877276502,
+            0.85889537636475277,
+            0.73957462933784246
+          ]
+        ],
+        "exitflag": 3,
+        "elapsedSeconds": 0.0314978
+      },
+      "endpoint": [
+        11,
+        2.5341507568415573,
+        1.9491566823087587,
+        24.011532187745996,
+        3.4766114564351249,
+        2.32970073630604
+      ],
+      "status": "plane",
+      "tEnd": 0.4074790803071287,
+      "isOpening": true
+    }
+  ],
+  "outputs": {
+    "gif": "C:\\Users\\lhl87\\Documents\\MATLAB\\UPC\\仿真\\Matlab版\\img\\约束轨迹簇演示.gif",
+    "png": "C:\\Users\\lhl87\\Documents\\MATLAB\\UPC\\仿真\\Matlab版\\img\\约束轨迹簇对比.png"
+  },
+  "note": "两组均为同一观测约束下的合格全程参数；差异来自全程环境/气动参数，不是飞行中途的突然阵风。本文件不覆盖正式导出数据。"
+}
