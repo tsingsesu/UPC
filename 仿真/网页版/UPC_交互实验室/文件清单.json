@@ -1,0 +1,239 @@
+{
+  "sourceCommit": "71b4d5e79047a6a3087de8c390b6c3e1a46e6ff5",
+  "webURL": "https://upc-flight-lab-20261107.corkycake1.chatgpt.site",
+  "runtimeFilesIdenticalToPublishedSource": [
+    "app.js",
+    "density.js",
+    "experiments.js",
+    "guide.html",
+    "index.html",
+    "mapping.js",
+    "physics.js",
+    "report.js",
+    "run-lab.cjs",
+    "sources.json",
+    "study.js",
+    "style.css",
+    "validation/browser.validation.json",
+    "validation/density.test.cjs",
+    "validation/density.validation.json",
+    "validation/experiments.test.cjs",
+    "validation/experiments.validation.json",
+    "validation/force-mask.test.cjs",
+    "validation/force-mask.validation.json",
+    "validation/legacy_nominal_reference.json",
+    "validation/mapping.test.cjs",
+    "validation/mapping.validation.json",
+    "validation/requirements-validation.txt",
+    "validation/study.test.cjs",
+    "validation/study.validation.json",
+    "view.js",
+    "开始使用.txt",
+    "综合预测映射.js"
+  ],
+  "validation": {
+    "scientific": 61,
+    "browser": 19
+  },
+  "files": [
+    {
+      "path": "app.js",
+      "bytes": 34612,
+      "sha256": "975d9ef11a04795d85ebf1ae099b6fc4ac445c995921335327c6560cb586b9b8"
+    },
+    {
+      "path": "density.js",
+      "bytes": 13191,
+      "sha256": "cfb715f186edafd145cd2b60ca5bda3fe1adbc2d58d81f1de42e7c7dd56ff201"
+    },
+    {
+      "path": "experiments.js",
+      "bytes": 16765,
+      "sha256": "8e5c201e110ea0d606a178aef6b104449c2f96c164196a590722356b3c5b3350"
+    },
+    {
+      "path": "guide.html",
+      "bytes": 7776,
+      "sha256": "0cfb1174710d4bdb6f88765583a8d79baf5f1809f06ca53664abd3b5bedd8c2a"
+    },
+    {
+      "path": "index.html",
+      "bytes": 13862,
+      "sha256": "ff0611b7830f4a571be45b1af9c48f0e67fff1abb6655831ce592e45d5cbcb08"
+    },
+    {
+      "path": "mapping.js",
+      "bytes": 6378,
+      "sha256": "e317ef76cf0296dac00dc45ecc39ba1b0d73b303e4451485fff46be26b8ef039"
+    },
+    {
+      "path": "physics.js",
+      "bytes": 26980,
+      "sha256": "f50e8a4913e88a7cfdeaea9a373c63d97f2b2ceaee9405128a2af7aba0a5dfdf"
+    },
+    {
+      "path": "report.js",
+      "bytes": 8841,
+      "sha256": "98922fbb5406c5d0ce1478ba5412d61083596fe057c1287d9ac3d6fb10d3bbd4"
+    },
+    {
+      "path": "run-lab.cjs",
+      "bytes": 1494,
+      "sha256": "f1199d02d674f99a6b630b9fafa011f0e7924f3953f0b2b20f55660f6db47a31"
+    },
+    {
+      "path": "sources.json",
+      "bytes": 7912,
+      "sha256": "737ed44d9481d9cbaab8e43c93d4ebe25de6e59af33f66c6fa8f077507a63e1c"
+    },
+    {
+      "path": "study.js",
+      "bytes": 17826,
+      "sha256": "fccde20d3df76df81a1c76c1f77bb38bc47cd0e25517f3f846237448b329beba"
+    },
+    {
+      "path": "style.css",
+      "bytes": 21500,
+      "sha256": "0aed1aa579091e74bd610d79ccede887460cd0696b57b3147224c9bee746d78f"
+    },
+    {
+      "path": "validation/browser.validation.json",
+      "bytes": 18931,
+      "sha256": "4915053c977eb2bf6ff44d71bfa23f05a41fa9c2d2a95bfe37181365859177aa"
+    },
+    {
+      "path": "validation/density.test.cjs",
+      "bytes": 14083,
+      "sha256": "88c3912ed2825619371889397113eb6d2ba123b046510ee839919b932d5135a8"
+    },
+    {
+      "path": "validation/density.validation.json",
+      "bytes": 5921,
+      "sha256": "c35363cb7b8d25718e30a2e1e049839a182977401c31399f0eb595d2c7485f80"
+    },
+    {
+      "path": "validation/experiments.test.cjs",
+      "bytes": 7664,
+      "sha256": "88d06da84f0e1ce098dbd7286da8b3cb118f2d4ca606e40461241c8468febd25"
+    },
+    {
+      "path": "validation/experiments.validation.json",
+      "bytes": 1312,
+      "sha256": "f52a9506f90b4cc148e383c7b694977456805b4dae32cec9060890363342a72a"
+    },
+    {
+      "path": "validation/force-mask.test.cjs",
+      "bytes": 8664,
+      "sha256": "5631615443375ded3038bda99c566cfa13b6d0f990e25e0db5794829645e84f6"
+    },
+    {
+      "path": "validation/force-mask.validation.json",
+      "bytes": 2537,
+      "sha256": "3f1fac605e20dcebb94f8869488de1a674930e38aa1146b17a6d982c9329ea8d"
+    },
+    {
+      "path": "validation/legacy_nominal_reference.json",
+      "bytes": 3195,
+      "sha256": "7a108220f4412b265b1ec8afff090179676758c618ad7f5857b926fb8dc7a1f7"
+    },
+    {
+      "path": "validation/mapping.test.cjs",
+      "bytes": 8012,
+      "sha256": "39ea0dcf0cbcb0fd54cf1c792606b856cb7224c942819684549f3dc58f6f1588"
+    },
+    {
+      "path": "validation/mapping.validation.json",
+      "bytes": 2215,
+      "sha256": "ffb6e9225e6b95f67a11af3dadb34abab96e2706db57872190ce91026cadd473"
+    },
+    {
+      "path": "validation/requirements-validation.txt",
+      "bytes": 29,
+      "sha256": "a692999e6f9581eb9613829009cc71b92f824aa65a1468cdcbafe1aa37f26b44"
+    },
+    {
+      "path": "validation/study.test.cjs",
+      "bytes": 12010,
+      "sha256": "31dc363a0ce2adca7f0b723ffa03392cec35480a4e354783a8425e4d89f48996"
+    },
+    {
+      "path": "validation/study.validation.json",
+      "bytes": 3151,
+      "sha256": "e8e498d3ca8ad2e75c09d8aa9c9dfe14b48391479e82701cd55dd452c2253ae5"
+    },
+    {
+      "path": "view.js",
+      "bytes": 18820,
+      "sha256": "9ed6b99eaf86734bf598a276f119983944664fd659954b699c6615f02d7b86d5"
+    },
+    {
+      "path": "交付与验证说明.html",
+      "bytes": 3944,
+      "sha256": "fbc0210daca9d6e93b9d21ce1738f47faa73c28fcffcfe78aa6c136b923191f6"
+    },
+    {
+      "path": "使用与实验指南.html",
+      "bytes": 421634,
+      "sha256": "74463956d5274d3cffb6fcb85ba35416c5eab54e2c090d6282574d89b5c87916"
+    },
+    {
+      "path": "使用与实验指南.md",
+      "bytes": 18442,
+      "sha256": "532c443e88a311aff12444fcb046c5da3673508c4b17ba7cb1c10070ae083eb2"
+    },
+    {
+      "path": "使用与实验指南.pdf",
+      "bytes": 751981,
+      "sha256": "4503cd41684f06abc809e7ece86a81a429ddc986bc3a591d084706a4393e0415"
+    },
+    {
+      "path": "开始使用.txt",
+      "bytes": 1794,
+      "sha256": "6c29128f802fecb7fb2bc4b89a119d4ed728f10014e8632a22fc568d288ffdf6"
+    },
+    {
+      "path": "手机预览.png",
+      "bytes": 202359,
+      "sha256": "f3be709fa30f97ca4e779b15c1148c360c30969542d2683c8ac3e1be725d3d77"
+    },
+    {
+      "path": "界面预览.png",
+      "bytes": 300379,
+      "sha256": "a6a82c08c0df07510605cb45c4e2fdde811254a8712e2335a27126001ab75a8c"
+    },
+    {
+      "path": "示例输出/两案例批量验证.json",
+      "bytes": 45470,
+      "sha256": "e49c3c061cd3eb96ac0d469460112991bf66650bc501aecbd5e6357993cdbf19"
+    },
+    {
+      "path": "示例输出/完整报告示例.html",
+      "bytes": 1106324,
+      "sha256": "d91766530da62bac5522774691597363fb398f1fbd408f4b5d061b712631fed4"
+    },
+    {
+      "path": "示例输出/虚拟射门研究数据.json",
+      "bytes": 7796601,
+      "sha256": "e3e0d7ac03e36bb393fa60c9e1decd54ebe81006949409b66e68474cc4d65df9"
+    },
+    {
+      "path": "示例输出/观测配置示例.json",
+      "bytes": 3788,
+      "sha256": "4b6c577ca03c623f1ad6c4604cbd07608916d6840935ef9db08d52c7d31fba5c"
+    },
+    {
+      "path": "综合预测映射.js",
+      "bytes": 66166,
+      "sha256": "27b5d41b7f3523843ab21ecd32a7420f984c3ed540263923a71ea72f803619dc"
+    },
+    {
+      "path": "网页版入口.url",
+      "bytes": 81,
+      "sha256": "e7a6565fac38b5b732e3d8dc1d7d408b9305b673ca35b2bfda7859ca1645b5f6"
+    }
+  ],
+  "deliveryDate": "2026-11-07",
+  "deliveryNote": "S仓网页版目录交付；新增人类使用与实验指南；计算、UI、示例和既有验证文件保持原版字节一致。",
+  "previousManifestSha256": "c20bb0ba83866bcf3b0ec66e0bd575d83c92b2a0ef61d1a40231e04d95c13ced",
+  "originalPackageSha256": "af6debd4196a5584cb35406dfb08f0f5cc7486b2e6b70f5400a1a926b0ba0906"
+}

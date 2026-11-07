@@ -1,0 +1,216 @@
+{
+  "schema": "upc-lab-1",
+  "mode": "observe",
+  "study": {
+    "version": "upc-combination-study-0.2",
+    "base": {
+      "schemaVersion": "1.0",
+      "model": "M3",
+      "mode": "inverse",
+      "initial": [
+        0,
+        0,
+        0.11
+      ],
+      "observations": [
+        {
+          "t": 0.05,
+          "position": [
+            1.5,
+            0.45,
+            0.44
+          ]
+        },
+        {
+          "t": 0.1,
+          "position": [
+            2.96,
+            0.86,
+            0.74
+          ]
+        }
+      ],
+      "m": 0.43,
+      "R": 0.11,
+      "rho": 1.225,
+      "g": 9.80665,
+      "wind": [
+        0,
+        0,
+        0
+      ],
+      "sigma": 0.01,
+      "h": 0.001,
+      "fitH": 0.005,
+      "horizon": 2,
+      "goalX": 11,
+      "goalHalfWidth": 3.66,
+      "goalHeight": 2.44,
+      "velocity": [
+        30.4,
+        9.4,
+        6.9
+      ],
+      "Cd": 0.3,
+      "b": [
+        0,
+        0,
+        0
+      ],
+      "constantAcceleration": [
+        -16,
+        -16,
+        -12
+      ],
+      "forceMask": {
+        "drag": true,
+        "magnus": true
+      }
+    },
+    "sigma": 0.01,
+    "sampleCount": 20,
+    "assessmentCount": 20,
+    "assessmentEnabled": true,
+    "seed": 20261107,
+    "wind": [
+      0,
+      2,
+      0
+    ],
+    "schemes": [
+      {
+        "id": "M0",
+        "preset": "gravity",
+        "label": "M0 · 重力",
+        "forceMask": {
+          "drag": false,
+          "magnus": false
+        },
+        "usesWind": false
+      },
+      {
+        "id": "M1",
+        "preset": "constantAccel",
+        "label": "M1 · 常加速度代数对照",
+        "forceMask": {
+          "drag": false,
+          "magnus": false
+        },
+        "usesWind": false
+      },
+      {
+        "id": "M2",
+        "preset": "drag",
+        "label": "M2 · 重力＋阻力",
+        "forceMask": {
+          "drag": true,
+          "magnus": false
+        },
+        "usesWind": false
+      },
+      {
+        "id": "M3",
+        "preset": "magnus",
+        "label": "M3 · 重力＋阻力＋Magnus",
+        "forceMask": {
+          "drag": true,
+          "magnus": true
+        },
+        "usesWind": false
+      },
+      {
+        "id": "G_M",
+        "preset": "fields",
+        "label": "重力＋Magnus（无阻力）",
+        "forceMask": {
+          "drag": false,
+          "magnus": true
+        },
+        "usesWind": false
+      }
+    ],
+    "bandwidth": {
+      "sigma_h": null,
+      "minBandwidth": 0.001
+    },
+    "selection": {
+      "maxNormalizedRMSE": 2,
+      "minArrivalFraction": 0.9,
+      "maxNumericalFailureFraction": 0.05,
+      "minSamples": 20
+    },
+    "intervalReplicates": 200
+  },
+  "reference": {
+    "schemaVersion": "1.0",
+    "model": "M3",
+    "mode": "forward",
+    "initial": [
+      0,
+      0,
+      0.11
+    ],
+    "observations": [
+      {
+        "t": 0.05,
+        "position": [
+          1.5,
+          0.45,
+          0.44
+        ]
+      },
+      {
+        "t": 0.1,
+        "position": [
+          2.96,
+          0.86,
+          0.74
+        ]
+      }
+    ],
+    "m": 0.43,
+    "R": 0.11,
+    "rho": 1.225,
+    "g": 9.80665,
+    "wind": [
+      0,
+      2,
+      0
+    ],
+    "sigma": 0.01,
+    "h": 0.001,
+    "fitH": 0.005,
+    "horizon": 2,
+    "goalX": 11,
+    "goalHalfWidth": 3.66,
+    "goalHeight": 2.44,
+    "velocity": [
+      30.4,
+      9.4,
+      6.9
+    ],
+    "Cd": 0.3,
+    "b": [
+      0,
+      0.12,
+      -0.25
+    ],
+    "constantAcceleration": [
+      -16,
+      -16,
+      -12
+    ],
+    "forceMask": {
+      "drag": true,
+      "magnus": true
+    }
+  },
+  "manual": false,
+  "enumeration": {
+    "includeWind": false,
+    "includeConstantAccel": true,
+    "allowDrag": true,
+    "allowMagnus": true
+  },
+  "budget": "quick"
+}

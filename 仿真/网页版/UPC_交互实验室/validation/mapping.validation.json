@@ -1,0 +1,65 @@
+{
+  "passed": true,
+  "checks": 8,
+  "node": "v24.22.0",
+  "mappingVersion": "upc-prediction-mapping-0.2",
+  "tests": [
+    {
+      "name": "New two-frame coordinates rerun every inverse fit and produce new predictions and densities",
+      "passed": true
+    },
+    {
+      "name": "Mapped selection is linked to the fresh nominal solve, with ambiguity and independent assessment retained",
+      "passed": true
+    },
+    {
+      "name": "Common perturbations are regenerated deterministically around the changed observations",
+      "passed": true
+    },
+    {
+      "name": "Invalid or incompatible new frames never fall back to a previous saved density",
+      "passed": true
+    },
+    {
+      "name": "CommonJS exportSource produces a standalone module in an empty VM with no files or globals",
+      "passed": true
+    },
+    {
+      "name": "Delivered single-file mapping artifact also executes fresh observations without external imports",
+      "passed": true
+    },
+    {
+      "name": "Outer selection sensitivity reruns the whole selector and avoids an extra assessment/noise layer",
+      "passed": true
+    },
+    {
+      "name": "Outer seeds and all failure denominators reproduce without implying model probabilities",
+      "passed": true
+    }
+  ],
+  "sources": {
+    "../physics.js": "f50e8a4913e88a7cfdeaea9a373c63d97f2b2ceaee9405128a2af7aba0a5dfdf",
+    "../density.js": "cfb715f186edafd145cd2b60ca5bda3fe1adbc2d58d81f1de42e7c7dd56ff201",
+    "../study.js": "fccde20d3df76df81a1c76c1f77bb38bc47cd0e25517f3f846237448b329beba",
+    "../mapping.js": "e317ef76cf0296dac00dc45ecc39ba1b0d73b303e4451485fff46be26b8ef039",
+    "../综合预测映射.js": "27b5d41b7f3523843ab21ecd32a7420f984c3ed540263923a71ea72f803619dc"
+  },
+  "sampleCount": 20,
+  "assessmentCount": 20,
+  "seed": 13579,
+  "portableBytes": 66162,
+  "outerTest": {
+    "sampleCount": 3,
+    "seed": 24680,
+    "selectionCounts": {
+      "M0": 3,
+      "M1": 0,
+      "M2": 0,
+      "M3": 0,
+      "G_M": 0
+    },
+    "ambiguousCount": 3,
+    "noEligibleCount": 0
+  },
+  "scope": "Software mapping and denominator checks only. The tiny outer test budget is not a research estimate or evidence of real physical model probabilities."
+}

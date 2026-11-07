@@ -1,0 +1,93 @@
+{
+  "passed": true,
+  "checks": 15,
+  "node": "v24.22.0",
+  "studyVersion": "upc-combination-study-0.2",
+  "densityVersion": "upc-density-1.1.0",
+  "tests": [
+    {
+      "name": "Default candidates retain M0-M3 and add the distinct gravity-plus-Magnus combination",
+      "passed": true
+    },
+    {
+      "name": "Every pilot trial feeds exactly the same perturbed two-frame observations to every candidate",
+      "passed": true
+    },
+    {
+      "name": "Independent assessment shares its own trials and freezes the pilot candidate selection",
+      "passed": true
+    },
+    {
+      "name": "All attempted samples remain in state counts and observed-density denominators",
+      "passed": true
+    },
+    {
+      "name": "Zero declared noise produces deterministic outcomes with no density or recommendation",
+      "passed": true
+    },
+    {
+      "name": "Extreme incompatible observations never produce a forced winner",
+      "passed": true
+    },
+    {
+      "name": "Variable candidate sets with identical presets and specified wind remain identical and ambiguous",
+      "passed": true
+    },
+    {
+      "name": "M1 stores and independently reconstructs all six fitted kinematic quantities for every trial",
+      "passed": true
+    },
+    {
+      "name": "Ranking and numerical dispersion do not depend on KDE bandwidth",
+      "passed": true
+    },
+    {
+      "name": "Complete JSON export restores the sample ledger and every available density function",
+      "passed": true
+    },
+    {
+      "name": "All failed fits remain in the full denominator and cannot become an empty conditional winner",
+      "passed": true
+    },
+    {
+      "name": "Thrown solver failures and each nonarrival status are retained separately",
+      "passed": true
+    },
+    {
+      "name": "Invalid smoothing floor is rejected before producing a recommendation",
+      "passed": true
+    },
+    {
+      "name": "Configured minimum sample threshold prevents a small-sample unique recommendation",
+      "passed": true
+    },
+    {
+      "name": "All three factories serialize together and preserve the paired random observations",
+      "passed": true
+    }
+  ],
+  "sampleCount": 20,
+  "seed": 13579,
+  "defaultDecision": {
+    "status": "ambiguous",
+    "preferredId": "M0",
+    "candidateIds": [
+      "M0",
+      "M2"
+    ],
+    "uniqueSupported": false,
+    "criterion": "sqrt(trace(Cov(y,z)))",
+    "policy": {
+      "maxNormalizedRMSE": 2,
+      "minArrivalFraction": 0.9,
+      "maxNumericalFailureFraction": 0.05,
+      "minSamples": 20,
+      "criterion": "sqrt(trace(Cov(y,z)))",
+      "kind": "predeclared operational stability rule, not proof of model truth",
+      "intervalRule": "Overlap of resampling intervals is a conservative ambiguity flag, not a significance test",
+      "boundaryRule": "Boundary counts are retained and warned; boundary-hit samples are not dropped"
+    },
+    "message": "当前最小数值来自M0，但有限抽样区间不能清楚区分候选；暂不作唯一稳定推荐。"
+  },
+  "scope": "Checks software comparison and all-trial bookkeeping, not physical validity or a uniquely correct force model."
+}
