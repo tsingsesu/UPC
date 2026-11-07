@@ -332,3 +332,67 @@ OpenAI Codex 协助了选题、建模决策、来源核查、独立数值验证�
 \end{document}
 
 ```
+
+
+## 动态仿真委派输入
+
+读取src/Mai实施计划.md，按任务合同实现三个指定文件，禁止运行命令和使用子代理。
+
+# 点球动态仿真任务合同
+
+允许写src/Mai_ball_rhs.m、src/Mai_penalty_view.m、src/Mai执行反馈.md，仅这些文件。读取src/Mai_penalty.m和data/派生数据/Mai罚球结果.json；禁止README.md、latex/Human、提交文件夹。不运行命令、不用子代理。MATLAB R2024a。
+
+实现两个函数。Mai_ball_rhs(t,s,theta,cfg)逐字等价于Mai_penalty现有stateDeriv物理方程，支持g/K/w/bx/cdExponent/cdRefSpeed/bDecayTau。输出[ds,forces]，forces.gravity/drag/magnus三维列向量单位N，质量cfg.m；主ds前3是v后3是加速度。请别修改Mai_penalty，Codex会改它的局部stateDeriv为调用共享函数。
+
+Mai_penalty_view(mode)：默认'interactive'，'export'导出GIF和最终PNG、时序CSV/JSON；所有数据读已有JSON，不重新跑600次bootstrap，不覆盖既有正式论文/结果。用Mai_ball_rhs+ode45从0至2秒，事件x=11方向+1、z=R方向-1（launch初始接触不能误终止，ground事件t<1e-7时返回正数），终止T应该.400503486；t_eval用deval，显式包括.05,.10及终点。事件判断记录。验证观测位置误差<1e-7m、终点与已有JSON<1e-7m并assert。只显示名义有效Magnus模型；可选叠加只重力、只阻力基线轨迹（用JSON中各模型拟合初速和Cd，不混用）。
+
+经典figure+uicontrol（兼容headless export），左侧三维场地草坪、球门矩形、网格、球体surf、模型完整轨迹浅虚线、已播放轨迹实线、给定观测点和.1秒预测起点标注，右侧球门(y,z)平面预测点、95%联合椭圆（从result.uncertainty.C算eig，chi2常数5.991464547），bootstrap散点保留框外点，坐标等比例。顶部中文标题是交互界面可有（论文图无标题规则不用于交互界面），UI中文使用Microsoft YaHei/SimSun；物理图坐标英文SI单位。界面标明：早期观测之外为模型推算；b是有效系数，球皮不伪装真实自旋。
+
+下方播放/暂停、重播、时间滑块、播放速度下拉0.05x/0.1x/0.25x/1x默认.1x、比较基线checkbox；时间状态坐标速度、三力N。force arrows quiver3不同颜色，固定比例.25m/N并在图例说明；只作示意不变更物理。球的半径真实.11m，足球黑白表面可简单pattern不虚构角速度。timer周期.04秒fixedSpacing、播放状态基于tic/toc乘倍率；timer是本应用GUI内部播放机制，不是后台shell任务；close清理timer，拖动滑块暂停并更新，重播回0并开始，关窗口可安全退出。timer不得在export模式启动。
+
+export模式figure Visible off，60或80帧，模拟慢放成约4秒GIF，输出img/点球物理仿真.gif和img/点球仿真全景.png，CSV写data/派生数据/点球仿真时序.csv，JSON写点球仿真验证.json（含实际误差、端点、单位、数值设置）；GIF通过getframe+frame2im+rgb2ind+imwrite，若getframe不可靠可每帧exportgraphics临时PNG再imread（最后清理仅自己临时PNG）。不得只写骨架，控制300行以内，真实跑由Codex。PNG应使用完整轨迹和终点，屏幕控件不能遮挡图形，两个axes之间留足空间。导出数据保存每帧的力和状态供复核。不做网页，不用Python可视化，不添加工具箱依赖。
+
+
+## 动态仿真执行反馈（未运行版本的原文）
+
+# Mai_ball_rhs / Mai_penalty_view 执行反馈
+
+## 交付范围
+- `src/Mai_ball_rhs.m`：`ds = [v; g - K*Cd*||u||*u + cross(b,u)]`，`u=v-w`，Cd 随 `cdExponent/cdRefSpeed` 修正，`b` 随 `bDecayTau` 指数衰减，表达式与 `Mai_penalty` 局部 `stateDeriv` 逐字一致；`forces.gravity/drag/magnus` 为对应加速度乘 `cfg.m` 的三维列向量（N）。未改动 `Mai_penalty.m`。
+- `src/Mai_penalty_view.m`：默认交互，`'export'` 导出；只调用 `Mai_ball_rhs`，不重新拟合、不跑 Bootstrap。
+
+## 关键实现决定
+- **积分区间**：严格 ode45 从 0 至 2 s（`numericSettings.maxFlightTime_s`），`odeset` 取 JSON 的 `predictionRelTol=1e-9 / predictionAbsTol=1e-11 / MaxStep=0.01`。
+- **事件**：`x-11`（+1）、`z-R`（-1），均终止；`t<1e-7 s` 时地面事件值取 `abs(v)+1`，避免起步初始接触误终止。事件时刻/编号写入验证 JSON。
+- **t_eval**：全部用 `deval(sol, t_eval)`，显式包含 0.05、0.10 与终点；已播放轨迹与球体位置由同一组 `deval` 状态插值，保证画面与数据一致。
+- **验证**：观测位置最大误差 <1e-7 m、终点位置与时间对已有 JSON 两项 <1e-7 均 `assert` 硬校验；实际误差、端点、事件、单位、容差写入 `data/派生数据/点球仿真验证.json`。
+- **椭圆**：`eig(uncertainty.C)` + 常数 5.991464547；散点按框内/框外分色但全部保留，两个 axes 等比例。
+- **基线**：仅重力用 `baselines(1).v0`、仅阻力用 `baselines(3).theta`（v0+Cd），不混用；交互默认隐藏，checkbox 叠加。
+- **播放**：`timer` 周期 0.04 s、`fixedSpacing`，`t0+speed*toc(tClock)` 计时；拖动滑块暂停并更新；重播回 0 自动播放；关窗 `stop+delete` 清理 timer；export 分支不创建 timer。
+- **export**：figure `Visible off`，80 帧，`DelayTime=4/80` 约 4 s GIF；GIF 走 `getframe+frame2im+rgb2ind+imwrite`，失败回退到每帧临时 PNG（`tempname` 目录，结束 `rmdir` 只清理自己生成的文件）。PNG 用 `exportgraphics`（整张 figure，控件位于图形下方不遮挡 axes，全程绘制到终点）。CSV 保存 80 帧的 6 维状态与三力（N）。
+
+## 输出文件
+- `img/点球物理仿真.gif`
+- `img/点球仿真全景.png`
+- `data/派生数据/点球仿真时序.csv`
+- `data/派生数据/点球仿真验证.json`（含实际误差、端点、事件、`theta`、有效系数含义、容差、帧数/时长）
+
+## 待 Codex 实跑核验
+1. 是否出现 `终点与已有 JSON 不一致` 或 `观测位置误差` 断言失败（若失败说明 `ode45` 起点/事件设置与 `Mai_penalty` 的 RK4 起点出现差异，需要先对齐起点状态）。
+2. 观测误差量级（只需 <1e-7 m）。
+3. `T` 是否等于 0.40050348611563008。
+4. headless/无 JVM 环境下 export 会主动报错；需在有图形会话的 MATLAB 下运行。
+5. `getframe` 在本机是否稳定；若回退路径被触发，检查临时 PNG 是否已全部清理。
+
+## 界面说明
+- 中文标题/控件使用 Microsoft YaHei；物理图坐标轴与单位为英文 SI。
+- 界面文字标明：早期观测之外为模型推算；`b` 是有效 Magnus 系数，球皮图案不表示真实自旋；力矢量 0.25 m/N 仅示意。
+- 球半径真实 0.11 m，黑白图案固定不旋转，未虚构角速度。
+
+
+Codex随后修正观测位置切片、ODE连续解取样、矢量固定比例、导出全景捕获与图例排版，实跑交互回调、关闭清理与80帧导出通过。该记录仍不等同完整AI对话输出。
+
+
+## 共享项目命名修订
+
+按用户要求，当前文件与调用已去掉个人Mai前缀；上方历史输入输出保持原文，其中旧名字只作历史记录，不是现有入口。现用入口为src/penalty.m、src/penalty_view.m和src/复现结果.ps1。

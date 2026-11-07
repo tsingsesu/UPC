@@ -1,7 +1,7 @@
-function result = Mai_penalty(mode, obs)
-%MAI_PENALTY  FIFA点球早期观测反演、球门落点预测与不确定性评估
+function result = penalty(mode, obs)
+%PENALTY  FIFA点球早期观测反演、球门落点预测与不确定性评估
 %
-%   result = Mai_penalty(mode)
+%   result = penalty(mode)
 %
 %   mode = 'full'  （默认）完整Bootstrap与合成反演样本
 %   mode = 'quick' （少量样本，用于快速流程检查）
@@ -61,7 +61,7 @@ if nargin<2 || isempty(obs)
 end
 validateattributes(obs,{'numeric'},{'size',[2,3],'finite','real'});
 
-fprintf('[Mai_penalty] 模式=%s，开始完整反演。\n', mode);
+fprintf('[penalty] 模式=%s，开始完整反演。\n', mode);
 
 % ---------- 1. 完整有效Magnus模型拟合（多初值核查局部解） ----------
 starts = [24, 3, 5, 0.25,  0.0,  0.0;
@@ -73,13 +73,13 @@ if ~isfinite(fitBest.sse) || fitBest.exitflag<=0
     error('完整模型的所有初值均未得到有效拟合，请检查输入与工具箱。');
 end
 thetaHat = fitBest.theta;
-fprintf('[Mai_penalty] 拟合完成：RMSE=%.6g m，退出标志=%d，边界命中=%d。\n', ...
+fprintf('[penalty] 拟合完成：RMSE=%.6g m，退出标志=%d，边界命中=%d。\n', ...
     fitBest.rmse, fitBest.exitflag, fitBest.boundaryHit);
 
 % 基准预测（x=11 球门平面）与球心全越线 x=11.11 的几何敏感性
 predBase   = predictGoal(thetaHat, cfg, 11.00);
 predCenter = predictGoal(thetaHat, cfg, 11.11);
-fprintf('[Mai_penalty] 基准预测状态=%s，y=%.6g，z=%.6g。\n', ...
+fprintf('[penalty] 基准预测状态=%s，y=%.6g，z=%.6g。\n', ...
     predBase.status, predBase.yGoal, predBase.zGoal);
 
 % ---------- 2. 观测位置雅可比、参数协方差与预测协方差 ----------
@@ -127,7 +127,7 @@ for k = 1:numel(sigmas)
     noiseScenarios(k).joint95Axes = eS.axes;
     noiseScenarios(k).marginal95HalfWidth_yz = 1.959964 * sqrt(max(diag(CS), 0));
 end
-fprintf('[Mai_penalty] 噪声情景完成：%d 个假设噪声水平。\n', numel(sigmas));
+fprintf('[penalty] 噪声情景完成：%d 个假设噪声水平。\n', numel(sigmas));
 
 % ---------- 4. 四个基线模型 ----------
 baselines = repmat(struct('name','', 'theta',nan(1,6), 'v0',nan(1,3), ...
@@ -167,7 +167,7 @@ baselines(4) = makeBaseline('完整有效Magnus模型', thetaHat, nan(1,3), nan(
     predictPositions(thetaHat, obsT, cfg), obs, predBase);
 baselines(4).rmse = fitBest.rmse;
 baselines(4).residual = fitBest.resid;
-fprintf('[Mai_penalty] 四个基线模型完成。\n');
+fprintf('[penalty] 四个基线模型完成。\n');
 
 % ---------- 5. 参数Bootstrap（重新拟合） ----------
 if strcmp(mode, 'full'), nb = 600; else, nb = 40; end
@@ -195,7 +195,7 @@ for b = 1:nb
         bsSamples(b).status = 'fit_fail';
     end
     if mod(b, 50) == 0 || b == nb
-        fprintf('[Mai_penalty] Bootstrap 进度 %d/%d。\n', b, nb);
+        fprintf('[penalty] Bootstrap 进度 %d/%d。\n', b, nb);
     end
 end
 
@@ -234,7 +234,7 @@ bsSummary.nOutside=sum(strcmp({bsSamples.status},'cross_out'));
 bsSummary.goalPointQuantiles=prctile([[bsSamples(planeMask).yGoal]',[bsSamples(planeMask).zGoal]'],[2.5,50,97.5],1);
 bsSummary.goalPointMean=mean([[bsSamples(planeMask).yGoal]',[bsSamples(planeMask).zGoal]'],1);
 bsSummary.goalPointStd=std([[bsSamples(planeMask).yGoal]',[bsSamples(planeMask).zGoal]'],0,1);
-fprintf('[Mai_penalty] Bootstrap完成：成功 %d/%d，进球稳定性频率 %.3f。\n', ...
+fprintf('[penalty] Bootstrap完成：成功 %d/%d，进球稳定性频率 %.3f。\n', ...
     bsSummary.nSuccessful, nb, bsSummary.goalStabilityFrequency);
 
 % ---------- 6. 数值验证 ----------
@@ -365,7 +365,7 @@ for k = 1:nSyn
         synSamples(k).fitStatus = 'fit_fail';
     end
     if mod(k, 25) == 0 || k == nSyn
-        fprintf('[Mai_penalty] 合成反演进度 %d/%d。\n', k, nSyn);
+        fprintf('[penalty] 合成反演进度 %d/%d。\n', k, nSyn);
     end
 end
 
@@ -481,7 +481,7 @@ for k = 1:numel(scNames)
     scenarios(k).relativeDeviation = relDev;
     scenarios(k).boundaryHit = fitS.boundaryHit;
     scenarios(k).exitflag = fitS.exitflag;
-    fprintf('[Mai_penalty] 模型情景 %d/%d：%s，状态=%s。\n', ...
+    fprintf('[penalty] 模型情景 %d/%d：%s，状态=%s。\n', ...
         k, numel(scNames), scNames{k}, predS.status);
 end
 
@@ -500,7 +500,7 @@ plot3(11*ones(1,5), [-3.66 3.66 3.66 -3.66 -3.66], ...
     [0 0 2.44 2.44 0], 'r-', 'LineWidth', 1.5, 'DisplayName','Goal plane x = 11 m');
 xlabel('x (m)'); ylabel('y (m)'); zlabel('z (m)');
 grid on; view(3); legend('Location','best');
-f1 = fullfile(imgDir, 'Mai罚球轨迹与观测.png');
+f1 = fullfile(imgDir, '罚球轨迹与观测.png');
 exportgraphics(fig, f1, 'Resolution', 200); close(fig); figFiles{end+1} = f1;
 
 % 图2：球门预测椭圆与Bootstrap散点
@@ -522,7 +522,7 @@ end
 plot([-3.66 3.66 3.66 -3.66 -3.66], [0 0 2.44 2.44 0], 'k--', ...
     'DisplayName','Goal frame');
 xlabel('y (m)'); ylabel('z (m)'); axis equal; grid on; legend('Location','best');
-f2 = fullfile(imgDir, 'Mai球门预测椭圆与自助散点.png');
+f2 = fullfile(imgDir, '球门预测椭圆与自助散点.png');
 exportgraphics(fig, f2, 'Resolution', 200); close(fig); figFiles{end+1} = f2;
 
 % 图3：噪声水平与边际区间半宽
@@ -534,7 +534,7 @@ plot(sigmas, HW(:,2), 's-', 'LineWidth', 1.8, 'DisplayName','z half-width');
 xlabel('Assumed position noise \sigma (m)');
 ylabel('95% marginal half-width (m)');
 grid on; legend('Location','best');
-f3 = fullfile(imgDir, 'Mai噪声水平与边际区间半宽.png');
+f3 = fullfile(imgDir, '噪声水平与边际区间半宽.png');
 exportgraphics(fig, f3, 'Resolution', 200); close(fig); figFiles{end+1} = f3;
 
 % 图4：各单因素情景相对于基准的偏移，厘米单位便于辨认
@@ -549,7 +549,7 @@ for k=1:numel(scenarios)
 end
 xlabel('Change in y (cm)'); ylabel('Change in z (cm)'); grid on; axis equal;
 legend('Location','bestoutside','Interpreter','none');
-f4=fullfile(imgDir,'Mai模型情景预测比较.png');
+f4=fullfile(imgDir,'模型情景预测比较.png');
 exportgraphics(fig,f4,'Resolution',200); close(fig); figFiles{end+1}=f4;
 
 % ---------- 9. 汇总结果结构 ----------
@@ -610,7 +610,7 @@ result.notes = { ...
     ['所有正式派生数据写入 data/派生数据，正式图片写入 img/。']};
 
 % ---------- 10. 写出JSON/CSV/PNG/MAT ----------
-jsonPath = fullfile(dataDir, 'Mai罚球结果.json');
+jsonPath = fullfile(dataDir, '罚球结果.json');
 try
     txt = jsonencode(result, 'PrettyPrint', true);
     fid = fopen(jsonPath, 'w', 'n', 'UTF-8');
@@ -618,10 +618,10 @@ try
     fprintf(fid, '%s', txt);
     fclose(fid);
 catch ME
-    warning('Mai_penalty:JsonWrite', 'JSON写出失败：%s', ME.message);
+    warning('penalty:JsonWrite', 'JSON写出失败：%s', ME.message);
 end
 
-matPath = fullfile(dataDir, 'Mai罚球结果.mat');
+matPath = fullfile(dataDir, '罚球结果.mat');
 save(matPath, 'result');
 
 % 拟合残差CSV
@@ -631,7 +631,7 @@ Tfit = table(obsT(:), obs(:,1), obs(:,2), obs(:,3), ...
     Pfit(:,1)-obs(:,1), Pfit(:,2)-obs(:,2), Pfit(:,3)-obs(:,3), ...
     'VariableNames', {'t_s','x_obs_m','y_obs_m','z_obs_m', ...
     'x_fit_m','y_fit_m','z_fit_m','rx_m','ry_m','rz_m'});
-writetable(Tfit, fullfile(dataDir, 'Mai拟合残差.csv'));
+writetable(Tfit, fullfile(dataDir, '拟合残差.csv'));
 
 % Bootstrap样本CSV
 TH = vertcat(bsSamples.theta);
@@ -641,7 +641,7 @@ Tbs = table((1:nb)', TH(:,1), TH(:,2), TH(:,3), TH(:,4), TH(:,5), TH(:,6), ...
     [bsSamples.zGoal]', [bsSamples.sse]', ...
     'VariableNames', {'index','vx','vy','vz','Cd','by','bz','ok','exitflag', ...
     'boundaryHit','status','goal','yGoal_m','zGoal_m','sse_m2'});
-writetable(Tbs, fullfile(dataDir, 'Mai自助样本.csv'));
+writetable(Tbs, fullfile(dataDir, '自助样本.csv'));
 
 % 合成反演样本CSV
 TT = vertcat(synSamples.thetaTrue);
@@ -656,7 +656,7 @@ Tsyn = table((1:nSyn)', TT(:,1), TT(:,2), TT(:,3), TT(:,4), TT(:,5), TT(:,6), ..
     'by_true','bz_true','vx_hat','vy_hat','vz_hat','Cd_hat','by_hat','bz_hat', ...
     'ok','boundaryHit','truthGoal','fitGoal','yTrue_m','zTrue_m', ...
     'yHat_m','zHat_m','coverValid','covered','truthStatus','fitStatus'});
-writetable(Tsyn, fullfile(dataDir, 'Mai合成反演样本.csv'));
+writetable(Tsyn, fullfile(dataDir, '合成反演样本.csv'));
 
 % 模型偏差情景CSV
 Tsc = table({scenarios.name}', [scenarios.bx]', [scenarios.rmse]', ...
@@ -665,15 +665,15 @@ Tsc = table({scenarios.name}', [scenarios.bx]', [scenarios.rmse]', ...
     [scenarios.relativeDeviation]', ...
     'VariableNames', {'scenario','bx','rmse_m','exitflag','boundaryHit', ...
     'status','goal','yGoal_m','zGoal_m','relativeDeviation'});
-writetable(Tsc, fullfile(dataDir, 'Mai模型偏差情景.csv'));
+writetable(Tsc, fullfile(dataDir, '模型偏差情景.csv'));
 
 % 噪声情景CSV
 Tns = table([noiseScenarios.sigma]', ...
     HW(:,1), HW(:,2), ...
     'VariableNames', {'sigma_m','yHalfWidth_m','zHalfWidth_m'});
-writetable(Tns, fullfile(dataDir, 'Mai噪声情景.csv'));
+writetable(Tns, fullfile(dataDir, '噪声情景.csv'));
 
-fprintf('[Mai_penalty] 完成。JSON=%s，耗时=%.2f s。\n', jsonPath, result.timing.elapsedSeconds);
+fprintf('[penalty] 完成。JSON=%s，耗时=%.2f s。\n', jsonPath, result.timing.elapsedSeconds);
 end
 
 % =====================================================================
@@ -766,19 +766,8 @@ stateEnd=state;
 end
 
 function ds = stateDeriv(t, s, cfg, theta)
-r = s(1:3); %#ok<NASGU>
-v = s(4:6);
-u = v - cfg.w;
-Cd = theta(4);
-if cfg.cdExponent ~= 0
-    Cd = Cd * (norm(u)/cfg.cdRefSpeed)^cfg.cdExponent;
-end
-b = [cfg.bx; theta(5); theta(6)];
-if isfinite(cfg.bDecayTau) && cfg.bDecayTau > 0
-    b = b * exp(-t/cfg.bDecayTau);
-end
-a = cfg.g - cfg.K*Cd*norm(u)*u + cross(b, u);
-ds = [v; a];
+% 主求解器和交互仿真共用同一套物理方程。
+ds = ball_rhs(t,s,theta,cfg);
 end
 
 function S = simulateAt(theta, times, cfg, maxStep)

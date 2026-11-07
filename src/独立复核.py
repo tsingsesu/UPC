@@ -69,7 +69,7 @@ def main():
                   method='DOP853',rtol=2e-12,atol=2e-13,max_step=.005)
     energies=.43*np.sum(sol.y[3:6]**2,axis=0)/2+.43*G*sol.y[2]
     report['energy_balance_max_residual_J']=float(np.max(np.abs(energies+sol.y[6]-energies[0])))
-    matlab_path=ROOT/'data'/'派生数据'/'Mai罚球结果.json'
+    matlab_path=ROOT/'data'/'派生数据'/'罚球结果.json'
     if matlab_path.exists():
         main_data=json.loads(matlab_path.read_text(encoding='utf-8'))
         matlab_point=main_data['prediction']

@@ -19123,13 +19123,13 @@
     ]
   },
   "figures": [
-    "C:\\Users\\lhl87\\Desktop\\UPC\\img\\Mai罚球轨迹与观测.png",
-    "C:\\Users\\lhl87\\Desktop\\UPC\\img\\Mai球门预测椭圆与自助散点.png",
-    "C:\\Users\\lhl87\\Desktop\\UPC\\img\\Mai噪声水平与边际区间半宽.png",
-    "C:\\Users\\lhl87\\Desktop\\UPC\\img\\Mai模型情景预测比较.png"
+    "C:\\Users\\lhl87\\Desktop\\UPC\\img\\罚球轨迹与观测.png",
+    "C:\\Users\\lhl87\\Desktop\\UPC\\img\\球门预测椭圆与自助散点.png",
+    "C:\\Users\\lhl87\\Desktop\\UPC\\img\\噪声水平与边际区间半宽.png",
+    "C:\\Users\\lhl87\\Desktop\\UPC\\img\\模型情景预测比较.png"
   ],
   "timing": {
-    "elapsedSeconds": 12.5735019
+    "elapsedSeconds": 28.4736427
   },
   "notes": [
     "本结果由MATLAB实际运行生成；仍未完成实验确认。",

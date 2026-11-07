@@ -4,7 +4,7 @@ import json
 import numpy as np
 from scipy.stats import chi2
 ROOT=Path(__file__).resolve().parents[1]
-d=json.loads((ROOT/'data/派生数据/Mai罚球结果.json').read_text(encoding='utf-8'))
+d=json.loads((ROOT/'data/派生数据/罚球结果.json').read_text(encoding='utf-8'))
 assert d['mode']=='full'
 names=['Gravity only','Constant acceleration','Drag only','Drag and effective Magnus']
 rows=[]
@@ -33,7 +33,7 @@ Model & RMSE (mm) & $t_g$ (s) & $y_g$ (m) & $z_g$ (m)\\\midrule
 '''+f'''The drag-only objective is $\\chi^2={drag_chi2:.3f}$ for two nominal residual degrees of freedom, corresponding to an approximate goodness-of-fit tail probability ${chi2.sf(drag_chi2,2):.3f}$ under the 1 cm Gaussian assumption. Thus these observations do not by themselves establish the need for the two extra transverse-force parameters at that noise level. At 2 mm noise, the same drag-only discrepancy gives $\\chi^2={drag_chi2*25:.1f}$, making the interpretation strongly dependent on measurement quality. The more flexible model is retained as a conditional curvature-aware forecast, not declared uniquely correct by its exact fit.
 '''+r'''
 \begin{figure}[H]\centering
-\includegraphics[width=.78\linewidth]{Mai罚球轨迹与观测.png}
+\includegraphics[width=.78\linewidth]{罚球轨迹与观测.png}
 \caption{Nominal fitted flight from launch to the first goal-plane crossing. Only the two early positions are observations.}
 \end{figure}
 At the centre plane $x=11.11$ m, the finite-radius sensitivity gives $(y,z)=(2.61689,1.97822)$ m at $0.40493$ s. The additional travel shifts the centre by approximately 2.1 cm in the goal plane. The nominal shot clears the ideal opening under both conventions.
@@ -49,7 +49,7 @@ The marginal 95\% half-widths are 0.9704 m and 0.9673 m. At noise levels of 2, 5
 All {bs['nSamples']} bootstrap fits terminate successfully; {bs['nBoundary']} hit at least one parameter boundary. All reach the goal plane, but {bs['nOutside']} fail the finite-radius opening-clearance criterion. The latter are retained in the coordinate summaries and figure. The empirical 2.5--97.5 percentile ranges of the re-estimated plane coordinates are $[{q[0,0]:.3f},{q[2,0]:.3f}]$ m in $y$ and $[{q[0,1]:.3f},{q[2,1]:.3f}]$ m in $z$. These are estimator resampling quantiles, not a posterior distribution for the true shot. The {100*bs['goalFractionAllDraws']:.1f}\\% within-opening frequency is a stability diagnostic only. Boundary hits and the region extending beyond the frame are material features of the result.
 '''+r'''
 \begin{figure}[H]\centering
-\includegraphics[width=.88\linewidth]{Mai球门预测椭圆与自助散点.png}
+\includegraphics[width=.88\linewidth]{球门预测椭圆与自助散点.png}
 \caption{Goal-plane forecasts from 600 bootstrap refits with 1 cm coordinate noise. All plane crossings are retained, including forecasts outside the opening. The ellipse is the local 95\% joint confidence approximation.}
 \end{figure}
 
@@ -70,7 +70,7 @@ Scenario & $y_g$ (m) & $z_g$ (m) & Shift (cm)\\\midrule
 \bottomrule\end{tabular}\end{table}
 Each stress case fits the early positions to numerical precision, yet future positions differ. The largest shift in this chosen set is about 11.5 cm for the 0.5 s decay case. Steady transverse wind has a small residual effect after refitting because the free initial velocity and force parameters absorb much of its early influence; this does not imply that an unexpected later gust is harmless. Unobserved longitudinal spin causes roughly 9 cm shifts. The stress range is illustrative and does not bound all physically possible future disturbances.
 \begin{figure}[H]\centering
-\includegraphics[width=.9\linewidth]{Mai模型情景预测比较.png}
+\includegraphics[width=.9\linewidth]{模型情景预测比较.png}
 \caption{Displacement from the nominal goal-plane forecast after one-factor refitting. Units are centimetres; the selected scenarios carry no probability weights.}
 \end{figure}
 '''
