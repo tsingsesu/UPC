@@ -345,6 +345,7 @@ objects=findall(fig);
 for k=1:numel(objects)
  h=objects(k);
  if isprop(h,'FontName'),h.FontName='SimSun';end
+ if strcmp(h.Type,'colorbar'),h.Label.String=translateLabel(h.Label.String);end
  if isprop(h,'String') && any(strcmp(h.Type,{'text','legend'}))
   h.String=translateLabel(h.String);
  end

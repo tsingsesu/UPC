@@ -43,6 +43,28 @@ switch lower(action)
    'kineticEnergy',.5*c.m*sum(theta(1:3).^2),'elapsedSeconds',toc(clock), ...
    'note','逐坐标容差筛选；未通过只表示当前剖面代表未通过，不证明全局不可行。');
   out=struct('params',p,'cfg',c,'theta',theta,'fit',fit);
+ case 'linearize'
+  s=varargin{1};c=s.cfg;th=s.theta;S0=zeros(6,8);S0(4:6,1:3)=eye(3);
+  y0=[c.r0;th(1:3)';S0(:)];
+  sol=ode45(@(t,y)variationRhs(t,y,c,th),[0 s.tEnd],y0, ...
+   odeset('RelTol',1e-10,'AbsTol',1e-12,'MaxStep',.002));
+  J=zeros(6,8);
+  for j=1:2
+   times=[.05 .1];z=deval(sol,times(j));S=reshape(z(7:end),6,8);J(3*j-2:3*j,:)=S(1:3,:);
+  end
+  z=deval(sol,s.tEnd);S=reshape(z(7:end),6,8);v=z(4:6);
+  assert(strcmp(s.status,'plane')&&v(1)>0,'球门敏感性只用于向前穿越。');
+  dt=-S(1,:)/v(1);G=S(2:3,:)+v(2:3)*dt;
+  u=th(1:3)'-c.w;U=norm(u);[~,F]=ball_rhs(0,[c.r0;th(1:3)'],th,c);
+  T=s.tEnd;buoyancyRatio=c.rho*4*pi*c.R^3/(3*c.m);
+  scales=struct('relativeSpeed',U,'dragForce',norm(F.drag),'sideForce',norm(F.magnus), ...
+   'weight',c.m*norm(c.g),'Reynolds',c.rho*(2*c.R)*U/1.81e-5, ...
+   'Mach',U/343,'dragChangeScale',c.K*th(4)*U*T, ...
+   'sideChangeScale',norm(th(5:6))*T,'gravityChangeScale',norm(c.g)*T/U, ...
+   'buoyancyToWeight',buoyancyRatio,'buoyancyUnrefittedDisplacement',.5*buoyancyRatio*norm(c.g)*T^2, ...
+   'coriolisDisplacementScale',7.292115e-5*norm(th(1:3))*T^2);
+  out=struct('parameterOrder',{{'v0x','v0y','v0z','by','bz','windY','density','Cd'}}, ...
+   'observationJacobian',J,'goalJacobian',G,'crossingTimeJacobian',dt,'scales',scales);
  case 'propagate'
   f=varargin{1};c=f.cfg;th=f.theta;
   opts=odeset('RelTol',1e-9,'AbsTol',1e-11,'MaxStep',f.params.maxStep, ...
@@ -118,4 +140,16 @@ a=struct('accepted',isempty(reasons),'reasons',{reasons}, ...
  'maxTransverseCoefficient',max(CL),'initialSpeed',v, ...
  'initialElevationDegrees',atan2d(s.theta(3),norm(s.theta(1:2))), ...
  'coefficientCheckMaxSpacing',s.tEnd/(numel(ts)-1),'limits',L);
+end
+
+function dz=variationRhs(t,z,c,th)
+s=z(1:6);S=reshape(z(7:end),6,8);u=s(4:6)-c.w;U=norm(u);
+assert(U>1e-8,'相对气流过小，不使用此线性化。');b=[0;th(5:6)'];
+B=[0 -b(3) b(2);b(3) 0 -b(1);-b(2) b(1) 0];
+H=U*eye(3)+u*u'/U;D=-c.K*th(4)*H+B;
+A=[zeros(3) eye(3);zeros(3) D];P=zeros(6,8);
+P(4:6,4)=[u(3);0;-u(1)];P(4:6,5)=[-u(2);u(1);0];
+P(4:6,6)=-D*[0;1;0];
+P(4:6,7)=-c.K*th(4)/c.rho*U*u;P(4:6,8)=-c.K*U*u;
+dS=A*S+P;dz=[ball_rhs(t,s,th,c);dS(:)];
 end

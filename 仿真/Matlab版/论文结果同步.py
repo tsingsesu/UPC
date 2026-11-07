@@ -86,8 +86,8 @@ else:
 
 ew = ver.get('energyWorkResidual')
 if isinstance(ew, (int, float)) and not isinstance(ew, bool):
-    en_check.append(f"The work-energy balance closes to ${sci(ew)}$ J.")
-    zh_check.append(f"功与能平衡的残差为 ${sci(ew)}$ J。")
+    en_check.append(f"The maximum magnitude of this work-energy residual is ${sci(ew)}$ J.")
+    zh_check.append(f"该功与能累积残差的最大值为 ${sci(ew)}$ J。")
 else:
     en_check.append("The work-energy balance is reported in the MATLAB check output.")
     zh_check.append("功与能平衡结果见 MATLAB 检查输出。")
@@ -206,38 +206,7 @@ A trajectory is retained when it meets the allowed coordinate error and the phys
 \end{figure}
 
 \section{Physical model from kick to goal}
-This section writes the force law used from the kick to the first terminal event.
-
-The ball is a sphere of radius $R=@@R@@$ m and mass $m=@@M@@$ kg. The air is steady with lateral wind $\mathbf w=(0,w_y,0)$, constant density $\rho$, constant drag coefficient $C_D$, and a constant effective sideways coefficient $\mathbf b=(0,b_y,b_z)$. We use
-\begin{equation}
-\dot{\mathbf r}=\mathbf v,\qquad
-\dot{\mathbf v}=\mathbf g-KC_D|\mathbf u|\mathbf u+\mathbf b\times\mathbf u,
-\qquad \mathbf u=\mathbf v-\mathbf w,
-\qquad K=\frac{\rho\pi R^2}{2m},
-\label{eq:model}
-\end{equation}
-with $\mathbf g=(0,0,-@@G@@)$ m s$^{-2}$. The drag term is quadratic and opposes the motion relative to the air. The cross term is perpendicular to $\mathbf u$. The coefficient $\mathbf b$ has units s$^{-1}$ and combines rotation and lift efficiency; it is not the angular velocity, and we do not claim to recover the true spin. Setting $b_x=0$ removes a direction that the two positions constrain weakly. Constant coefficients, steady wind, no spin decay and no drag crisis are assumptions, not measurements; they are checked only as a model, not calibrated to this ball. The force form follows standard football aerodynamics~\cite{asai}.
-
-\begin{table}[htbp]\centering
-\caption{Symbols, units and roles. Listed environmental values are scenario inputs; launch conditions are inferred.}
-\begin{tabular}{lll}\toprule
-Symbol & Meaning & Unit or role\\\midrule
-$\mathbf r,\mathbf v$ & Ball centre and velocity & m; m s$^{-1}$\\
-$\mathbf u=\mathbf v-\mathbf w$ & Velocity relative to the air & m s$^{-1}$\\
-$\mathbf w=(0,w_y,0)$ & Steady lateral wind & listed scenario input\\
-$\rho$ & Air density & listed scenario input\\
-$C_D$ & Drag coefficient & listed scenario input\\
-$\mathbf b=(0,b_y,b_z)$ & Effective sideways coefficient & s$^{-1}$; inferred\\
-$K$ & $\rho\pi R^2/(2m)$ & m$^{-1}$\\
-$\epsilon$ & Allowed coordinate error & m\\
-$C_\perp$ & Side-force coefficient $|\mathbf b\times\mathbf u|/(K|\mathbf u|^2)$ & dimensionless\\
-$(t_g,y_g,z_g)$ & First crossing of $x=11$ m & s; m; m\\
-\bottomrule\end{tabular}
-\end{table}
-
-The fixed mass and radius satisfy the IFAB ball specifications~\cite{ifab}. Density, wind and drag values are listed scenarios, not weather measurements. We do not model the goalkeeper, post collisions, deformation during contact, or flight after the first terminal event. The ball starts at the given centre with no vertical offset beyond the radius.
-
-Over the roughly 0.4 s between kick and goal, the three terms can all change the path. Gravity bends the flight downward throughout. Drag grows with the square of the speed relative to the air, so a tailwind or headwind changes the deceleration as well as the direction of the relative flow. The sideways term grows with speed and with the fitted coefficients, and it bends the path without doing work, since $\mathbf b\times\mathbf u$ is perpendicular to $\mathbf u$. A model with gravity alone cannot connect the early positions to a late one, but the data do not measure the size of either aerodynamic term. That gap is why the paper treats the environmental values as listed inputs rather than known quantities.
+@@PHYSICS@@
 
 \section{Finding parameters from the observations}
 This section explains how the two positions become parameter choices.
@@ -248,7 +217,7 @@ q^*(\eta)=\arg\min_{q\in\mathcal B}\sum_{i=1}^{2}
 \|\mathbf r(t_i;q,\eta)-\mathbf r_i\|^2,
 \label{eq:fit}
 \end{equation}
-using \texttt{lsqnonlin}~\cite{lsq} from two starting points. The trajectory in the fit is integrated with RK4 at the recorded step. A fit is checked on all six coordinates,
+using \texttt{lsqnonlin}~\cite{lsq} from two starting points. The fit uses fourth-order Runge--Kutta integration with step $0.0025$ s. Acceptance is re-evaluated with \texttt{ode45} at RelTol=$10^{-11}$ and AbsTol=$10^{-12}$; whole-flight propagation uses RelTol=$10^{-9}$, AbsTol=$10^{-11}$ and maximum step $0.002$ s. A fit is checked on all six coordinates,
 \begin{equation}
 |r_j(t_i;q,\eta)-r_{ij}|\le\epsilon,
 \qquad i=1,2,\quad j=x,y,z,
@@ -260,7 +229,9 @@ The search uses @@NWIND@@ wind values on $[@@WMIN@@,@@WMAX@@]$ m s$^{-1}$, @@NDE
 
 Before a fit is called accepted it also passes a physical screening. The launch must point forward and not downward, the initial speed must lie between 10 and 40 m s$^{-1}$, and along the sampled trajectory the side-force coefficient must satisfy $C_\perp\le0.50$. The ball must stay above the ground before the terminal event, and the event must be located within 2 s. An accepted fit must pass both the six-coordinate test and this screening; observation fit and physical screening are stored separately. The speed range and the 0.50 cap are conservative model screens, not universal limits for players or footballs. We do not force the crossing into the goal: a miss is a recorded outcome, and the goal is used only to describe where the ball goes.
 
-Two further points explain why the result is a set rather than one shot. First, the fitting problem has more unknowns than the six coordinates. Changing the wind or the drag changes the air force, and a different launch velocity can make up for much of that change at the two observed times. The fit therefore finds different launch conditions for different listed environments, even though all of them look the same at $t=0.05$ and $t=0.10$ s. Second, the two observations constrain the early path only. A small difference in the fitted sideways coefficient can build into a larger sideways displacement over the remaining flight, because the force keeps acting after the last observation. The accepted set is the result of searching the listed values, not a proof that nothing outside the grid exists. Only the listed parameter values are searched, and the ranges in the figures do not guarantee that all possible cases are included.
+Two further points explain why the result is a set rather than one shot. First, the fitting problem has more unknowns than the six coordinates. Changing the wind or the drag changes the air force, and a different launch velocity can make up for much of that change at the two observed times. The fit therefore finds different launch conditions for different listed environments, even though all of them look the same at $t=0.05$ and $t=0.10$ s. Second, the two observations constrain the early path only, and a small difference in the fitted sideways coefficient keeps acting after the last observation. The accepted set is the result of searching the listed values, not a proof that nothing outside the grid exists.
+
+@@INFERENCE_DETAILS@@
 
 \section{Results}
 This section reports the current example, two accepted trajectories with different landings, and the screening figures.
@@ -324,10 +295,9 @@ A separate interactive view allows wind in $[-15,15]$ m s$^{-1}$, density in $[0
 \section{Numerical checks and scope}
 This section lists the checks made inside MATLAB and the limits of the result.
 
-All calculations use the same equations and event definitions. The three step sizes differ only in the maximum step of the integration, so they measure numerical sensitivity rather than a new model. The work-energy check compares the change of mechanical energy with the work of drag and the sideways force,
+All calculations use the same equations and event definitions. The three step sizes differ only in the maximum step of the integration, so they measure numerical sensitivity rather than a new model. Using the balance derived in Eq.~\eqref{eq:energy}, we check the accumulated residual
 \begin{equation}
-\frac{d}{dt}\left(\frac12m|\mathbf v|^2+mgz\right)
-=(\mathbf F_D+\mathbf F_M)\cdot\mathbf v.
+R_E(t)=E(t)-E(0)-\int_0^t(\mathbf F_D+\mathbf F_M)\cdot\mathbf v\,d\tau.
 \end{equation}
 Event checks confirm that ground contact, the forward crossing of $x=11$ m and any time-out are located and recorded separately. @@CHECKEN@@
 
@@ -342,6 +312,7 @@ From the two early positions, a single trajectory cannot be recovered when the w
 \bibitem{upc} University Physics Competition. 2026 contest, Problem B. \url{https://www.uphysicsc.com/2026contest.html}. Accessed 7 November 2026.
 \bibitem{ifab} The IFAB. Laws of the Game, Law 2: The Ball. \url{https://www.theifab.com/laws/latest/the-ball/}. Accessed 7 November 2026.
 \bibitem{asai} T. Asai, K. Seo, O. Kobayashi and R. Sakashita. Fundamental aerodynamics of the soccer ball. \emph{Sports Engineering} 10, 101--109 (2007). \url{https://doi.org/10.1007/BF02844207}.
+\bibitem{nasa} NASA Glenn Research Center. Drag Equation. \url{https://www1.grc.nasa.gov/beginners-guide-to-aeronautics/drag-equation/}.
 \bibitem{ode} MathWorks. \texttt{ode45}: Solve nonstiff differential equations. \url{https://www.mathworks.com/help/matlab/ref/ode45.html}. Implementation run with MATLAB R2024a.
 \bibitem{lsq} MathWorks. \texttt{lsqnonlin}: Solve nonlinear least-squares problems. \url{https://www.mathworks.com/help/optim/ug/lsqnonlin.html}.
 \end{thebibliography}
@@ -398,38 +369,7 @@ template_zh = r'''\documentclass[11pt,a4paper,UTF8,fontset=windows]{ctexart}
 \end{figure}
 
 \section{从出脚到球门的物理模型}
-本节写出从出脚到第一个终止事件所使用的受力方程。
-
-把球看成半径 $R=@@R@@$ m、质量 $m=@@M@@$ kg 的球体。空气为恒定横风 $\mathbf w=(0,w_y,0)$，密度 $\rho$、阻力系数 $C_D$ 和有效侧向系数 $\mathbf b=(0,b_y,b_z)$ 都取常数。方程写成
-\begin{equation}
-\dot{\mathbf r}=\mathbf v,\qquad
-\dot{\mathbf v}=\mathbf g-KC_D|\mathbf u|\mathbf u+\mathbf b\times\mathbf u,
-\qquad \mathbf u=\mathbf v-\mathbf w,
-\qquad K=\frac{\rho\pi R^2}{2m},
-\label{eq:model}
-\end{equation}
-其中 $\mathbf g=(0,0,-@@G@@)$ m/s$^2$。阻力项是二次项，方向与相对空气速度相反；叉乘项与 $\mathbf u$ 垂直。$\mathbf b$ 的单位是 s$^{-1}$，它把转动和升力效率合并在一起，并不是角速度，我们也不声称恢复真实自旋。令 $b_x=0$，因为两次位置对这个方向的约束很弱。系数恒定、风恒定、自旋不衰减、阻力危机不出现，都是模型假设而非测量结果；它们只作为模型被检查，没有对这只球做标定。受力形式沿用足球空气动力学的常用写法~\cite{asai}。
-
-\begin{table}[htbp]\centering
-\caption{符号、单位与角色。列出的环境值是情景输入；出脚条件是反求量。}
-\begin{tabular}{lll}\toprule
-符号 & 含义 & 单位或角色\\\midrule
-$\mathbf r,\mathbf v$ & 球心位置与速度 & m；m/s\\
-$\mathbf u=\mathbf v-\mathbf w$ & 相对空气速度 & m/s\\
-$\mathbf w=(0,w_y,0)$ & 恒定横风 & 列出的情景输入\\
-$\rho$ & 空气密度 & 列出的情景输入\\
-$C_D$ & 阻力系数 & 列出的情景输入\\
-$\mathbf b=(0,b_y,b_z)$ & 有效侧向系数 & s$^{-1}$；反求量\\
-$K$ & $\rho\pi R^2/(2m)$ & m$^{-1}$\\
-$\epsilon$ & 逐坐标允许误差 & m\\
-$C_\perp$ & 侧力系数 $|\mathbf b\times\mathbf u|/(K|\mathbf u|^2)$ & 无量纲\\
-$(t_g,y_g,z_g)$ & 首次穿过 $x=11$ m & s；m；m\\
-\bottomrule\end{tabular}
-\end{table}
-
-固定的质量和半径满足 IFAB 的球规格~\cite{ifab}。密度、风速和阻力系数都是列出的情景取值，不是现场测量。模型不包含守门员、门柱碰撞、触球时的形变以及第一个终止事件之后的飞行。球从题给球心出发，除半径外没有额外的竖直偏移。
-
-从出脚到球门大约 0.4 s，三项力都会改变轨迹。重力全程把轨迹向下弯；阻力随相对空气速度的平方增大，顺风或逆风既改变减速大小，也改变相对气流方向；侧向力随速度和拟合系数增大，它只改变方向而不做功，因为 $\mathbf b\times\mathbf u$ 与 $\mathbf u$ 垂直。只有重力的模型不足以把早期位置接到后期位置，但观测也没有测出两项气动力的大小。正因为如此，后文把环境取值当作列出的输入，而不是已知量。
+@@PHYSICS@@
 
 \section{用观测求参数}
 本节说明两次位置如何变成一组组参数取值。
@@ -440,7 +380,7 @@ q^*(\eta)=\arg\min_{q\in\mathcal B}\sum_{i=1}^{2}
 \|\mathbf r(t_i;q,\eta)-\mathbf r_i\|^2,
 \label{eq:fit}
 \end{equation}
-使用 \texttt{lsqnonlin}~\cite{lsq}，并从两个初值出发。拟合中的轨迹用记录步长的 RK4 积分。随后逐个检查六个坐标：
+使用 \texttt{lsqnonlin}~\cite{lsq}，并从两个初值出发。拟合时用四阶Runge--Kutta方法，步长为$0.0025$ s；接受前另用\texttt{ode45}回代观测，RelTol=$10^{-11}$、AbsTol=$10^{-12}$。全程预测用RelTol=$10^{-9}$、AbsTol=$10^{-11}$、最大步长$0.002$ s。随后逐个检查六个坐标：
 \begin{equation}
 |r_j(t_i;q,\eta)-r_{ij}|\le\epsilon,
 \qquad i=1,2,\quad j=x,y,z,
@@ -452,7 +392,9 @@ q^*(\eta)=\arg\min_{q\in\mathcal B}\sum_{i=1}^{2}
 
 一组参数还要通过物理筛选才算被接受：出脚方向向前且不向下，初速度在 10 到 40 m/s 之间，沿采样轨迹的侧力系数满足 $C_\perp\le0.50$；球在终止事件前必须位于地面以上，终止事件要在 2 s 内定位到。观测拟合与物理筛选分别记录，只有两项都通过才被接受。速度范围和 0.50 上限是保守的模型筛选，不是运动员或足球的普适极限。我们不强迫球进门：射偏也是记录下来的结果，球门只用来描述球飞到哪里。
 
-结果之所以是一组轨迹而不是一次射门，有两个原因。第一，未知量比六个坐标多。改变风速或阻力就改变了空气力，不同的初速度又能在两个观测时刻上补偿其中的大部分差别，于是不同的环境取值会反求出不同的出脚条件，而在 $t=0.05$ 与 $t=0.10$ s 处看起来一样。第二，两次观测只约束前段。拟合出的侧向系数只要有一点不同，在最后观测之后仍继续作用，落到球门平面时就会放大成明显的侧向差距。被接受的集合是搜索列出的参数得到的结果，并不证明网格之外没有别的解。只搜索列出的参数，图中的范围不能保证包含所有可能情况。
+结果之所以是一组轨迹而不是一次射门，有两个原因。第一，未知量比六个坐标多。改变风速或阻力就改变了空气力，不同的初速度又能在两个观测时刻上补偿其中的大部分差别，于是不同的环境取值会反求出不同的出脚条件，而在 $t=0.05$ 与 $t=0.10$ s 处看起来一样。第二，两次观测只约束前段，拟合出的侧向系数只要有一点不同，在最后观测之后仍继续作用。被接受的集合是搜索列出的参数得到的结果，并不证明网格之外没有别的解。
+
+@@INFERENCE_DETAILS@@
 
 \section{计算结果}
 本节先给出当前示例的落点与时间，再给出两条符合观测但落点不同的轨迹，最后给出筛选图表。
@@ -514,10 +456,9 @@ $\epsilon$ (mm) & 被接受 & 到平面 & 过门口 & 先触地 & $y_g$ (m) & $z
 \section{计算检查与适用范围}
 本节列出 MATLAB 内部做过的检查，以及这个结果的适用边界。
 
-所有计算使用同一套方程和事件定义。三档步长只改变积分的最大步长，因此检验的是数值敏感性，而不是另一个模型。功与能检查比较机械能的变化与阻力、侧向力所做的功：
+所有计算使用同一套方程和事件定义。三档步长只改变积分的最大步长，因此检验的是数值敏感性，而不是另一个模型。根据式~\eqref{eq:energy}推导的功与能关系，检查累积残差：
 \begin{equation}
-\frac{d}{dt}\left(\frac12m|\mathbf v|^2+mgz\right)
-=(\mathbf F_D+\mathbf F_M)\cdot\mathbf v.
+R_E(t)=E(t)-E(0)-\int_0^t(\mathbf F_D+\mathbf F_M)\cdot\mathbf v\,d\tau.
 \end{equation}
 事件检查确认触地、向前穿过 $x=11$ m 以及超时都被分别定位并记录。@@CHECKZH@@
 
@@ -532,6 +473,7 @@ $\epsilon$ (mm) & 被接受 & 到平面 & 过门口 & 先触地 & $y_g$ (m) & $z
 \bibitem{upc} University Physics Competition. 2026 contest, Problem B. \url{https://www.uphysicsc.com/2026contest.html}. 访问于 2026 年 11 月 7 日.
 \bibitem{ifab} The IFAB. Laws of the Game, Law 2: The Ball. \url{https://www.theifab.com/laws/latest/the-ball/}. 访问于 2026 年 11 月 7 日.
 \bibitem{asai} T. Asai, K. Seo, O. Kobayashi and R. Sakashita. Fundamental aerodynamics of the soccer ball. \emph{Sports Engineering} 10, 101--109 (2007). \url{https://doi.org/10.1007/BF02844207}.
+\bibitem{nasa} NASA Glenn Research Center. Drag Equation. \url{https://www1.grc.nasa.gov/beginners-guide-to-aeronautics/drag-equation/}.
 \bibitem{ode} MathWorks. \texttt{ode45}: Solve nonstiff differential equations. \url{https://www.mathworks.com/help/matlab/ref/ode45.html}. 使用 MATLAB R2024a 实现.
 \bibitem{lsq} MathWorks. \texttt{lsqnonlin}: Solve nonlinear least-squares problems. \url{https://www.mathworks.com/help/optim/ug/lsqnonlin.html}.
 \end{thebibliography}
@@ -544,10 +486,292 @@ $\epsilon$ (mm) & 被接受 & 到平面 & 过门口 & 先触地 & $y_g$ (m) & $z
 \end{document}
 '''
 
+
+# 第2/3节的推导在原有六节结构内展开，计算结果仍来自同一JSON。
+sc=ver['linearization']['scales']
+values.update({
+ 'UREL':fmt(sc['relativeSpeed'],2),'FD0':fmt(sc['dragForce'],2),'FM0':fmt(sc['sideForce'],2),
+ 'FG0':fmt(sc['weight'],2),'RE0':sci(sc['Reynolds'],2),'MA0':fmt(sc['Mach'],3),
+ 'PID':fmt(sc['dragChangeScale'],3),'PIM':fmt(sc['sideChangeScale'],3),'PIG':fmt(sc['gravityChangeScale'],3),
+ 'FBRATIO':fmt(100*sc['buoyancyToWeight'],2),'FBDISP':fmt(100*sc['buoyancyUnrefittedDisplacement'],2),
+ 'CORIOLIS':fmt(1000*sc['coriolisDisplacementScale'],2),'SENSCHECK':sci(ver['goalSensitivityMaxDifference'])})
+PHYSICS_ZH=r"""
+本节依次回答三个问题：球受到什么力，这些力怎样写成方程，哪些简化会影响最后的预测。先建立受力依据，再使用方程计算。
+\subsection{研究对象、坐标和初始条件}
+研究对象是已经离脚、尚未碰到地面或门柱的足球。取球心位置$\mathbf r=(x,y,z)$，速度$\mathbf v=\dot{\mathbf r}$，$x$轴指向球门，$z$轴向上。球半径$R=@@R@@$ m、质量$m=@@M@@$ kg；初始球心按题目固定，初速度待求：
+\begin{equation}
+\mathbf r(0)=(0,0,R),\qquad \mathbf v(0)=\mathbf v_0,\qquad
+\mathbf g=(0,0,@@G@@)\ \mathrm{m\,s^{-2}}.
+\end{equation}
+质量和周长$2\pi R$符合IFAB球规格~\cite{ifab}，但不表示测得了本题足球的质量与材料。脚的作用已通过$\mathbf v_0$体现；球离脚后不再承受脚的推力。忽略形变后的球心平动满足牛顿第二定律：
+\begin{equation}
+m\dot{\mathbf v}=\mathbf F_g+\mathbf F_D+\mathbf F_M,\qquad \mathbf F_g=m\mathbf g.
+\label{eq:newton}
+\end{equation}
+接下来分别建立阻力$\mathbf F_D$和侧向力$\mathbf F_M$，而不是直接从位置曲线猜加速度。
+\subsection{从相对气流得到阻力}
+空气动力取决于球相对空气的速度。设本次射门期间横风近似不变，$\mathbf w=(0,w_y,0)$，定义
+\begin{equation}
+\mathbf u=\mathbf v-\mathbf w,\quad U=\|\mathbf u\|,\quad
+A=\pi R^2,\quad p_{\rm dyn}=\tfrac12\rho U^2.
+\end{equation}
+$p_{\rm dyn}$是动压，乘迎风面积得到力的尺度。把球面接缝、边界层和分离等影响收进无量纲阻力系数$C_D$，便有~\cite{nasa}
+\begin{equation}
+D=p_{\rm dyn}AC_D,\qquad
+\mathbf F_D=-D\frac{\mathbf u}{U}
+=-\tfrac12\rho AC_DU\mathbf u.
+\label{eq:drag}
+\end{equation}
+负号规定阻力与相对气流反向；$\rho AU^2$的单位是N。式中并非既有“运动阻力”又额外加一份“风阻”：风通过$\mathbf u$改变同一项空气动力。动压给出量级，$C_D$仍需实验标定，不能只用伯努利方程或能量守恒把它推定为某个数。
+\subsection{为什么使用有效侧向力}
+旋转会改变球两侧的边界层与尾流，使气动力出现垂直于气流的分量。足球风洞实验支持这一机制，也显示系数与旋转、流态有关~\cite{asai}。用通常的力系数定义，侧向力大小为
+\begin{equation}
+F_M=\tfrac12\rho AU^2C_L.
+\end{equation}
+为了连接到可计算的向量形式，记$\boldsymbol\omega_\perp$为角速度垂直于$\mathbf u$的部分。若在有限速度范围内近似$C_L\simeq c_sR\|\boldsymbol\omega_\perp\|/U$，其中$c_s$为无量纲系数，并取方向沿$\boldsymbol\omega\times\mathbf u$，则
+\begin{equation}
+\mathbf F_M\simeq\tfrac12\rho Ac_sR(\boldsymbol\omega\times\mathbf u)
+=m(\mathbf b\times\mathbf u),\qquad
+\mathbf b=\frac{\rho Ac_sR}{2m}\boldsymbol\omega.
+\label{eq:magnus}
+\end{equation}
+这一步是局部经验近似，不是风洞文献证明的普适线性定律。$\mathbf b$的单位是s$^{-1}$，把真实自旋与未知的气动效率$c_s$合在一起。两帧位置无法分别确定它们，因此程序只求有效$\mathbf b$，不把它解释成实测角速度。
+
+本文取$\mathbf b=(0,b_y,b_z)$，使主要沿$x$方向运动的球，其横向和竖向偏转分别由$b_z$和$b_y$描述。令$b_x=0$是减少未知量的假设，并不说明真实球的这个分量必为零。若要预测自旋本身，还需转动惯量和空气力矩去求$\mathbf I\dot{\boldsymbol\omega}=\boldsymbol\tau$；题目没有这些数据。保持$\mathbf b$恒定只代表在约0.4s内使用恒定有效参数，其误差须留在模型局限中。
+\subsection{合成完整运动方程}
+将式~\eqref{eq:drag}、\eqref{eq:magnus}代入牛顿方程，并令$K=\rho A/(2m)$，得到程序实际积分的六个一阶方程：
+\begin{align}
+\dot{\mathbf r}&=\mathbf v,\qquad
+\dot{\mathbf v}=\mathbf g-KC_DU\mathbf u+\mathbf b\times\mathbf u,\label{eq:model}\\
+\dot v_x&=-KC_DUv_x+b_yv_z-b_z(v_y-w_y),\nonumber\\
+\dot v_y&=-KC_DU(v_y-w_y)+b_zv_x,\nonumber\\
+\dot v_z&=-g-KC_DUv_z-b_yv_x,\qquad g=\|\mathbf g\|.\nonumber
+\end{align}
+分量式也说明三种运动相互影响：横风不仅改变$y$方向阻力，$v_y-w_y$还进入$x$方向侧力。改变某一参数后，必须重新计算整个向量状态。
+\begin{table}[H]\centering\small
+\caption{本节符号及其角色。}\begin{tabular}{lll}\toprule
+符号 & 含义 & 单位或来源\\\midrule
+$\mathbf r,\mathbf v,\mathbf u$ & 位置、地面速度、相对空气速度 & m；m/s；m/s\\
+$m,R,A$ & 质量、半径、迎风面积 & kg；m；m$^2$\\
+$\rho,w_y,C_D$ & 密度、横风、阻力系数 & 指定情景，不是实测\\
+$\mathbf v_0,b_y,b_z$ & 初速度和有效侧力参数 & m/s；s$^{-1}$，待求\\
+$K,C_L,C_\perp$ & 气动尺度、升力与侧力系数 & m$^{-1}$；无量纲\\
+\bottomrule\end{tabular}\end{table}
+\subsection{用量级判断哪些作用重要}
+为判断是否能忽略某项，取当前示例出脚相对气流速度$U_0=@@UREL@@$ m/s、飞行时间$T=@@SELTEND@@$ s。初始重力、阻力、侧力大小分别约为$@@FG0@@$、$@@FD0@@$、$@@FM0@@$ N，气动力与重力是同一量级。进一步比较它们在飞行时间内改变速度的相对大小：
+\begin{equation}
+\Pi_D=KC_DU_0T=@@PID@@,\quad
+\Pi_M=\|\mathbf b\|T=@@PIM@@,\quad
+\Pi_g=\frac{gT}{U_0}=@@PIG@@.
+\end{equation}
+这些量均不远小于1，因此三项都保留。采用示例空气黏度$\mu=1.81\times10^{-5}$ Pa s和声速$c=343$ m/s，可估计
+\begin{equation}
+\mathrm{Re}=\frac{2\rho RU_0}{\mu}\simeq@@RE0@@,\qquad
+\mathrm{Ma}=\frac{U_0}{c}\simeq@@MA0@@.
+\end{equation}
+声速和黏度为量级估算所用的假设，不是场地测量。较小的马赫数支持忽略压缩性；雷诺数说明阻力系数与流态有关，所以恒定$C_D$是有限工况下的简化，不能因此认定它已被标定。
+
+其余简化也要估计影响。空气浮力与重力之比约为$\rho(4\pi R^3/3)/m=@@FBRATIO@@\%$；在不重新拟合出脚条件的估算中，忽略它可产生约$@@FBDISP@@$ cm的竖向位移差。因此本文不能把毫米级的计算残差说成毫米级的真实准确度。取地球自转角速度$\Omega=7.292115\times10^{-5}$ s$^{-1}$，其导致的位移量级$\Omega\|\mathbf v_0\|T^2$约为$@@CORIOLIS@@$ mm，低于本例允许误差。浮力、非恒定风和变化的气动系数仍会贡献模型误差，更多早期观测才能帮助检验它们。
+\subsection{有风时怎样检查功与能}
+令$E=\tfrac12m\|\mathbf v\|^2+mgz$。将牛顿方程与地面系速度点乘，重力势能项抵消后得到
+\begin{align}
+\frac{dE}{dt}&=(\mathbf F_D+\mathbf F_M)\cdot\mathbf v\label{eq:energy}\\
+&=-\tfrac12\rho AC_DU^3+(\mathbf F_D+\mathbf F_M)\cdot\mathbf w.\nonumber
+\end{align}
+推导中用到了$\mathbf F_M\cdot\mathbf u=0$，但$\mathbf v=\mathbf u+\mathbf w$。所以侧向力对相对气流的瞬时功率为零，有风时对地面系的球仍可做功；不能强求球的地面系机械能一直下降。后面的功与能检查正是积分式~\eqref{eq:energy}，用于检验程序是否把力的方向和符号算对。
+"""
+PHYSICS_EN=r"""
+This section builds the force law in order: define the moving system, relate airflow to force, combine the forces, and check the size and limits of the approximations.
+\subsection{System, coordinates and initial conditions}
+The system is the ball after release from the foot and before contact with the ground or a post. Its centre is $\mathbf r=(x,y,z)$ and $\mathbf v=\dot{\mathbf r}$; $x$ points toward the goal and $z$ upward. With radius $R=@@R@@$ m and mass $m=@@M@@$ kg,
+\begin{equation}
+\mathbf r(0)=(0,0,R),\quad \mathbf v(0)=\mathbf v_0,\quad
+\mathbf g=(0,0,@@G@@)\ \mathrm{m\,s^{-2}}.
+\end{equation}
+The chosen mass and circumference $2\pi R$ satisfy IFAB specifications~\cite{ifab}; they are not measurements of this particular ball. The kick is represented by the unknown launch velocity. After release there is no continuing force from the foot. Newton's second law for the centre is
+\begin{equation}
+m\dot{\mathbf v}=\mathbf F_g+\mathbf F_D+\mathbf F_M,\qquad\mathbf F_g=m\mathbf g.
+\label{eq:newton}
+\end{equation}
+The next steps establish drag $\mathbf F_D$ and the transverse force $\mathbf F_M$ instead of prescribing a fitted acceleration curve.
+\subsection{Drag from relative airflow}
+For steady lateral wind $\mathbf w=(0,w_y,0)$ define
+\begin{equation}
+\mathbf u=\mathbf v-\mathbf w,\quad U=\|\mathbf u\|,\quad A=\pi R^2,\quad p_{\rm dyn}=\tfrac12\rho U^2.
+\end{equation}
+Dynamic pressure multiplied by frontal area gives a force scale. The dimensionless drag coefficient includes effects of the surface, boundary layer and flow separation~\cite{nasa}. Hence
+\begin{equation}
+D=p_{\rm dyn}AC_D,\qquad\mathbf F_D=-D\frac{\mathbf u}{U}
+=-\tfrac12\rho AC_DU\mathbf u.
+\label{eq:drag}
+\end{equation}
+The sign makes drag oppose relative motion, and $\rho AU^2$ has units of newtons. Wind changes this same force through $\mathbf u$; it is not an additional copy of drag. Dynamic pressure supplies a scale, while $C_D$ requires calibration. Bernoulli's equation or conservation of energy alone cannot determine its numerical value.
+\subsection{Meaning of the effective transverse force}
+Rotation changes the boundary layer and wake and can produce a force perpendicular to airflow. Football wind-tunnel measurements support this mechanism while showing dependence on rotation and flow regime~\cite{asai}. Write its magnitude as
+\begin{equation}
+F_M=\tfrac12\rho AU^2C_L.
+\end{equation}
+Let $\boldsymbol\omega_\perp$ denote the angular-velocity component perpendicular to $\mathbf u$. Over a limited range, assume $C_L\simeq c_sR\|\boldsymbol\omega_\perp\|/U$ with dimensionless slope $c_s$ and direction along $\boldsymbol\omega\times\mathbf u$. Substitution gives
+\begin{equation}
+\mathbf F_M\simeq\tfrac12\rho Ac_sR(\boldsymbol\omega\times\mathbf u)
+=m(\mathbf b\times\mathbf u),\qquad
+\mathbf b=\frac{\rho Ac_sR}{2m}\boldsymbol\omega.
+\label{eq:magnus}
+\end{equation}
+The linear coefficient relation is a modelling approximation, not a universal law established by the cited experiment. The fitted $\mathbf b$, in s$^{-1}$, combines spin with unknown aerodynamic efficiency. Two positions cannot identify these separately, so $\mathbf b$ is not reported as a measured angular velocity.
+
+We set $\mathbf b=(0,b_y,b_z)$: for predominantly forward motion, $b_z$ controls lateral bending and $b_y$ vertical bending. Fixing $b_x=0$ reduces the unknowns but does not prove that the actual component vanishes. Resolving spin would also require inertia and aerodynamic torque in $\mathbf I\dot{\boldsymbol\omega}=\boldsymbol\tau$, which are not given. Constant $\mathbf b$ is a short-flight approximation whose error remains part of the model limitations.
+\subsection{The complete equations used for integration}
+Substituting the two force expressions into Newton's law and defining $K=\rho A/(2m)$ yields six first-order equations:
+\begin{align}
+\dot{\mathbf r}&=\mathbf v,\qquad\dot{\mathbf v}=\mathbf g-KC_DU\mathbf u+\mathbf b\times\mathbf u,\label{eq:model}\\
+\dot v_x&=-KC_DUv_x+b_yv_z-b_z(v_y-w_y),\nonumber\\
+\dot v_y&=-KC_DU(v_y-w_y)+b_zv_x,\nonumber\\
+\dot v_z&=-g-KC_DUv_z-b_yv_x,\qquad g=\|\mathbf g\|.\nonumber
+\end{align}
+These components explain coupling: wind changes both lateral drag and the $x$ component of the transverse force. Changing one input therefore requires recomputing the complete state.
+\begin{table}[H]\centering\small
+\caption{Symbols used in the force derivation.}\begin{tabular}{lll}\toprule
+Symbol & Meaning & Unit or role\\\midrule
+$\mathbf r,\mathbf v,\mathbf u$ & Centre, ground velocity, relative velocity & m; m s$^{-1}$; m s$^{-1}$\\
+$m,R,A$ & Mass, radius, frontal area & kg; m; m$^2$\\
+$\rho,w_y,C_D$ & Density, wind, drag coefficient & prescribed scenarios\\
+$\mathbf v_0,b_y,b_z$ & Launch and effective transverse coefficients & fitted; m s$^{-1}$; s$^{-1}$\\
+$K,C_L,C_\perp$ & Aerodynamic scale and force coefficients & m$^{-1}$; dimensionless\\
+\bottomrule\end{tabular}\end{table}
+\subsection{Scale checks and approximation limits}
+For the current example, launch relative speed is $U_0=@@UREL@@$ m s$^{-1}$ and flight time $T=@@SELTEND@@$ s. The initial weight, drag and transverse-force magnitudes are approximately $@@FG0@@$, $@@FD0@@$ and $@@FM0@@$ N. Aerodynamic forces are comparable to weight. Their relative velocity changes over one flight are estimated by
+\begin{equation}
+\Pi_D=KC_DU_0T=@@PID@@,\quad\Pi_M=\|\mathbf b\|T=@@PIM@@,\quad
+\Pi_g=\frac{gT}{U_0}=@@PIG@@.
+\end{equation}
+None is very small, so all three accelerations are retained. With an assumed viscosity $\mu=1.81\times10^{-5}$ Pa s and sound speed $c=343$ m s$^{-1}$,
+\begin{equation}
+\mathrm{Re}=\frac{2\rho RU_0}{\mu}\simeq@@RE0@@,\qquad\mathrm{Ma}=\frac{U_0}{c}\simeq@@MA0@@.
+\end{equation}
+Viscosity and sound speed are scale assumptions, not site measurements. The small Mach number supports neglecting compressibility. Reynolds number makes the dependence of $C_D$ on flow regime relevant; it does not calibrate a constant $C_D$ for this ball.
+
+Neglected terms also deserve scale estimates. The buoyancy-to-weight ratio is $\rho(4\pi R^3/3)/m\simeq@@FBRATIO@@\%$. Without refitting launch conditions, omitting buoyancy gives a vertical-displacement scale of about $@@FBDISP@@$ cm over this flight. Thus millimetre fitting residuals cannot be called millimetre physical accuracy. With Earth's rotation rate $\Omega=7.292115\times10^{-5}$ s$^{-1}$, the displacement scale $\Omega\|\mathbf v_0\|T^2$ of roughly $@@CORIOLIS@@$ mm, below the chosen coordinate tolerance. Buoyancy, changing wind and changing coefficients remain sources of model error; additional observations are needed to test them.
+\subsection{Work and energy in moving air}
+For $E=\tfrac12m\|\mathbf v\|^2+mgz$, taking the scalar product of Newton's law with ground-frame velocity cancels the gravitational potential term:
+\begin{align}
+\frac{dE}{dt}&=(\mathbf F_D+\mathbf F_M)\cdot\mathbf v\label{eq:energy}\\
+&=-\tfrac12\rho AC_DU^3+(\mathbf F_D+\mathbf F_M)\cdot\mathbf w.\nonumber
+\end{align}
+Here $\mathbf F_M\cdot\mathbf u=0$, but $\mathbf v=\mathbf u+\mathbf w$. The transverse force is perpendicular to relative airflow, yet it can do ground-frame work when wind is present. Ground-frame mechanical energy therefore need not decrease monotonically. Integrating Eq.~\eqref{eq:energy} supplies the work-energy check used later.
+"""
+DETAILS_ZH=r"""
+\subsection{为什么不同参数能通过同样的观测}
+前面的数值筛选可以进一步用方程说明。把全部未知量写为
+\begin{equation}
+p=(v_{0x},v_{0y},v_{0z},b_y,b_z,w_y,\rho,C_D),\qquad
+\mathbf f(p)=\begin{bmatrix}\mathbf r(t_1;p)\\\mathbf r(t_2;p)\end{bmatrix}.
+\end{equation}
+这里$p$有8个分量，而观测只提供6个位置数。更直接的例子是：阻力中只出现$\rho C_D$；保持这个乘积、风和有效$\mathbf b$不变，力场和轨迹就完全相同。这说明仅靠观测不能把密度和阻力系数分别测出来。若横风也改变，就可能用不同的出脚条件使两次位置仍落在允许误差内，后续轨迹却不同。
+
+在一个已经求出的参数附近，记$J=\partial\mathbf f/\partial p$，则
+\begin{equation}
+\delta\mathbf f\simeq J\delta p,\qquad
+\|\mathbf f(p)-\mathbf r_{\rm obs}\|_\infty\le\epsilon.
+\end{equation}
+使$J\delta p$很小的参数变化，在早期数据上难以区分；这给“参数互相补偿”一个明确含义。它只是局部解释，最终是否符合观测仍须回代完整非线性方程。最小二乘减少的是误差平方和，不保证每个坐标都过关，所以必须保留前面的逐坐标检查。某组最小二乘结果没过关，也不证明这个环境下所有参数都不可能过关。
+\subsection{从连续飞行确定球门位置}
+球门点不是在一个随意选定的时间读取，而是满足
+\begin{equation}
+x(t_g;p)=11,\quad v_x(t_g)>0,\qquad
+(y_g,z_g)=(y(t_g;p),z(t_g;p)).
+\label{eq:goal}
+\end{equation}
+同时检查下降触地事件$z(t)-R=0,\ v_z(t)<0$，先发生哪个就记录哪个。在球门中心平面，一个简单的有限半径净空检查为
+\begin{equation}
+|y_g|<3.66-R,\qquad R\le z_g<2.44-R.
+\end{equation}
+这里严格采用题目球心穿过$x=11$的约定；这个局部几何检查不代替球与门柱的完整碰撞计算，也不把未到达球门的触地点投影成进球点。
+\subsection{参数差异怎样传到球门点}
+以下只讨论相对速度非零、仍先到达球门且向前穿越的小幅参数变化。不仅$y,z$会变，穿越时刻$t_g$也会变。将式~\eqref{eq:goal}对$p$求导，得到
+\begin{equation}
+\frac{\partial t_g}{\partial p}=-\frac{\partial x/\partial p}{v_x(t_g)},\qquad
+G=\frac{\partial(y_g,z_g)}{\partial p}
+=S_{yz}-\frac{1}{v_x(t_g)}\begin{bmatrix}v_y\\v_z\end{bmatrix}S_x.
+\label{eq:goalderivative}
+\end{equation}
+$S_x,S_{yz}$是在同一固定时间$t_g$对位置求导；最后一项补偿“到达时间也变了”的影响。漏掉这一项，就会把固定时刻的位置误差误当成球门平面误差。
+
+这些导数也能沿同一方程计算。令$s=(\mathbf r,\mathbf v)$、$\dot s=F(s,p)$、$S=\partial s/\partial p$，直接求导便有
+\begin{equation}
+\dot S=F_sS+F_p,\quad
+F_s=\begin{bmatrix}0&I\\0&D\end{bmatrix},\qquad
+D=-KC_D\left(UI+\frac{\mathbf u\mathbf u^T}{U}\right)+[\mathbf b]_\times.
+\end{equation}
+$[\mathbf b]_\times\mathbf u=\mathbf b\times\mathbf u$；$S(0)$的位置行全为零，速度对初速度的三个导数构成单位阵，其余为零。不同参数的直接影响例如
+\begin{equation}
+\frac{\partial\dot{\mathbf v}}{\partial b_y}=(u_z,0,-u_x)^T,\quad
+\frac{\partial\dot{\mathbf v}}{\partial b_z}=(-u_y,u_x,0)^T,\quad
+\frac{\partial\dot{\mathbf v}}{\partial w_y}=-D\mathbf e_y.
+\end{equation}
+这些式子分别接回侧力方向和相对气流定义，因此导数与受力模型是一致的。MATLAB另行积分这组变化方程，并用原方程的小幅参数扰动检查式~\eqref{eq:goalderivative}；球门导数的最大差异为$@@SENSCHECK@@$（按所用SI参数单位）。它检查的是公式与程序是否一致，不给参数赋予概率；正式轨迹仍由原来的非线性运动方程求出。
+"""
+DETAILS_EN=r"""
+\subsection{How different parameters can meet the same observations}
+The screening has a mathematical explanation. Collect the unknowns and observation map as
+\begin{equation}
+p=(v_{0x},v_{0y},v_{0z},b_y,b_z,w_y,\rho,C_D),\qquad
+\mathbf f(p)=\begin{bmatrix}\mathbf r(t_1;p)\\\mathbf r(t_2;p)\end{bmatrix}.
+\end{equation}
+There are eight entries in $p$ and six observed coordinates. More directly, drag contains only $\rho C_D$: changing density and drag inversely while keeping wind and effective $\mathbf b$ fixed preserves the complete force field. The two values cannot be measured separately from these positions. Changing wind can instead be compensated by different launch conditions within the allowed coordinate error, while later paths differ.
+
+Near a fitted point, let $J=\partial\mathbf f/\partial p$. Then
+\begin{equation}
+\delta\mathbf f\simeq J\delta p,\qquad
+\|\mathbf f(p)-\mathbf r_{\rm obs}\|_\infty\le\epsilon.
+\end{equation}
+Changes giving small $J\delta p$ are difficult to distinguish in the early data. This gives a precise local meaning to parameter compensation. Acceptance still requires substitution into the nonlinear equations. Least squares minimizes a sum, not the largest coordinate error, so componentwise screening remains essential. Failure of a fitted choice does not establish that all possible launch conditions in that environment fail.
+\subsection{Locating the goal point during continuous flight}
+We do not read the endpoint at an arbitrary common time. The crossing satisfies
+\begin{equation}
+x(t_g;p)=11,\quad v_x(t_g)>0,\qquad
+(y_g,z_g)=(y(t_g;p),z(t_g;p)).
+\label{eq:goal}
+\end{equation}
+Descending ground contact $z(t)-R=0,\ v_z(t)<0$ competes with this event, and the first event is recorded. At the centre plane a simple finite-radius opening check is
+\begin{equation}
+|y_g|<3.66-R,\qquad R\le z_g<2.44-R.
+\end{equation}
+The predicted point follows the question's centre-crossing convention $x=11$. This local clearance check is not a complete post-collision calculation. A ground-first endpoint is never projected onto the goal as a crossing.
+\subsection{How parameter changes reach the goal point}
+For small changes that keep relative speed nonzero and preserve a forward goal-first crossing, the crossing time changes along with $y,z$. Differentiating Eq.~\eqref{eq:goal} gives
+\begin{equation}
+\frac{\partial t_g}{\partial p}=-\frac{\partial x/\partial p}{v_x(t_g)},\qquad
+G=\frac{\partial(y_g,z_g)}{\partial p}
+=S_{yz}-\frac{1}{v_x(t_g)}\begin{bmatrix}v_y\\v_z\end{bmatrix}S_x.
+\label{eq:goalderivative}
+\end{equation}
+$S_x,S_{yz}$ are position derivatives at the same fixed time $t_g$. The second term corrects for the changed arrival time. Omitting it confuses a fixed-time position change with a change in the goal-plane crossing.
+
+To compute these derivatives consistently, write $s=(\mathbf r,\mathbf v)$, $\dot s=F(s,p)$ and $S=\partial s/\partial p$. Differentiation yields
+\begin{equation}
+\dot S=F_sS+F_p,\quad
+F_s=\begin{bmatrix}0&I\\0&D\end{bmatrix},\qquad
+D=-KC_D\left(UI+\frac{\mathbf u\mathbf u^T}{U}\right)+[\mathbf b]_\times.
+\end{equation}
+Here $[\mathbf b]_\times\mathbf u=\mathbf b\times\mathbf u$. Initially the position derivatives are zero, the velocity derivatives with respect to launch velocity form the identity, and the other entries are zero. Direct parameter effects include
+\begin{equation}
+\frac{\partial\dot{\mathbf v}}{\partial b_y}=(u_z,0,-u_x)^T,\quad
+\frac{\partial\dot{\mathbf v}}{\partial b_z}=(-u_y,u_x,0)^T,\quad
+\frac{\partial\dot{\mathbf v}}{\partial w_y}=-D\mathbf e_y.
+\end{equation}
+These expressions follow directly from the force directions and the definition of relative velocity. MATLAB integrates the variation equations as a diagnostic and checks Eq.~\eqref{eq:goalderivative} against small parameter perturbations of the original flight equations. The largest derivative discrepancy is $@@SENSCHECK@@$ in the adopted SI parameter units. This tests the implementation without assigning probabilities. The reported trajectories continue to be calculated from the nonlinear flight equations.
+"""
+
+# DERIVATION_BLOCKS
+# PHYSICS_EN/PHYSICS_ZH、DETAILS_EN/DETAILS_ZH 由主审定义；必须先替换占位符再 render。
 for lang, template in [('英文', template_en), ('中文', template_zh)]:
     path = ROOT / f'latex/AI/B题{lang}论文.tex'
-    text=render(template).replace('[htbp]','[H]')
+    filled = template.replace('@@PHYSICS@@', PHYSICS_EN if lang == '英文' else PHYSICS_ZH)
+    filled = filled.replace('@@INFERENCE_DETAILS@@', DETAILS_EN if lang == '英文' else DETAILS_ZH)
+    text=render(filled).replace('[htbp]','[H]')
     text=text.replace(r'\begin{thebibliography}{9}',r'\begingroup\small\raggedright'+'\n'+r'\begin{thebibliography}{9}').replace(r'\end{document}',r'\endgroup'+'\n'+r'\end{document}')
+    text=text.replace(r'\section{Conclusion}',r'\clearpage'+'\n'+r'\section{Conclusion}').replace(r'\section{结论}',r'\clearpage'+'\n'+r'\section{结论}')
     path.write_text(text, encoding='utf-8')
 
 print('中英文单文件论文已由正式 JSON 重新生成。')

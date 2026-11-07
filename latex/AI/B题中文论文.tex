@@ -41,38 +41,91 @@
 \end{figure}
 
 \section{从出脚到球门的物理模型}
-本节写出从出脚到第一个终止事件所使用的受力方程。
 
-把球看成半径 $R=0.11$ m、质量 $m=0.43$ kg 的球体。空气为恒定横风 $\mathbf w=(0,w_y,0)$，密度 $\rho$、阻力系数 $C_D$ 和有效侧向系数 $\mathbf b=(0,b_y,b_z)$ 都取常数。方程写成
+本节依次回答三个问题：球受到什么力，这些力怎样写成方程，哪些简化会影响最后的预测。先建立受力依据，再使用方程计算。
+\subsection{研究对象、坐标和初始条件}
+研究对象是已经离脚、尚未碰到地面或门柱的足球。取球心位置$\mathbf r=(x,y,z)$，速度$\mathbf v=\dot{\mathbf r}$，$x$轴指向球门，$z$轴向上。球半径$R=0.11$ m、质量$m=0.43$ kg；初始球心按题目固定，初速度待求：
 \begin{equation}
-\dot{\mathbf r}=\mathbf v,\qquad
-\dot{\mathbf v}=\mathbf g-KC_D|\mathbf u|\mathbf u+\mathbf b\times\mathbf u,
-\qquad \mathbf u=\mathbf v-\mathbf w,
-\qquad K=\frac{\rho\pi R^2}{2m},
-\label{eq:model}
+\mathbf r(0)=(0,0,R),\qquad \mathbf v(0)=\mathbf v_0,\qquad
+\mathbf g=(0,0,-9.81)\ \mathrm{m\,s^{-2}}.
 \end{equation}
-其中 $\mathbf g=(0,0,--9.81)$ m/s$^2$。阻力项是二次项，方向与相对空气速度相反；叉乘项与 $\mathbf u$ 垂直。$\mathbf b$ 的单位是 s$^{-1}$，它把转动和升力效率合并在一起，并不是角速度，我们也不声称恢复真实自旋。令 $b_x=0$，因为两次位置对这个方向的约束很弱。系数恒定、风恒定、自旋不衰减、阻力危机不出现，都是模型假设而非测量结果；它们只作为模型被检查，没有对这只球做标定。受力形式沿用足球空气动力学的常用写法~\cite{asai}。
+质量和周长$2\pi R$符合IFAB球规格~\cite{ifab}，但不表示测得了本题足球的质量与材料。脚的作用已通过$\mathbf v_0$体现；球离脚后不再承受脚的推力。忽略形变后的球心平动满足牛顿第二定律：
+\begin{equation}
+m\dot{\mathbf v}=\mathbf F_g+\mathbf F_D+\mathbf F_M,\qquad \mathbf F_g=m\mathbf g.
+\label{eq:newton}
+\end{equation}
+接下来分别建立阻力$\mathbf F_D$和侧向力$\mathbf F_M$，而不是直接从位置曲线猜加速度。
+\subsection{从相对气流得到阻力}
+空气动力取决于球相对空气的速度。设本次射门期间横风近似不变，$\mathbf w=(0,w_y,0)$，定义
+\begin{equation}
+\mathbf u=\mathbf v-\mathbf w,\quad U=\|\mathbf u\|,\quad
+A=\pi R^2,\quad p_{\rm dyn}=\tfrac12\rho U^2.
+\end{equation}
+$p_{\rm dyn}$是动压，乘迎风面积得到力的尺度。把球面接缝、边界层和分离等影响收进无量纲阻力系数$C_D$，便有~\cite{nasa}
+\begin{equation}
+D=p_{\rm dyn}AC_D,\qquad
+\mathbf F_D=-D\frac{\mathbf u}{U}
+=-\tfrac12\rho AC_DU\mathbf u.
+\label{eq:drag}
+\end{equation}
+负号规定阻力与相对气流反向；$\rho AU^2$的单位是N。式中并非既有“运动阻力”又额外加一份“风阻”：风通过$\mathbf u$改变同一项空气动力。动压给出量级，$C_D$仍需实验标定，不能只用伯努利方程或能量守恒把它推定为某个数。
+\subsection{为什么使用有效侧向力}
+旋转会改变球两侧的边界层与尾流，使气动力出现垂直于气流的分量。足球风洞实验支持这一机制，也显示系数与旋转、流态有关~\cite{asai}。用通常的力系数定义，侧向力大小为
+\begin{equation}
+F_M=\tfrac12\rho AU^2C_L.
+\end{equation}
+为了连接到可计算的向量形式，记$\boldsymbol\omega_\perp$为角速度垂直于$\mathbf u$的部分。若在有限速度范围内近似$C_L\simeq c_sR\|\boldsymbol\omega_\perp\|/U$，其中$c_s$为无量纲系数，并取方向沿$\boldsymbol\omega\times\mathbf u$，则
+\begin{equation}
+\mathbf F_M\simeq\tfrac12\rho Ac_sR(\boldsymbol\omega\times\mathbf u)
+=m(\mathbf b\times\mathbf u),\qquad
+\mathbf b=\frac{\rho Ac_sR}{2m}\boldsymbol\omega.
+\label{eq:magnus}
+\end{equation}
+这一步是局部经验近似，不是风洞文献证明的普适线性定律。$\mathbf b$的单位是s$^{-1}$，把真实自旋与未知的气动效率$c_s$合在一起。两帧位置无法分别确定它们，因此程序只求有效$\mathbf b$，不把它解释成实测角速度。
 
-\begin{table}[H]\centering
-\caption{符号、单位与角色。列出的环境值是情景输入；出脚条件是反求量。}
-\begin{tabular}{lll}\toprule
-符号 & 含义 & 单位或角色\\\midrule
-$\mathbf r,\mathbf v$ & 球心位置与速度 & m；m/s\\
-$\mathbf u=\mathbf v-\mathbf w$ & 相对空气速度 & m/s\\
-$\mathbf w=(0,w_y,0)$ & 恒定横风 & 列出的情景输入\\
-$\rho$ & 空气密度 & 列出的情景输入\\
-$C_D$ & 阻力系数 & 列出的情景输入\\
-$\mathbf b=(0,b_y,b_z)$ & 有效侧向系数 & s$^{-1}$；反求量\\
-$K$ & $\rho\pi R^2/(2m)$ & m$^{-1}$\\
-$\epsilon$ & 逐坐标允许误差 & m\\
-$C_\perp$ & 侧力系数 $|\mathbf b\times\mathbf u|/(K|\mathbf u|^2)$ & 无量纲\\
-$(t_g,y_g,z_g)$ & 首次穿过 $x=11$ m & s；m；m\\
-\bottomrule\end{tabular}
-\end{table}
+本文取$\mathbf b=(0,b_y,b_z)$，使主要沿$x$方向运动的球，其横向和竖向偏转分别由$b_z$和$b_y$描述。令$b_x=0$是减少未知量的假设，并不说明真实球的这个分量必为零。若要预测自旋本身，还需转动惯量和空气力矩去求$\mathbf I\dot{\boldsymbol\omega}=\boldsymbol\tau$；题目没有这些数据。保持$\mathbf b$恒定只代表在约0.4s内使用恒定有效参数，其误差须留在模型局限中。
+\subsection{合成完整运动方程}
+将式~\eqref{eq:drag}、\eqref{eq:magnus}代入牛顿方程，并令$K=\rho A/(2m)$，得到程序实际积分的六个一阶方程：
+\begin{align}
+\dot{\mathbf r}&=\mathbf v,\qquad
+\dot{\mathbf v}=\mathbf g-KC_DU\mathbf u+\mathbf b\times\mathbf u,\label{eq:model}\\
+\dot v_x&=-KC_DUv_x+b_yv_z-b_z(v_y-w_y),\nonumber\\
+\dot v_y&=-KC_DU(v_y-w_y)+b_zv_x,\nonumber\\
+\dot v_z&=-g-KC_DUv_z-b_yv_x,\qquad g=\|\mathbf g\|.\nonumber
+\end{align}
+分量式也说明三种运动相互影响：横风不仅改变$y$方向阻力，$v_y-w_y$还进入$x$方向侧力。改变某一参数后，必须重新计算整个向量状态。
+\begin{table}[H]\centering\small
+\caption{本节符号及其角色。}\begin{tabular}{lll}\toprule
+符号 & 含义 & 单位或来源\\\midrule
+$\mathbf r,\mathbf v,\mathbf u$ & 位置、地面速度、相对空气速度 & m；m/s；m/s\\
+$m,R,A$ & 质量、半径、迎风面积 & kg；m；m$^2$\\
+$\rho,w_y,C_D$ & 密度、横风、阻力系数 & 指定情景，不是实测\\
+$\mathbf v_0,b_y,b_z$ & 初速度和有效侧力参数 & m/s；s$^{-1}$，待求\\
+$K,C_L,C_\perp$ & 气动尺度、升力与侧力系数 & m$^{-1}$；无量纲\\
+\bottomrule\end{tabular}\end{table}
+\subsection{用量级判断哪些作用重要}
+为判断是否能忽略某项，取当前示例出脚相对气流速度$U_0=31.26$ m/s、飞行时间$T=0.4042$ s。初始重力、阻力、侧力大小分别约为$4.22$、$7.96$、$6.96$ N，气动力与重力是同一量级。进一步比较它们在飞行时间内改变速度的相对大小：
+\begin{equation}
+\Pi_D=KC_DU_0T=0.239,\quad
+\Pi_M=\|\mathbf b\|T=0.215,\quad
+\Pi_g=\frac{gT}{U_0}=0.127.
+\end{equation}
+这些量均不远小于1，因此三项都保留。采用示例空气黏度$\mu=1.81\times10^{-5}$ Pa s和声速$c=343$ m/s，可估计
+\begin{equation}
+\mathrm{Re}=\frac{2\rho RU_0}{\mu}\simeq4.65\times 10^{5},\qquad
+\mathrm{Ma}=\frac{U_0}{c}\simeq0.091.
+\end{equation}
+声速和黏度为量级估算所用的假设，不是场地测量。较小的马赫数支持忽略压缩性；雷诺数说明阻力系数与流态有关，所以恒定$C_D$是有限工况下的简化，不能因此认定它已被标定。
 
-固定的质量和半径满足 IFAB 的球规格~\cite{ifab}。密度、风速和阻力系数都是列出的情景取值，不是现场测量。模型不包含守门员、门柱碰撞、触球时的形变以及第一个终止事件之后的飞行。球从题给球心出发，除半径外没有额外的竖直偏移。
+其余简化也要估计影响。空气浮力与重力之比约为$\rho(4\pi R^3/3)/m=1.59\%$；在不重新拟合出脚条件的估算中，忽略它可产生约$1.27$ cm的竖向位移差。因此本文不能把毫米级的计算残差说成毫米级的真实准确度。取地球自转角速度$\Omega=7.292115\times10^{-5}$ s$^{-1}$，其导致的位移量级$\Omega\|\mathbf v_0\|T^2$约为$0.39$ mm，低于本例允许误差。浮力、非恒定风和变化的气动系数仍会贡献模型误差，更多早期观测才能帮助检验它们。
+\subsection{有风时怎样检查功与能}
+令$E=\tfrac12m\|\mathbf v\|^2+mgz$。将牛顿方程与地面系速度点乘，重力势能项抵消后得到
+\begin{align}
+\frac{dE}{dt}&=(\mathbf F_D+\mathbf F_M)\cdot\mathbf v\label{eq:energy}\\
+&=-\tfrac12\rho AC_DU^3+(\mathbf F_D+\mathbf F_M)\cdot\mathbf w.\nonumber
+\end{align}
+推导中用到了$\mathbf F_M\cdot\mathbf u=0$，但$\mathbf v=\mathbf u+\mathbf w$。所以侧向力对相对气流的瞬时功率为零，有风时对地面系的球仍可做功；不能强求球的地面系机械能一直下降。后面的功与能检查正是积分式~\eqref{eq:energy}，用于检验程序是否把力的方向和符号算对。
 
-从出脚到球门大约 0.4 s，三项力都会改变轨迹。重力全程把轨迹向下弯；阻力随相对空气速度的平方增大，顺风或逆风既改变减速大小，也改变相对气流方向；侧向力随速度和拟合系数增大，它只改变方向而不做功，因为 $\mathbf b\times\mathbf u$ 与 $\mathbf u$ 垂直。只有重力的模型不足以把早期位置接到后期位置，但观测也没有测出两项气动力的大小。正因为如此，后文把环境取值当作列出的输入，而不是已知量。
 
 \section{用观测求参数}
 本节说明两次位置如何变成一组组参数取值。
@@ -83,7 +136,7 @@ q^*(\eta)=\arg\min_{q\in\mathcal B}\sum_{i=1}^{2}
 \|\mathbf r(t_i;q,\eta)-\mathbf r_i\|^2,
 \label{eq:fit}
 \end{equation}
-使用 \texttt{lsqnonlin}~\cite{lsq}，并从两个初值出发。拟合中的轨迹用记录步长的 RK4 积分。随后逐个检查六个坐标：
+使用 \texttt{lsqnonlin}~\cite{lsq}，并从两个初值出发。拟合时用四阶Runge--Kutta方法，步长为$0.0025$ s；接受前另用\texttt{ode45}回代观测，RelTol=$10^{-11}$、AbsTol=$10^{-12}$。全程预测用RelTol=$10^{-9}$、AbsTol=$10^{-11}$、最大步长$0.002$ s。随后逐个检查六个坐标：
 \begin{equation}
 |r_j(t_i;q,\eta)-r_{ij}|\le\epsilon,
 \qquad i=1,2,\quad j=x,y,z,
@@ -95,7 +148,59 @@ q^*(\eta)=\arg\min_{q\in\mathcal B}\sum_{i=1}^{2}
 
 一组参数还要通过物理筛选才算被接受：出脚方向向前且不向下，初速度在 10 到 40 m/s 之间，沿采样轨迹的侧力系数满足 $C_\perp\le0.50$；球在终止事件前必须位于地面以上，终止事件要在 2 s 内定位到。观测拟合与物理筛选分别记录，只有两项都通过才被接受。速度范围和 0.50 上限是保守的模型筛选，不是运动员或足球的普适极限。我们不强迫球进门：射偏也是记录下来的结果，球门只用来描述球飞到哪里。
 
-结果之所以是一组轨迹而不是一次射门，有两个原因。第一，未知量比六个坐标多。改变风速或阻力就改变了空气力，不同的初速度又能在两个观测时刻上补偿其中的大部分差别，于是不同的环境取值会反求出不同的出脚条件，而在 $t=0.05$ 与 $t=0.10$ s 处看起来一样。第二，两次观测只约束前段。拟合出的侧向系数只要有一点不同，在最后观测之后仍继续作用，落到球门平面时就会放大成明显的侧向差距。被接受的集合是搜索列出的参数得到的结果，并不证明网格之外没有别的解。只搜索列出的参数，图中的范围不能保证包含所有可能情况。
+结果之所以是一组轨迹而不是一次射门，有两个原因。第一，未知量比六个坐标多。改变风速或阻力就改变了空气力，不同的初速度又能在两个观测时刻上补偿其中的大部分差别，于是不同的环境取值会反求出不同的出脚条件，而在 $t=0.05$ 与 $t=0.10$ s 处看起来一样。第二，两次观测只约束前段，拟合出的侧向系数只要有一点不同，在最后观测之后仍继续作用。被接受的集合是搜索列出的参数得到的结果，并不证明网格之外没有别的解。
+
+
+\subsection{为什么不同参数能通过同样的观测}
+前面的数值筛选可以进一步用方程说明。把全部未知量写为
+\begin{equation}
+p=(v_{0x},v_{0y},v_{0z},b_y,b_z,w_y,\rho,C_D),\qquad
+\mathbf f(p)=\begin{bmatrix}\mathbf r(t_1;p)\\\mathbf r(t_2;p)\end{bmatrix}.
+\end{equation}
+这里$p$有8个分量，而观测只提供6个位置数。更直接的例子是：阻力中只出现$\rho C_D$；保持这个乘积、风和有效$\mathbf b$不变，力场和轨迹就完全相同。这说明仅靠观测不能把密度和阻力系数分别测出来。若横风也改变，就可能用不同的出脚条件使两次位置仍落在允许误差内，后续轨迹却不同。
+
+在一个已经求出的参数附近，记$J=\partial\mathbf f/\partial p$，则
+\begin{equation}
+\delta\mathbf f\simeq J\delta p,\qquad
+\|\mathbf f(p)-\mathbf r_{\rm obs}\|_\infty\le\epsilon.
+\end{equation}
+使$J\delta p$很小的参数变化，在早期数据上难以区分；这给“参数互相补偿”一个明确含义。它只是局部解释，最终是否符合观测仍须回代完整非线性方程。最小二乘减少的是误差平方和，不保证每个坐标都过关，所以必须保留前面的逐坐标检查。某组最小二乘结果没过关，也不证明这个环境下所有参数都不可能过关。
+\subsection{从连续飞行确定球门位置}
+球门点不是在一个随意选定的时间读取，而是满足
+\begin{equation}
+x(t_g;p)=11,\quad v_x(t_g)>0,\qquad
+(y_g,z_g)=(y(t_g;p),z(t_g;p)).
+\label{eq:goal}
+\end{equation}
+同时检查下降触地事件$z(t)-R=0,\ v_z(t)<0$，先发生哪个就记录哪个。在球门中心平面，一个简单的有限半径净空检查为
+\begin{equation}
+|y_g|<3.66-R,\qquad R\le z_g<2.44-R.
+\end{equation}
+这里严格采用题目球心穿过$x=11$的约定；这个局部几何检查不代替球与门柱的完整碰撞计算，也不把未到达球门的触地点投影成进球点。
+\subsection{参数差异怎样传到球门点}
+以下只讨论相对速度非零、仍先到达球门且向前穿越的小幅参数变化。不仅$y,z$会变，穿越时刻$t_g$也会变。将式~\eqref{eq:goal}对$p$求导，得到
+\begin{equation}
+\frac{\partial t_g}{\partial p}=-\frac{\partial x/\partial p}{v_x(t_g)},\qquad
+G=\frac{\partial(y_g,z_g)}{\partial p}
+=S_{yz}-\frac{1}{v_x(t_g)}\begin{bmatrix}v_y\\v_z\end{bmatrix}S_x.
+\label{eq:goalderivative}
+\end{equation}
+$S_x,S_{yz}$是在同一固定时间$t_g$对位置求导；最后一项补偿“到达时间也变了”的影响。漏掉这一项，就会把固定时刻的位置误差误当成球门平面误差。
+
+这些导数也能沿同一方程计算。令$s=(\mathbf r,\mathbf v)$、$\dot s=F(s,p)$、$S=\partial s/\partial p$，直接求导便有
+\begin{equation}
+\dot S=F_sS+F_p,\quad
+F_s=\begin{bmatrix}0&I\\0&D\end{bmatrix},\qquad
+D=-KC_D\left(UI+\frac{\mathbf u\mathbf u^T}{U}\right)+[\mathbf b]_\times.
+\end{equation}
+$[\mathbf b]_\times\mathbf u=\mathbf b\times\mathbf u$；$S(0)$的位置行全为零，速度对初速度的三个导数构成单位阵，其余为零。不同参数的直接影响例如
+\begin{equation}
+\frac{\partial\dot{\mathbf v}}{\partial b_y}=(u_z,0,-u_x)^T,\quad
+\frac{\partial\dot{\mathbf v}}{\partial b_z}=(-u_y,u_x,0)^T,\quad
+\frac{\partial\dot{\mathbf v}}{\partial w_y}=-D\mathbf e_y.
+\end{equation}
+这些式子分别接回侧力方向和相对气流定义，因此导数与受力模型是一致的。MATLAB另行积分这组变化方程，并用原方程的小幅参数扰动检查式~\eqref{eq:goalderivative}；球门导数的最大差异为$1.38\times 10^{-10}$（按所用SI参数单位）。它检查的是公式与程序是否一致，不给参数赋予概率；正式轨迹仍由原来的非线性运动方程求出。
+
 
 \section{计算结果}
 本节先给出当前示例的落点与时间，再给出两条符合观测但落点不同的轨迹，最后给出筛选图表。
@@ -161,15 +266,15 @@ B & -5.3 & 1.225 & 0.4500 & 32.849 & 4.999 & 2.5389 & 1.9451 & 0.4099 \\
 \section{计算检查与适用范围}
 本节列出 MATLAB 内部做过的检查，以及这个结果的适用边界。
 
-所有计算使用同一套方程和事件定义。三档步长只改变积分的最大步长，因此检验的是数值敏感性，而不是另一个模型。功与能检查比较机械能的变化与阻力、侧向力所做的功：
+所有计算使用同一套方程和事件定义。三档步长只改变积分的最大步长，因此检验的是数值敏感性，而不是另一个模型。根据式~\eqref{eq:energy}推导的功与能关系，检查累积残差：
 \begin{equation}
-\frac{d}{dt}\left(\frac12m|\mathbf v|^2+mgz\right)
-=(\mathbf F_D+\mathbf F_M)\cdot\mathbf v.
+R_E(t)=E(t)-E(0)-\int_0^t(\mathbf F_D+\mathbf F_M)\cdot\mathbf v\,d\tau.
 \end{equation}
-事件检查确认触地、向前穿过 $x=11$ m 以及超时都被分别定位并记录。三档步长下球门平面落点的最大变化为 $6.66\times 10^{-15}$ m。功与能平衡的残差为 $1.99\times 10^{-13}$ J。人为设置的过大初速度和侧向力均被检查程序拒绝。
+事件检查确认触地、向前穿过 $x=11$ m 以及超时都被分别定位并记录。三档步长下球门平面落点的最大变化为 $6.66\times 10^{-15}$ m。该功与能累积残差的最大值为 $1.99\times 10^{-13}$ J。人为设置的过大初速度和侧向力均被检查程序拒绝。
 
 这些检查检验的是程序与内部的能量平衡。没有独立的实测全程飞行，因此它们不能证明这只球、这块场地和这台相机服从该模型。报出的落点和范围只对列出的参数取值和声明的允许误差成立，不带概率，也不能保证搜索范围之外的情况。放宽允许误差会接受更多轨迹，但不会把采样得到的分散范围变成置信区间。
 
+\clearpage
 \section{结论}
 本节回答问题。
 
@@ -180,6 +285,7 @@ B & -5.3 & 1.225 & 0.4500 & 32.849 & 4.999 & 2.5389 & 1.9451 & 0.4099 \\
 \bibitem{upc} University Physics Competition. 2026 contest, Problem B. \url{https://www.uphysicsc.com/2026contest.html}. 访问于 2026 年 11 月 7 日.
 \bibitem{ifab} The IFAB. Laws of the Game, Law 2: The Ball. \url{https://www.theifab.com/laws/latest/the-ball/}. 访问于 2026 年 11 月 7 日.
 \bibitem{asai} T. Asai, K. Seo, O. Kobayashi and R. Sakashita. Fundamental aerodynamics of the soccer ball. \emph{Sports Engineering} 10, 101--109 (2007). \url{https://doi.org/10.1007/BF02844207}.
+\bibitem{nasa} NASA Glenn Research Center. Drag Equation. \url{https://www1.grc.nasa.gov/beginners-guide-to-aeronautics/drag-equation/}.
 \bibitem{ode} MathWorks. \texttt{ode45}: Solve nonstiff differential equations. \url{https://www.mathworks.com/help/matlab/ref/ode45.html}. 使用 MATLAB R2024a 实现.
 \bibitem{lsq} MathWorks. \texttt{lsqnonlin}: Solve nonlinear least-squares problems. \url{https://www.mathworks.com/help/optim/ug/lsqnonlin.html}.
 \end{thebibliography}
