@@ -27,8 +27,10 @@ seed = 20261107;
 rng(seed, 'twister');
 
 % ---------- 项目路径（由当前文件位置计算，不含个人绝对路径） ----------
+% 本文件位于 项目根/仿真/Matlab版/，项目根需向上三级；
+% 正式数据与配图仍留在项目根的 data/ 与 img/，不在仿真目录内另存。
 thisFile = mfilename('fullpath');
-rootDir = fileparts(fileparts(thisFile));
+rootDir = fileparts(fileparts(fileparts(thisFile)));
 dataDir = fullfile(rootDir, 'data', '派生数据');
 imgDir  = fullfile(rootDir, 'img');
 if ~exist(dataDir, 'dir'), mkdir(dataDir); end

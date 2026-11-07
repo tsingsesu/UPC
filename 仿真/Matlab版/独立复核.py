@@ -6,7 +6,7 @@ from scipy.integrate import solve_ivp
 from scipy.optimize import least_squares
 import scipy
 
-ROOT = Path(__file__).resolve().parents[1]
+ROOT = Path(__file__).resolve().parents[2]  # 仿真/Matlab版/ → 项目根
 OBS = np.array([[1.5, .45, .44], [2.96, .86, .74]])
 R0 = np.array([0., 0., .11])
 K = 1.225 * np.pi * .11**2 / (2*.43)

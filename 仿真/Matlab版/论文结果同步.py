@@ -3,7 +3,7 @@ from pathlib import Path
 import json
 import numpy as np
 from scipy.stats import chi2
-ROOT=Path(__file__).resolve().parents[1]
+ROOT=Path(__file__).resolve().parents[2]  # 仿真/Matlab版/ → 项目根
 d=json.loads((ROOT/'data/派生数据/罚球结果.json').read_text(encoding='utf-8'))
 assert d['mode']=='full'
 names=['Gravity only','Constant acceleration','Drag only','Drag and effective Magnus']

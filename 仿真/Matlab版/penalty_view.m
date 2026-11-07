@@ -6,9 +6,14 @@ if nargin < 1 || isempty(mode), mode = 'interactive'; end
 mode = lower(char(mode));
 assert(any(strcmp(mode,{'interactive','export'})), 'mode 必须是 ''interactive'' 或 ''export''。');
 isExport = strcmp(mode,'export');
-thisFile = mfilename('fullpath'); rootDir = fileparts(fileparts(thisFile));
+thisFile = mfilename('fullpath'); rootDir = fileparts(fileparts(fileparts(thisFile)));
+% 读取：正式计算结果仍在项目根 data/派生数据；导出：演示物写本目录 data/ 与 img/
 dataDir = fullfile(rootDir,'data','派生数据'); imgDir = fullfile(rootDir,'img');
-if isExport && ~exist(imgDir,'dir'), mkdir(imgDir); end
+outDataDir = fullfile(fileparts(thisFile),'data'); outImgDir = fullfile(fileparts(thisFile),'img');
+if isExport
+    if ~exist(outImgDir,'dir'), mkdir(outImgDir); end
+    if ~exist(outDataDir,'dir'), mkdir(outDataDir); end
+end
 srcJson = fullfile(dataDir,'罚球结果.json');
 assert(exist(srcJson,'file')==2, '缺少已有结果文件：%s', srcJson);
 if isExport, assert(usejava('jvm'), 'export 模式需要图形环境（JVM）。'); end
@@ -139,8 +144,8 @@ if ~isExport
 end
 
 % ---------- export：GIF、最终 PNG、时序 CSV、验证 JSON ----------
-gifPath = fullfile(imgDir,'点球物理仿真.gif'); pngPath = fullfile(imgDir,'点球仿真全景.png');
-csvPath = fullfile(dataDir,'点球仿真时序.csv'); verPath = fullfile(dataDir,'点球仿真验证.json');
+gifPath = fullfile(outImgDir,'点球物理仿真.gif'); pngPath = fullfile(outImgDir,'点球仿真全景.png');
+csvPath = fullfile(outDataDir,'点球仿真时序.csv'); verPath = fullfile(outDataDir,'点球仿真验证.json');
 set([hG hD],'Visible','on'); set(hCmp,'Value',1);
 nF = 80; gifDur = 4; tmpDir = [tempname '_Frames']; mkdir(tmpDir);
 for k = 1:nF
