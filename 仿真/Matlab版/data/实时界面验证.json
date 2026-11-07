@@ -1,18 +1,8 @@
 {
   "passed": true,
-  "singleAxes": true,
-  "fourParameters": true,
-  "feasibleAfterEdit": true,
-  "rebuildFromZero": true,
-  "v0Changed": true,
-  "earlyWithinTolerance": true,
-  "oldHistoryNotAppended": true,
-  "invalidInputRestored": true,
-  "outOfRangeClamped": true,
-  "expandedControls": true,
-  "playbackPreservedAfterEdit": true,
-  "infeasibleMarkedRed": true,
-  "goalIntersectionsSynchronized": true,
-  "replayReturnsToZero": true,
-  "timerClearedOnClose": true
+  "singleCompleteCurve": true,
+  "noPredictionAnnotation": true,
+  "wholeCurveAtEveryTime": true,
+  "parameterRefit": true,
+  "playbackAndCleanup": true
 }

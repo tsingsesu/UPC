@@ -1,115 +1,14 @@
 {
-  "baselineEndpoint": [
-    11,
-    2.5994405492085213,
-    1.967004615467743,
-    24.882014498150237,
-    3.9678026578764274,
-    2.5555360605280697
-  ],
-  "baselineDifference": 0,
-  "windAtLaunch": [
-    0,
-    8,
-    0
-  ],
-  "refittedInitialVelocityChange": 0.085405518202058425,
-  "windFitResidual": [
-    [
-      0.0019051192620886948,
-      3.734936930172017E-5,
-      0.00040518118061078079
-    ],
-    [
-      -0.00098152254198780042,
-      -6.6416646872236029E-6,
-      -0.00020972822372555822
-    ]
-  ],
-  "densityDragProductDifference": 9.1695085130237991E-9,
+  "observationMaxError": 0.00091450658745317881,
+  "initialVelocityChange": 0.018740824221834512,
+  "densityDragProductDifference": 5.7920030309348066E-10,
   "steps": [
     0.004,
     0.002,
     0.001
   ],
-  "stepEndpoints": [
-    [
-      11,
-      2.6216534990816345,
-      1.955436514095175
-    ],
-    [
-      11,
-      2.6216534990816371,
-      1.9554365140951744
-    ],
-    [
-      11,
-      2.6216534990816349,
-      1.9554365140951759
-    ]
-  ],
-  "maxStepDifference": 2.7103998191910122E-15,
-  "relativeDragPower": -248.88659514936876,
-  "relativeMagnusPower": 4.4408920985006262E-16,
-  "energyWorkResidual": 4.6895820560166612E-13,
-  "rejectedResidual": 0.012790964846265629,
-  "familyCounts": [
-    51,
-    107,
-    189
-  ],
-  "groundEvent": [
-    2.1075067834613623,
-    -0.080579445996397187,
-    0.10999999999999842,
-    9.55643479224261,
-    -0.73690270669630686,
-    -0.98689332633076787
-  ],
-  "oldBranchRejected": true,
-  "implausibleSpeedAndForceRejected": true,
-  "expandedRangeChecks": [
-    {
-      "windY": -15,
-      "density": 0.9,
-      "Cd": 0.08,
-      "accepted": false,
-      "residual": 0.013736129709429168,
-      "reasons": [
-        "observation_tolerance"
-      ]
-    },
-    {
-      "windY": 15,
-      "density": 1.4,
-      "Cd": 0.8,
-      "accepted": false,
-      "residual": 0.032356035374110581,
-      "reasons": [
-        "transverse_coefficient_guard",
-        "observation_tolerance"
-      ]
-    },
-    {
-      "windY": -12,
-      "density": 1,
-      "Cd": 0.2,
-      "accepted": false,
-      "residual": 0.0084110365689509248,
-      "reasons": [
-        "observation_tolerance"
-      ]
-    },
-    {
-      "windY": 12,
-      "density": 1.3,
-      "Cd": 0.5,
-      "accepted": false,
-      "residual": 0.011866230330818794,
-      "reasons": [
-        "observation_tolerance"
-      ]
-    }
-  ]
+  "maxStepDifference": 6.6613381477509392E-15,
+  "energyWorkResidual": 1.9895196601282805E-13,
+  "groundEventHeight": 0.11,
+  "implausibleSpeedAndForceRejected": true
 }

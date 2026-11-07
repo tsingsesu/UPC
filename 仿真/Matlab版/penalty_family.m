@@ -3,7 +3,7 @@ function family=penalty_family(obs,nominalCd,mode)
 if nargin<3,mode='full';end
 p=penalty_inverse('defaults');
 if strcmp(mode,'quick'),winds=[-8 0 8];dens=[1.1 1.225 1.35];cds=unique([.25 nominalCd .5]);
-else,winds=linspace(-8,8,7);dens=[1.1 1.225 1.35];cds=unique([linspace(.15,.6,10) nominalCd]);end
+else,winds=linspace(-8,8,7);dens=[1.1 1.225 1.35];cds=.15:.05:.6;end
 n=numel(winds)*numel(dens)*numel(cds);
 template=struct('windY',NaN,'density',NaN,'Cd',NaN,'theta',nan(1,6), ...
  'maxResidual',inf,'rmse',inf,'residual',nan(2,3),'exitflag',0,'boundaryHit',false, ...

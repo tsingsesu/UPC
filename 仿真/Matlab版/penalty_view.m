@@ -1,12 +1,12 @@
 function penalty_view(mode)
-%PENALTY_VIEW 点球全程约束反演界面
+%PENALTY_VIEW 点球根据两次观测计算轨迹界面
 %   penalty_view                交互界面（唯一可旋转/缩放三维轴 + 四个参数）
 %   penalty_view('export')      导出 80 帧 GIF 与全景 PNG（默认全程参数）
 %   penalty_view('demo')        从正式约束族选两组差异较大的合格成员演示
 %   penalty_view('selftest')    轻量接口自检（不建界面）
 %
 %   参数（风、空气密度、阻力系数、观测容差）从出脚 t=0 起全程生效。
-%   任何参数修改都重新做全程联合反演，不复用、不拼接旧历史轨迹。
+%   任何参数修改都重新做全程求解，不复用、不拼接旧历史轨迹。
 %   动力学与拟合全部由 penalty_scenario 的稳定接口提供，本文件不实现第二套物理。
 
 if nargin < 1 || isempty(mode), mode = 'interactive'; end
@@ -54,7 +54,7 @@ scaleF = 0.25;             % 力箭头：0.25 m / N
 xPlane = 11; goalHW = 3.66; goalH = 2.44;
 
 % ---------- 图窗与唯一三维轴 ----------
-fig = figure('Name','点球全程约束反演','Color','w','Units','pixels', ...
+fig = figure('Name','点球根据两次观测计算轨迹','Color','w','Units','pixels', ...
     'Position',[40 40 1440 860],'NumberTitle','off');
 if any(strcmp(mode,{'export','demo'}))
     set(fig,'Visible','off');
@@ -82,15 +82,6 @@ patch(ax3,11*ones(1,4),[-goalHW goalHW goalHW -goalHW],[0 0 goalH goalH], ...
     [.20 .65 .85],'FaceAlpha',.045,'EdgeColor','none','HandleVisibility','off','Tag','GoalPlane');
 hFamilyGoal=plot3(ax3,nan,nan,nan,'.','Color',[.40 .40 .40],'MarkerSize',9, ...
     'HandleVisibility','off','Tag','FamilyGoalIntersections');
-hGoalPoint=plot3(ax3,nan,nan,nan,'d','Color',[.55 .12 .70], ...
-    'MarkerFaceColor','none','MarkerSize',18,'LineWidth',2, ...
-    'DisplayName','当前预测交点','Tag','GoalIntersection');
-hGoalCross=plot3(ax3,nan,nan,nan,'-','Color',[.55 .12 .70], ...
-    'LineWidth',1.4,'HandleVisibility','off','Tag','GoalIntersectionCross');
-hGoalText=text(ax3,0,0,0,'','FontName',fnUI,'FontSize',9, ...
-    'Color',[.45 .08 .60],'BackgroundColor','w','Margin',3,'Clipping','on', ...
-    'HandleVisibility','off','Tag','GoalIntersectionLabel');
-
 % 灰色合格族（最多画 80 条，均匀抽样）
 maxFamLines = 80;
 famLines = gobjects(maxFamLines,1);
@@ -99,13 +90,11 @@ for k = 1:maxFamLines
         'LineWidth',0.5,'HandleVisibility','off','Tag','FamilyLine');
 end
 hFamLegend = plot3(ax3,nan,nan,nan,'-','Color',[0.72 0.72 0.72], ...
-    'LineWidth',0.8,'DisplayName','灰色族及其交点');
+    'LineWidth',0.8,'DisplayName','其他符合观测的轨迹');
 
-% 已飞行 / 未来轨迹
-hPlayed = plot3(ax3,nan,nan,nan,'-','Color',[0 0.35 0.85], ...
-    'LineWidth',2.2,'DisplayName','已飞行','Tag','PlayedLine');
-hFuture = plot3(ax3,nan,nan,nan,'--','Color',[0.95 0.55 0.08], ...
-    'LineWidth',1.6,'DisplayName','未来','Tag','FutureLine');
+% 一条完整计算轨迹；足球位置表示播放进度。
+hPlayed=plot3(ax3,nan,nan,nan,'-','Color',[0 .35 .85], ...
+ 'LineWidth',2.2,'DisplayName','计算轨迹','Tag','PlayedLine');
 
 % 题给观测 + 当前拟合位置标记
 hObs = plot3(ax3,nan,nan,nan,'ko','MarkerFaceColor','k','MarkerSize',6, ...
@@ -113,7 +102,7 @@ hObs = plot3(ax3,nan,nan,nan,'ko','MarkerFaceColor','k','MarkerSize',6, ...
 hFitObs = plot3(ax3,nan,nan,nan,'ks','MarkerSize',8,'LineWidth',1.2, ...
     'DisplayName','拟合观测位置','Tag','FitObserved');
 hCur = plot3(ax3,nan,nan,nan,'kd','MarkerFaceColor','k','MarkerSize',5, ...
-    'LineWidth',1.0,'DisplayName','当前拟合位置','Tag','CurrentFit');
+    'LineWidth',1.0,'DisplayName','足球当前位置','Tag','CurrentFit');
 
 % 足球（固定真实半径 .11 m）
 [Xb,Yb,Zb] = sphere(20);
@@ -129,35 +118,16 @@ hqM = quiver3(ax3,0,0,0,0,0,0,'Color',[0.2 0.3 0.9],'LineWidth',1.5, ...
     'MaxHeadSize',0.8,'HandleVisibility','off');
 set([hqG hqD hqM],'Visible','off');
 
-% demo 对比专用（平时隐藏）
-hCmp = gobjects(1,2);
-hCmpTxt = gobjects(1,2);
-hCmpGoal=gobjects(1,2);
-hCmp(1) = plot3(ax3,nan,nan,nan,'-','Color',[0 0.35 0.85],'LineWidth',2.0, ...
-    'HandleVisibility','off');
-hCmp(2) = plot3(ax3,nan,nan,nan,'-','Color',[0.92 0.45 0.05],'LineWidth',2.0, ...
-    'HandleVisibility','off');
-hCmpTxt(1) = text(ax3,0,0,0,'第 1 组全程参数','FontName',fnUI,'FontSize',9, ...
-    'Color',[0 0.35 0.85],'FontWeight','bold','Visible','off');
-hCmpTxt(2) = text(ax3,0,0,0,'第 2 组全程参数','FontName',fnUI,'FontSize',9, ...
-    'Color',[0.92 0.45 0.05],'FontWeight','bold','Visible','off');
-set(hCmp,'Visible','off');
-for kk=1:2
- hCmpGoal(kk)=plot3(ax3,nan,nan,nan,'d','MarkerSize',9,'LineWidth',1.5, ...
-  'Color',hCmp(kk).Color,'MarkerFaceColor',hCmp(kk).Color, ...
-  'Visible','off','HandleVisibility','off','Tag','ComparisonGoalIntersection');
-end
-
 xlabel(ax3,'x（m，指向球门）'); ylabel(ax3,'y（m，横向）'); zlabel(ax3,'z（m，高度）');
-title(ax3,'点球全程约束反演（灰=合格参数族；蓝=已飞行；橙=未来）', ...
+title(ax3,'点球轨迹：环境参数与起脚条件共同决定', ...
     'FontName',fnUI,'FontSize',11);
-lg = legend(ax3,[hFamLegend hObs hFitObs hPlayed hFuture hCur hGoalPoint], ...
+lg = legend(ax3,[hPlayed hObs hFitObs], ...
     'Location','northwest','FontSize',8,'Box','off');
 set(lg,'AutoUpdate','off');
 
 % ---------- 左侧参数面板 ----------
 uicontrol(fig,'Style','text','Units','normalized','Position',[0.015 0.947 0.30 0.038], ...
-    'String','全程约束反演参数（改动后从 t=0 重新反演）','HorizontalAlignment','left', ...
+    'String','环境参数（改动后从 t=0 重新反演）','HorizontalAlignment','left', ...
     'FontName',fnUI,'FontSize',10,'FontWeight','bold');
 
 hS = struct(); hE = struct();
@@ -178,7 +148,7 @@ for ii = 1:numel(PRM.names)
 end
 
 uicontrol(fig,'Style','text','Units','normalized','Position',[0.015 0.665 0.30 0.030], ...
-    'String','—— 全程联合反演结果 ——','HorizontalAlignment','left', ...
+    'String','—— 由观测求出的结果 ——','HorizontalAlignment','left', ...
     'FontName',fnUI,'FontSize',9,'FontWeight','bold');
 
 hInfo = uicontrol(fig,'Style','text','Units','normalized', ...
@@ -207,7 +177,7 @@ hView = uicontrol(fig,'Style','popupmenu','Units','normalized', ...
     'Position',[0.655 0.095 0.105 0.040],'String',{'全景','末段放大'},'Value',1, ...
     'Tag','ViewSelect','Callback',@(~,~)cbView(),'FontName',fnUI,'FontSize',9);
 hFamilyToggle = uicontrol(fig,'Style','checkbox','Units','normalized', ...
-    'Position',[0.765 0.097 0.085 0.036],'String','族显示','Value',1, ...
+    'Position',[0.765 0.097 0.085 0.036],'String','其他轨迹','Value',0, ...
     'Tag','FamilyToggle','Callback',@(~,~)cbFamily(),'FontName',fnUI,'FontSize',9);
 hForceToggle = uicontrol(fig,'Style','checkbox','Units','normalized', ...
     'Position',[0.855 0.097 0.065 0.036],'String','力箭头','Value',0, ...
@@ -444,7 +414,7 @@ fprintf('[penalty_view] 就绪：T=%.6f s，状态 %s，最大残差 %.6f m。\n
             setappdata(fig,'Parameters',p);
             set(hView,'Value',1);
             set(hForceToggle,'Value',0);
-            set(hFamilyToggle,'Value',1);
+            set(hFamilyToggle,'Value',0);
             refreshCurve(); refreshObservations(); refreshFamily(true);
             syncControls(); resetTimeZero();
             applyView(); updateForceVisibility(); updateFamilyVisibility();
@@ -477,28 +447,6 @@ fprintf('[penalty_view] 就绪：T=%.6f s，状态 %s，最大残差 %.6f m。\n
         if size(s,1) ~= numel(t), s = s.'; end
         assert(size(s,2) >= 6,'curve 状态必须为 N×6。');
         curveT = t; curveS = s;
-        refreshGoalIntersection();
-    end
-
-    function refreshGoalIntersection()
-        % 只标出真正到达x=11的事件；先触地的端点不是球门交点。
-        ep=sim.endpoint(:);
-        crossing=strcmp(sim.status,'plane')&&numel(ep)>=3&&all(isfinite(ep(1:3)))&&abs(ep(1)-xPlane)<1e-7;
-        if ~crossing
-            set([hGoalPoint hGoalCross hGoalText],'Visible','off');
-            set(hGoalPoint,'XData',nan,'YData',nan,'ZData',nan);
-            return;
-        end
-        color=[.55 .12 .70];note='预测交点';
-        if ~sim.fit.feasible,color=[.82 .10 .10];note='未通过筛选的候选交点';end
-        set(hGoalPoint,'XData',ep(1),'YData',ep(2),'ZData',ep(3),'Color',color,'MarkerFaceColor','none','Visible','on');
-        a=.23;
-        set(hGoalCross,'XData',ep(1)*ones(1,5), ...
-            'YData',[ep(2)-a ep(2)+a nan ep(2) ep(2)], ...
-            'ZData',[ep(3) ep(3) nan ep(3)-a ep(3)+a],'Color',color,'Visible','on');
-        set(hGoalText,'Position',[ep(1)-.65 ep(2)+.15 ep(3)+.26], ...
-            'String',sprintf('%s\n(11, %.3f, %.3f) m',note,ep(2),ep(3)), ...
-            'Color',color,'Visible','on');
     end
 
     function refreshObservations()
@@ -529,17 +477,7 @@ fprintf('[penalty_view] 就绪：T=%.6f s，状态 %s，最大残差 %.6f m。\n
         end
         set(hBall,'XData',S(1)+rad*Xb,'YData',S(2)+rad*Yb,'ZData',S(3)+rad*Zb);
 
-        k = find(curveT <= tNow+1e-12);
-        if isempty(k)
-            P = [S;S];
-        else
-            P = curveS(k,1:3);
-            if curveT(k(end)) < tNow-1e-12, P = [P;S]; end
-        end
-        kf = find(curveT > tNow+1e-12);
-        Ftr = [S;curveS(kf,1:3)];
-        set(hPlayed,'XData',P(:,1),'YData',P(:,2),'ZData',P(:,3));
-        set(hFuture,'XData',Ftr(:,1),'YData',Ftr(:,2),'ZData',Ftr(:,3));
+        set(hPlayed,'XData',curveS(:,1),'YData',curveS(:,2),'ZData',curveS(:,3));
         set(hCur,'XData',S(1),'YData',S(2),'ZData',S(3));
 
         F = sm.forces;
@@ -608,7 +546,7 @@ fprintf('[penalty_view] 就绪：T=%.6f s，状态 %s，最大残差 %.6f m。\n
         lines = { ...
             sprintf('t = %.3f s ｜ 速度 %.2f m/s ｜ 位置 (%.2f, %.2f, %.2f) m', ...
                 tNow,norm(s(4:6)),s(1),s(2),s(3)), ...
-            '—— 起脚条件（全程联合反演） ——', ...
+            '—— 起脚条件（全程求解） ——', ...
             sprintf('v0 = (%+.2f, %+.2f, %+.2f) m/s',v0(1),v0(2),v0(3)), ...
             sprintf('起脚速度 %.2f m/s ｜ 起脚动能 %.2f J（不是脚的作用力）',sp,E), ...
             sprintf('指定 Cd = %.4f ｜ by = %+.3f ｜ bz = %+.3f',th(4),th(5),th(6)), ...
@@ -620,7 +558,7 @@ fprintf('[penalty_view] 就绪：T=%.6f s，状态 %s，最大残差 %.6f m。\n
             sprintf('合格状态：%s ｜ %s',feasTxt,openTxt), ...
             sprintf('当前风 (%+.2f, %+.2f, %+.2f) m/s ｜ 有效 Cd %.4f',w(1),w(2),w(3),CdNow), ...
             '环境从出脚 t=0 起全程生效。', ...
-            '灰色族为相容解的采样子集，不是置信区间。'};
+            '灰色族为符合观测的一些轨迹，不是置信区间。'};
         set(hInfo,'String',lines);
     end
 
@@ -628,12 +566,10 @@ fprintf('[penalty_view] 就绪：T=%.6f s，状态 %s，最大残差 %.6f m。\n
         feas = isfield(sim.fit,'feasible') && sim.fit.feasible;
         if feas
             set(hPlayed,'Color',[0 0.35 0.85]);
-            set(hFuture,'Color',[0.95 0.55 0.08]);
-            set(ax3.Title,'String','点球全程约束反演（灰=合格参数族；蓝=已飞行；橙=未来）', ...
+            set(ax3.Title,'String','点球轨迹：环境参数与起脚条件共同决定', ...
                 'Color',[0.1 0.1 0.1]);
         else
             set(hPlayed,'Color',[0.82 0.10 0.10]);
-            set(hFuture,'Color',[0.82 0.10 0.10]);
             set(ax3.Title,'String',candidateStatus(sim), ...
                 'Color',[0.75 0 0]);
         end
@@ -757,7 +693,7 @@ fprintf('[penalty_view] 就绪：T=%.6f s，状态 %s，最大残差 %.6f m。\n
                 txt = ['灰色族不可用：' familyError];
             end
         else
-            txt = sprintf('论文网格族：合格 %d 条，实际绘制 %d 条（等间隔抽样）；不是置信区间，也不是概率。', ...
+            txt = sprintf('其他轨迹：合格 %d 条，实际绘制 %d 条（等间隔抽样）；不是置信区间，也不是概率。', ...
                 familyQualified,familyDrawn);
             if ~vis, txt = [txt '（已隐藏）']; end
         end
@@ -834,7 +770,7 @@ fprintf('[penalty_view] 就绪：T=%.6f s，状态 %s，最大残差 %.6f m。\n
             end
         end
 
-        drawComparison(sims);
+        set(hView,'Value',2);applyView();drawAt(sim.tEnd);
         setStatus('约束轨迹簇对比：两组差异较大的合格全程参数。');
         drawnow;
         fr = getframe(fig);
@@ -868,26 +804,6 @@ fprintf('[penalty_view] 就绪：T=%.6f s，状态 %s，最大残差 %.6f m。\n
         set(hView,'Value',1);applyStyles(); applyView(); drawAt(0);
     end
 
-    function drawComparison(simsCell)
-        for jj = 1:2
-            c = penalty_scenario('curve',simsCell{jj});
-            set(hCmp(jj),'XData',c.state(:,1),'YData',c.state(:,2),'ZData',c.state(:,3));
-            ep = simsCell{jj}.endpoint(:);
-            if strcmp(simsCell{jj}.status,'plane')
-                set(hCmpGoal(jj),'XData',ep(1),'YData',ep(2),'ZData',ep(3),'Visible','on');
-                set(hCmpTxt(jj),'String',sprintf('第%d组交点\n(11, %.3f, %.3f) m',jj,ep(2),ep(3)));
-            end
-            set(hCmpTxt(jj),'Position',[ep(1)-.7,ep(2)+.08,ep(3)+(.20-.35*(jj-1))]);
-        end
-        set([hPlayed hFuture hCur hGoalPoint hGoalCross hGoalText],'Visible','off');
-        set([hqG hqD hqM],'Visible','off');
-        set(hBall,'Visible','off');
-        set(hObs,'Visible','on'); set(hFitObs,'Visible','on');
-        set(hCmp,'Visible','on'); set(hCmpTxt,'Visible','on');
-        set(ax3.Title,'String','约束轨迹簇对比：两组差异较大的合格全程参数');
-        set(hView,'Value',2);applyView();view(ax3,-28,20);
-    end
-
     % ================= 小工具 =================
     function b = busyNow()
         b = false;
@@ -903,7 +819,7 @@ end
 % ================= 局部函数 =================
 function p = withDefaults(p)
 if ~isstruct(p), p = struct(); end
-defs = struct('windY',0,'density',1.225,'Cd',0.370687,'tolerance',0.005,'maxStep',0.002);
+defs = struct('windY',8,'density',1.225,'Cd',.35,'tolerance',0.005,'maxStep',0.002);
 f = fieldnames(defs);
 for k = 1:numel(f)
     if ~isfield(p,f{k}) || ~isnumeric(p.(f{k})) || ~isfinite(p.(f{k}))
@@ -914,7 +830,7 @@ end
 
 function assertSim(s)
 assert(isstruct(s),'penalty_scenario(''start'') 未返回结构体。');
-need = {'params','theta','initialSpeed','fit','status','tEnd','endpoint','base','reference'};
+need = {'params','theta','initialSpeed','fit','status','tEnd','endpoint','base'};
 for k = 1:numel(need)
     assert(isfield(s,need{k}),['仿真结果缺少字段：' need{k}]);
 end
@@ -988,9 +904,8 @@ J.endpoint = s.endpoint(:)';
 J.status = s.status;
 J.tEnd = s.tEnd;
 J.isOpening = s.isOpening;
-J.referenceEndpoint = s.reference.endpoint(:)';
 J.outputs = outputs;
-J.note = ['参数、拟合与末端来自 penalty_scenario 的全程联合反演；' ...
+J.note = ['参数、拟合与末端来自 penalty_scenario 的全程求解；' ...
     '环境从出脚 t=0 起全程生效。'];
 end
 

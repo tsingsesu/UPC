@@ -2,12 +2,11 @@ function out=penalty_scenario(action,varargin)
 %PENALTY_SCENARIO 全程参数约束反演；不再拼接t=.1前后的不同物理。
 switch lower(action)
  case 'defaults'
-  out=penalty_inverse('defaults');d=loadData();out.Cd=d.fit.theta(4);
+  d=loadData();out=d.selected.params;
  case 'start'
   p=varargin{1};d=loadData();f=penalty_inverse('fit',p,d.observations.positions);
   sim=penalty_inverse('propagate',f);sim.base.observations=d.observations;
-  refp=penalty_inverse('defaults');refp.Cd=d.fit.theta(4);
-  sim.reference=reference(refp,d.observations.positions);out=sim;
+  out=sim;
  case 'sample'
   sim=varargin{1};t=varargin{2};
   assert(isscalar(t)&&isfinite(t)&&t>=0&&t<=sim.tEnd+1e-9,'时间越界。');
@@ -35,14 +34,4 @@ p=fullfile(root,'data','派生数据','罚球结果.json');m=dir(p);
 assert(~isempty(m),'请先运行 penalty(''full'') 生成正式结果。');tag=[m.datenum m.bytes];
 if isempty(cache)||~isequal(stamp,tag),cache=jsondecode(fileread(p));stamp=tag;end
 d=cache;
-end
-
-function ref=reference(p,obs)
-persistent cached signature
-key=[p.Cd obs(:)'];
-if isempty(cached)||~isequal(key,signature)
- sim=penalty_inverse('propagate',penalty_inverse('fit',p,obs));t=linspace(0,sim.tEnd,240);
- cached=struct('t',t(:),'state',deval(sim.sol,t)','endpoint',sim.endpoint,'tEnd',sim.tEnd);signature=key;
-end
-ref=cached;
 end

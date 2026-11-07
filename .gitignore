@@ -11,3 +11,6 @@ Require.md
 *.bbl
 *.blg
 *.xdv
+
+# 本地版面核查中间图片
+/tmp/

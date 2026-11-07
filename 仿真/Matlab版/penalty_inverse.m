@@ -4,7 +4,7 @@ function out=penalty_inverse(action,varargin)
 % 每个剖面保留一个有界最小二乘代表，不声称穷尽可行集。
 switch lower(action)
  case 'defaults'
-  out=struct('windY',0,'density',1.225,'Cd',.370687007715,'tolerance',.005,'maxStep',.002);
+  out=struct('windY',8,'density',1.225,'Cd',.35,'tolerance',.005,'maxStep',.002);
  case 'limits'
   out=struct('speedMin',10,'speedMax',40,'maxTransverseCoefficient',.5, ...
    'massRange',[.410 .450],'circumferenceRange',[.68 .70], ...
