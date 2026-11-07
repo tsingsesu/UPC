@@ -1,0 +1,227 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[margin=25mm]{geometry}
+\usepackage{amsmath,amssymb,booktabs,graphicx,fancyhdr,hyperref,float}
+\usepackage[T1]{fontenc}
+\hypersetup{colorlinks=true,linkcolor=blue,urlcolor=blue,citecolor=blue}
+\pagestyle{fancy}\fancyhf{}\fancyhead[C]{Team: TEAM NUMBER REQUIRED}\fancyfoot[C]{\thepage}
+\setlength{\headheight}{15pt}\setlength{\parskip}{5pt}\setlength{\parindent}{0pt}
+\graphicspath{{../../img/}}
+\newcommand{\R}{\mathbb R}
+\begin{document}
+\begin{center}
+{\large Team: TEAM NUMBER REQUIRED}\par\vspace{12mm}
+{\Large Problem B}\par\vspace{10mm}
+{\LARGE Predicting a Penalty Kick from 0.10 Seconds of Motion}\par\vspace{8mm}
+{\large A physics-constrained estimate and its uncertainty}
+\end{center}
+\vspace{10mm}
+\begin{abstract}
+Two short-time position measurements constrain a football's velocity and curvature but do not uniquely determine its future motion without assumptions about aerodynamic forces. We construct a bounded maximum-likelihood estimator using gravity, quadratic drag, and an effective Magnus term. The fitted trajectory is propagated to its first crossing of the goal plane, with ground contact treated as a competing event. For the specified observations, the nominal model predicts a crossing at approximately $(11,2.60,1.97)$ m at $0.401$ s after the kick. A constant-acceleration interpolant instead gives $(11,2.49,1.92)$ m, illustrating the effect of extrapolation assumptions. Measurement uncertainty is amplified strongly: assuming independent 1 cm coordinate errors, local 95\% marginal half-widths are approximately 0.97 m in each goal-plane coordinate. We separate this conditional sampling uncertainty from structural uncertainty due to wind, unobserved spin components, speed-dependent drag, and spin decay. Numerical validation uses analytical limiting cases, step-size refinement, independent integration, and synthetic forecast tests. No independent experimental trajectory is available, so these checks establish numerical consistency rather than experimental validity. A useful goalkeeper forecast is therefore a point together with an uncertainty region and a failure classification; a highly precise unconditional landing point is not justified by the information supplied.
+\end{abstract}
+\newpage
+\section{Problem interpretation and deliverables}
+We use the coordinates and observations specified in Problem B~\cite{upc}. The initial ball centre is $\mathbf r_0=(0,0,0.11)$ m; the two subsequent observations are
+\begin{equation}
+\mathbf r_1=(1.50,0.45,0.44)\ \mathrm m,\qquad
+\mathbf r_2=(2.96,0.86,0.74)\ \mathrm m,
+\end{equation}
+at $t_1=0.05$ s and $t_2=0.10$ s. Our primary prediction concerns the ball centre at its first forward crossing of $x=11$ m, following the problem's plane convention. A separate finite-radius check assesses passage through the opening. The model does not predict the goalkeeper's response or collisions with the posts.
+
+The requested general method must accept measured positions, estimate a trajectory, propagate uncertainty, and reject trajectories that hit the ground first or fail to reach the plane. We implement each stage explicitly. All reported uncertainty is conditional on stated noise and force assumptions; neither is fully specified by the question.
+
+\section{Information limits and analytical baselines}
+\subsection{Why interpolation is not validation}
+After the initial position is fixed, the data contain six scalar constraints. A sufficiently flexible six-parameter model can interpolate these observations exactly, leaving no residual degrees of freedom with which to estimate noise. Further unknowns, including three-dimensional spin, variable drag, wind, and camera bias, cannot all be inferred freely.
+
+For a simple constructive demonstration, adding $\mathbf c\,t(t-t_1)(t-t_2)$ to a smooth trajectory preserves all three observed positions but changes later positions. Physical restrictions limit admissible $\mathbf c$; observations alone do not. We therefore use a reduced physical model and test departures from it separately.
+
+\subsection{Constant acceleration}
+With $h=0.05$ s and $\mathbf r(t)=\mathbf r_0+\mathbf v_0t+\tfrac12\mathbf at^2$, exact interpolation gives
+\begin{align}
+\mathbf v_0&=\frac{4\mathbf r_1-\mathbf r_2-3\mathbf r_0}{2h}
+=(30.4,9.4,6.9)\ \mathrm{m\,s^{-1}},\\
+\mathbf a&=\frac{\mathbf r_2-2\mathbf r_1+\mathbf r_0}{h^2}
+=(-16,-16,-12)\ \mathrm{m\,s^{-2}}.
+\end{align}
+The earliest positive solution of $30.4t-8t^2=11$ is $0.405008$ s, giving $(y,z)=(2.494824,1.920367)$ m. These extra digits are retained only as a reproducibility check. This acceleration is an inferred short-time average, not a force law guaranteed to remain constant.
+
+A gravity-only baseline estimates initial velocity by linear least squares after subtracting the known gravitational displacement. A drag-only baseline estimates the three velocity components and a drag coefficient. Their residuals and predictions are compared with the full model in the numerical results.
+
+\subsection{Short observation windows amplify error}
+Assume that $\mathbf r_0$ is exact and each coordinate of $\mathbf r_1,\mathbf r_2$ has independent error with standard deviation $\sigma$. The acceleration uncertainty is
+\begin{equation}
+\operatorname{sd}(a_j)=\frac{\sqrt5\,\sigma}{h^2}.
+\end{equation}
+At $\sigma=0.01$ m this is $8.94\ \mathrm{m\,s^{-2}}$. At a fixed time $t=8h=0.40$ s, quadratic interpolation has weights $(21,-48,28)$, so its coordinate uncertainty is $\sqrt{48^2+28^2}\,\sigma=55.57\sigma$. Goal-plane prediction also requires uncertain crossing time; propagating uncertainty at fixed time alone is insufficient.
+
+\section{Physical model and justified scope}
+\subsection{Equations and parameters}
+Let $\mathbf u=\mathbf v-\mathbf w$ be velocity relative to air. Newton's second law is approximated by
+\begin{align}
+\dot{\mathbf r}&=\mathbf v,\\
+\dot{\mathbf v}&=-g\mathbf e_z-K C_D|\mathbf u|\mathbf u+\mathbf b\times\mathbf u,
+&K&=\frac{\rho\pi R^2}{2m}.
+\label{eq:model}
+\end{align}
+The drag term follows the conventional quadratic force law. Wind-tunnel studies establish that football drag and lateral forces depend on surface structure, flow regime and rotation~\cite{asai}. They support including these mechanisms, but do not calibrate the particular ball in this problem.
+
+The effective Magnus vector $\mathbf b$ has units of inverse seconds. If the lift coefficient is approximately proportional to spin parameter $R\omega/|\mathbf u|$, the transverse acceleration has this cross-product form. Thus $\mathbf b$ combines spin and aerodynamic efficiency; it is not a measurement of angular velocity. Constant $\mathbf b$ and $C_D$ are short-flight approximations, subsequently stressed rather than treated as universal laws.
+
+\begin{table}[H]\centering
+\caption{Inputs and assumptions. Search bounds are modelling choices, not measured population intervals.}
+\begin{tabular}{lll}\toprule
+Quantity & Value & Status\\\midrule
+Initial centre and observations & As supplied & Problem data\\
+Ball radius $R$ & $0.11$ m & Ground-contact assumption\\
+Ball mass $m$ & $0.43$ kg & Representative choice\\
+Air density $\rho$ & $1.225$ kg m$^{-3}$ & Environmental assumption\\
+Gravity $g$ & $9.80665$ m s$^{-2}$ & Standard representative value\\
+Drag coefficient $C_D$ & $[0.05,0.60]$ & Search domain\\
+$b_y,b_z$ & $[-1.5,1.5]$ s$^{-1}$ & Search domain\\
+Coordinate error $\sigma$ & $2,5,10,20$ mm & Separate noise scenarios\\
+\bottomrule\end{tabular}\end{table}
+The chosen mass and radius are consistent with the IFAB ball specifications of 410--450 g and 68--70 cm circumference~\cite{ifab}. Density and gravity are assumptions rather than site measurements. Initial speed bounds are $v_x\in[10,50]$, $v_y\in[-20,20]$, $v_z\in[-5,25]$ m s$^{-1}$.
+
+In the reference model $\mathbf w=\mathbf0$ and $b_x=0$, leaving
+\begin{equation}
+\boldsymbol\theta=(v_{0x},v_{0y},v_{0z},C_D,b_y,b_z).
+\end{equation}
+Fixing $b_x$ reduces a weakly identifiable direction; it does not establish that real spin has zero longitudinal component. All three spin components would give at least seven unknowns from six observations. Likewise, trajectory data primarily identify the product $KC_D$, so independently varying mass, density and fitted drag can double-count the same uncertainty.
+
+\subsection{Scale and conservation checks}
+The fitted initial speed is about $32.6$ m s$^{-1}$. Using an assumed viscosity $1.81\times10^{-5}$ Pa s gives $\mathrm{Re}=2\rho R|\mathbf v|/\mu\simeq4.9\times10^5$. This is a consistency check on using an aerodynamic force model, not a calibration of its coefficients. Over $T\simeq0.40$ s, the dimensionless changes $KC_DUT\simeq0.26$, $|\mathbf b|T\simeq0.15$ and $gT/U\simeq0.12$ show that drag, curvature and gravity can all materially affect extrapolation.
+
+In still air the mechanical energy satisfies
+\begin{equation}
+\frac{d}{dt}\left(\frac12m|\mathbf v|^2+mgz\right)
+=-mKC_D|\mathbf v|^3\le0,
+\end{equation}
+because $\mathbf v\cdot(\mathbf b\times\mathbf v)=0$. This is the appropriate dissipative balance. Ground-frame mechanical energy need not decrease monotonically when moving air performs work.
+
+\section{Inference, event detection and uncertainty}
+\subsection{Bounded maximum likelihood}
+For a chosen $\sigma$, we minimize
+\begin{equation}
+\chi^2(\boldsymbol\theta)=\sum_{i=1}^2
+\frac{\|\mathbf r(t_i;\boldsymbol\theta)-\mathbf r_i\|^2}{\sigma^2}
+\end{equation}
+over the stated bounds using \texttt{lsqnonlin}~\cite{lsq}. Equal coordinate variances mean changing $\sigma$ alone rescales the objective without changing an interior optimum. Multiple starting points check local consistency; they do not prove global optimality.
+
+The point forecast is the goal-plane image of the constrained maximum-likelihood parameter estimate. In this precise sense it is our model-conditioned ``most likely'' forecast. A mode of a marginal landing-point probability density would additionally require a probabilistic parameter model and integration over nuisance parameters; we do not claim such an unconditional mode.
+
+Observations are evaluated using fourth-order Runge--Kutta steps of $0.005$ s. Subsequent flight uses \texttt{ode45} with directional events~\cite{ode}: increasing $x-11=0$ and decreasing $z-R=0$. Event integration starts from the fitted state at $0.10$ s to avoid falsely treating launch contact as an immediate landing. Missing crossings, numerical failures, and earlier ground contacts are recorded explicitly. Applicability assumes the ball is airborne through the observation window.
+
+The problem's centre-plane criterion is $|y|<3.66$, $0<z<2.44$. A stricter opening clearance is $|y|<3.66-R$ and $R\le z<2.44-R$. We also compute the centre at $x=11+R$ as a finite-size sensitivity; this is an ideal thin-plane approximation, not a detailed post-collision model.
+
+\subsection{Local confidence region}
+Let $\mathbf f(\boldsymbol\theta)\in\R^6$ collect predicted observations, $J=\partial\mathbf f/\partial\boldsymbol\theta$, and $G=\partial(y_g,z_g)/\partial\boldsymbol\theta$, including variation of crossing time. For a full-rank interior solution,
+\begin{equation}
+C_\theta\simeq\sigma^2(J^TJ)^{-1},\qquad C_g\simeq GC_\theta G^T.
+\end{equation}
+The local 95\% joint ellipse is
+\begin{equation}
+(\mathbf q-\widehat{\mathbf q})^TC_g^{-1}(\mathbf q-\widehat{\mathbf q})\le5.991.
+\end{equation}
+Marginal coordinate half-widths are $1.959964\sqrt{(C_g)_{jj}}$. These are not jointly 95\% rectangular bounds. Near active parameter constraints, Gaussian linearization is approximate and may misrepresent coverage.
+
+\subsection{Resampling and model uncertainty}
+Parametric bootstrap generates noisy observations from the fitted model, refits every sample and propagates each successful fit. We report boundary hits, failures, ground contacts and plane crossings alongside coordinate quantiles. This describes the estimator's sampling stability. The fraction of bootstrap forecasts within the opening is neither an experimentally established scoring probability nor a Bayesian posterior probability.
+
+Structural tests change one mechanism at a time: fixed $b_x=\pm1$ s$^{-1}$, transverse wind $w_y=\pm3$ m s$^{-1}$, $C_D=C_{D0}(|\mathbf u|/30)^p$ with $p=\pm0.5$, and $\mathbf b(t)=\mathbf b_0e^{-t/\tau}$ with $\tau=0.5,1$ s. Each is refitted to the same observations. These deliberately chosen stress cases are not assigned occurrence probabilities and must not be pooled into a statistical confidence interval.
+
+\section{Numerical results and verification}
+% VERIFIED_RESULTS_BEGIN
+\subsection{Point forecast and competing baselines}
+The four independent starts converge to the same interior solution, with parameters
+\begin{equation}
+\widehat{\boldsymbol\theta}=(30.41546,9.41672,6.90801,0.370687,-0.060326,-0.357128).
+\end{equation}
+The first three entries have units m s$^{-1}$, the fourth is dimensionless, and the last two have units s$^{-1}$. The predicted crossing is $(y_g,z_g)=(2.599441,1.967005)$ m at $0.4005035$ s. This numerical precision permits reproducibility; the answer should be reported as $(11,2.60,1.97)$ m at $0.401$ s.
+\begin{table}[H]\centering
+\caption{Observation fit and extrapolation. Tiny interpolation residuals do not demonstrate physical validity.}
+\begin{tabular}{lrrrr}\toprule
+Model & RMSE (mm) & $t_g$ (s) & $y_g$ (m) & $z_g$ (m)\\\midrule
+Gravity only & 10.376 & 0.3706 & 3.217 & 1.957 \\
+Constant acceleration & 0.000 & 0.4050 & 2.495 & 1.920 \\
+Drag only & 5.029 & 0.4058 & 3.217 & 1.879 \\
+Drag and effective Magnus & 0.000 & 0.4005 & 2.599 & 1.967 \\
+\bottomrule\end{tabular}\end{table}
+The drag-only objective is $\chi^2=1.517$ for two nominal residual degrees of freedom, corresponding to an approximate goodness-of-fit tail probability $0.468$ under the 1 cm Gaussian assumption. Thus these observations do not by themselves establish the need for the two extra transverse-force parameters at that noise level. At 2 mm noise, the same drag-only discrepancy gives $\chi^2=37.9$, making the interpretation strongly dependent on measurement quality. The more flexible model is retained as a conditional curvature-aware forecast, not declared uniquely correct by its exact fit.
+
+\begin{figure}[H]\centering
+\includegraphics[width=.78\linewidth]{Mai罚球轨迹与观测.png}
+\caption{Nominal fitted flight from launch to the first goal-plane crossing. Only the two early positions are observations.}
+\end{figure}
+At the centre plane $x=11.11$ m, the finite-radius sensitivity gives $(y,z)=(2.61689,1.97822)$ m at $0.40493$ s. The additional travel shifts the centre by approximately 2.1 cm in the goal plane. The nominal shot clears the ideal opening under both conventions.
+
+\subsection{Measurement uncertainty and bootstrap stability}
+For independent coordinate errors of standard deviation 0.01 m, the local prediction covariance is
+\begin{equation}
+C_g\simeq\begin{pmatrix}0.245132&0.000117\\0.000117&0.243555\end{pmatrix}\ \mathrm{m^2}.
+\end{equation}
+The marginal 95\% half-widths are 0.9704 m and 0.9673 m. At noise levels of 2, 5 and 20 mm, the respective half-widths scale to approximately 0.194, 0.485 and 1.94 m in each coordinate. This scaling is a local result; it is not a claim that bounded nonlinear resampling scales exactly at every noise level.
+The 95\% joint ellipse has semiaxes 1.212 and 1.208 m. The unscaled observation Jacobian condition number is 15.0; it depends on parameter units and is reported as a numerical diagnostic, not an invariant identifiability score.
+
+All 600 bootstrap fits terminate successfully; 53 hit at least one parameter boundary. All reach the goal plane, but 165 fail the finite-radius opening-clearance criterion. The latter are retained in the coordinate summaries and figure. The empirical 2.5--97.5 percentile ranges of the re-estimated plane coordinates are $[1.703,3.617]$ m in $y$ and $[0.967,2.937]$ m in $z$. These are estimator resampling quantiles, not a posterior distribution for the true shot. The 72.5\% within-opening frequency is a stability diagnostic only. Boundary hits and the region extending beyond the frame are material features of the result.
+
+\begin{figure}[H]\centering
+\includegraphics[width=.88\linewidth]{Mai球门预测椭圆与自助散点.png}
+\caption{Goal-plane forecasts from 600 bootstrap refits with 1 cm coordinate noise. All plane crossings are retained, including forecasts outside the opening. The ellipse is the local 95\% joint confidence approximation.}
+\end{figure}
+
+\subsection{Verification and synthetic forecast testing}
+MATLAB R2024a performs the main integration, optimization and resampling, with random seed 20261107. The independent Python implementation uses SciPy 1.17.1, DOP853 integration and bounded nonlinear least squares. It agrees with the nominal MATLAB goal-plane coordinates to less than $2\times10^{-11}$ m. This very small difference establishes implementation consistency, not real-world prediction accuracy.
+The RK4 gravity benchmark has maximum position error $2.7e-15$ m and the one-dimensional quadratic-drag benchmark $5.2e-13$ m. At fixed fitted parameters, step sizes 0.01, 0.005 and 0.0025 s change the predicted crossing by less than $3\times10^{-10}$ m. Independently changing the event integrator's maximum step to 0.02, 0.01 and 0.005 s changes the result by less than $4\times10^{-12}$ m. Tolerances are RelTol=$10^{-9}$ and AbsTol=$10^{-11}$ for event integration. Refinement checks concern integration error, not uncertainty in the fitted physics. No convergence order is claimed from roundoff-scale errors. An independent integrated energy check balances mechanical-energy loss against drag dissipation to $2\times10^{-13}$ J.
+
+For the synthetic tests, each of 150 truth vectors is drawn independently and uniformly over $v_x\in[24,34]$, $v_y\in[3,10]$, $v_z\in[4,9]$ m s$^{-1}$, $C_D\in[0.15,0.40]$, $b_y\in[-0.15,0.15]$, $b_z\in[-0.60,0.10]$ s$^{-1}$. These ranges define a designed test set, not observed population statistics. High-accuracy ode45 trajectories generate the early observations, independently of the RK4 fitting routine. Noise of standard deviation 1 cm is then added and each case is refitted from two starts.
+
+All 150 inversions converge, with 31 boundary hits. All true trajectories reach the plane; 3 fitted trajectories instead hit the ground first. For the 147 paired plane crossings, two-coordinate RMSE is 0.727 m. The local 95\% ellipse covers 146 of those 147 true crossings (99.32\%); counting the three non-crossing forecasts as noncoverage yields 146/150 (97.33\%). Neither number proves exact 95\% calibration, especially with only 150 cases and active constraints. Opening/outside/ground classification agrees in 123/150 cases. Synthetic data obey the reference force family, so these results do not test structural correctness against real ball flight.
+
+\subsection{Structural stress cases}
+\begin{table}[H]\centering
+\caption{One-factor changes, each refitted to the same observations. Distances are relative to the nominal crossing; these are scenarios, not confidence bounds.}
+\begin{tabular}{lrrr}\toprule
+Scenario & $y_g$ (m) & $z_g$ (m) & Shift (cm)\\\midrule
+bx=-1 & 2.5516 & 2.0402 & 8.75 \\
+bx=+1 & 2.6601 & 1.9037 & 8.77 \\
+wind\_y=-3 & 2.6004 & 1.9669 & 0.10 \\
+wind\_y=+3 & 2.5983 & 1.9664 & 0.13 \\
+Cd exponent p=-0.5 & 2.5983 & 1.9648 & 0.25 \\
+Cd exponent p=+0.5 & 2.6005 & 1.9690 & 0.22 \\
+b decay tau=0.5 s & 2.7135 & 1.9503 & 11.53 \\
+b decay tau=1.0 s & 2.6611 & 1.9579 & 6.23 \\
+\bottomrule\end{tabular}\end{table}
+Each stress case fits the early positions to numerical precision, yet future positions differ. The largest shift in this chosen set is about 11.5 cm for the 0.5 s decay case. Steady transverse wind has a small residual effect after refitting because the free initial velocity and force parameters absorb much of its early influence; this does not imply that an unexpected later gust is harmless. Unobserved longitudinal spin causes roughly 9 cm shifts. The stress range is illustrative and does not bound all physically possible future disturbances.
+\begin{figure}[H]\centering
+\includegraphics[width=.9\linewidth]{Mai模型情景预测比较.png}
+\caption{Displacement from the nominal goal-plane forecast after one-factor refitting. Units are centimetres; the selected scenarios carry no probability weights.}
+\end{figure}
+
+% VERIFIED_RESULTS_END
+
+\section{Operational meaning, limitations and improvements}
+The nominal centre lies on the positive-$y$ side of the goal, high enough that vertical uncertainty matters. At 0.10 s, only about 0.30 s remains before the predicted crossing. The precision implied by the input decimal places must not be confused with known camera accuracy: rounding to centimetres alone would be a different error model from independent Gaussian noise of 1 cm standard deviation.
+
+The leading limitation is the short measurement interval. Additional frames could distinguish curvature changes and reduce velocity--acceleration coupling; calibrated camera error covariance and synchronized timestamps would make confidence estimates more defensible. Common camera bias, uncertain initial position, depth reconstruction and correlated coordinate errors are not captured by the independent-error scenario. For general known covariance $\Sigma$, replace $J^TJ/\sigma^2$ by $J^T\Sigma^{-1}J$.
+
+Constant effective Magnus force structure cannot resolve non-stationary wakes, abrupt gusts or force changes after the last observation. No data-driven finite bound on arbitrary future disturbances exists. Low-spin flutter and rebound require additional calibrated models. For trajectories that touch the ground before the goal, our method reports a different outcome instead of silently extrapolating below the surface.
+
+Independent implementations and synthetic validation check equations and algorithms. They do not establish that this particular football, field and camera obey the chosen model. There is no independent measured full trajectory here; experimental confirmation remains outstanding. Bounds and synthetic sampling ranges are explicit scenario choices, not universal football statistics.
+
+\section{Conclusions}
+The supplied observations support a conditional nominal forecast near $(11,2.60,1.97)$ m at $0.401$ s. A six-parameter gravity--drag--Magnus model gives a reproducible route from positions to event-localized forecasts, while analytical baselines expose the effect of extrapolation assumptions. Uncertainty must be part of the answer: a 1 cm coordinate-error scenario produces approximately 1 m marginal 95\% half-widths, much larger than numerical integration error. Structural stress cases must be reported separately. The general method therefore returns a point, a conditional uncertainty region, diagnostics and an outcome category, rather than an unsupported precise universal prediction.
+
+\begin{thebibliography}{9}
+\bibitem{upc} University Physics Competition. 2026 contest, Problem B. \url{https://www.uphysicsc.com/2026contest.html}. Accessed 7 November 2026.
+\bibitem{asai} T. Asai, K. Seo, O. Kobayashi and R. Sakashita. Fundamental aerodynamics of the soccer ball. \emph{Sports Engineering} 10, 101--109 (2007). \url{https://doi.org/10.1007/BF02844207}.
+\bibitem{ifab} The IFAB. Laws of the Game 2026/27, Law 2: The Ball. \url{https://www.theifab.com/laws/latest/the-ball/}. Accessed 7 November 2026.
+\bibitem{ode} MathWorks. \texttt{ode45}: Solve nonstiff differential equations. \url{https://www.mathworks.com/help/matlab/ref/ode45.html}. Implementation run with MATLAB R2024a.
+\bibitem{lsq} MathWorks. \texttt{lsqnonlin}: Solve nonlinear least-squares problems. \url{https://www.mathworks.com/help/optim/ug/lsqnonlin.html}.
+\bibitem{rules} University Physics Competition. Contest rules, including generative-AI disclosure. \url{https://www.uphysicsc.com/contestrules.html}. Accessed 7 November 2026.
+\end{thebibliography}
+
+\section*{Report on the Use of AI}
+OpenAI Codex assisted with problem selection, modelling decisions, source checking, independent numerical verification and manuscript preparation. Claude Code, routed through the user's existing provider to DeepSeek \texttt{deepseek-v4-flash}, assisted with MATLAB implementation. Human team members must verify and take responsibility for all adopted content.
+
+\textbf{Draft disclosure: not ready for submission.} The official rules require the exact input and complete output of AI tools~\cite{rules}. This paragraph is a role summary, not a substitute for those records. The complete adopted conversation and execution transcripts must be appended and reviewed before submission; team number is also awaiting confirmation. No contest materials have been submitted automatically.
+\end{document}

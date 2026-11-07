@@ -1,1 +1,13 @@
 Require.md
+
+# LaTeX 编译中间产物（不提交，PDF 单独提交）
+*.aux
+*.log
+*.out
+*.toc
+*.synctex.gz
+*.fls
+*.fdb_latexmk
+*.bbl
+*.blg
+*.xdv
