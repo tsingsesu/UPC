@@ -1,3 +1,0 @@
-# Only needed for independent verification; MATLAB remains the main model.
-numpy==2.3.4
-scipy==1.16.3
