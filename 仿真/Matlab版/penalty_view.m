@@ -46,21 +46,17 @@ assert(ePos < 1e-7 && eT < 1e-7, '终点与已有 JSON 不一致（%.3g m / %.3g
 pG = predictPlane(thetaG,cfg,xPlane,Tmax); pD = predictPlane(thetaD,cfg,xPlane,Tmax);
 SG = deval(pG.sol,linspace(0,tEndOf(pG,Tmax),160))'; SD = deval(pD.sol,linspace(0,tEndOf(pD,Tmax),160))';
 
-% ---------- 界面（三维 + 俯视双视图，export 时不可见） ----------
+% ---------- 界面（单一可旋转三维主图，export 时不可见） ----------
 fig = figure('Name','点球动态仿真','Color','w','Units','pixels','Position',[40 40 1440 860]);
 if isExport, set(fig,'Visible','off'); end
-ax3 = axes(fig,'Position',[0.045 0.42 0.44 0.52],'Tag','Trajectory3D');
-axTop = axes(fig,'Position',[0.515 0.42 0.44 0.52],'Tag','TrajectoryTop');
+ax3 = axes(fig,'Position',[0.065 0.405 0.87 0.54],'Tag','Trajectory3D');
 hold(ax3,'on'); grid(ax3,'on'); box(ax3,'on'); view(ax3,-28,16);
-hold(axTop,'on'); grid(axTop,'on'); box(axTop,'on');
-set([ax3 axTop],'FontName','Microsoft YaHei');
+set(ax3,'FontName','Microsoft YaHei');
 
 % 草坪：仅球门附近小范围淡色
 patch(ax3,[9 11.4 11.4 9],[-0.4 -0.4 3.8 3.8],[0 0 0 0],[0.42 0.72 0.42], ...
     'FaceColor',[0.42 0.72 0.42],'EdgeColor','none','FaceAlpha',0.10, ...
     'HandleVisibility','off');
-patch(axTop,[9 11.4 11.4 9],[-0.4 -0.4 3.8 3.8],[0.42 0.72 0.42], ...
-    'EdgeColor','none','FaceAlpha',0.10,'HandleVisibility','off');
 
 % 球门：只画落在视野内的相关部分（右立柱、横梁、门线）
 plot3(ax3,xPlane*[1 1],goalHW*[1 1],[0 goalH],'-','Color',[0.15 0.15 0.15], ...
@@ -69,8 +65,6 @@ plot3(ax3,xPlane*[1 1],[-0.4 goalHW],goalH*[1 1],'-','Color',[0.15 0.15 0.15], .
     'LineWidth',2,'HandleVisibility','off');
 plot3(ax3,xPlane*[1 1],[-0.4 goalHW],[0 0],'-','Color',[0.15 0.15 0.15], ...
     'LineWidth',1.2,'HandleVisibility','off');
-plot(axTop,xPlane*[1 1],[-0.4 goalHW],'-','Color',[0.15 0.15 0.15], ...
-    'LineWidth',1.5,'HandleVisibility','off');
 
 % 完整 Magnus 轨迹：已飞行实线 / 未来浅蓝虚线（hFuture 初始即完整轨迹）
 hFuture = plot3(ax3,SAll(:,1),SAll(:,2),SAll(:,3),'--','Color',[0.55 0.72 0.92], ...
@@ -81,21 +75,11 @@ hG = plot3(ax3,SG(:,1),SG(:,2),SG(:,3),'-.','Color',[0.55 0.55 0.55], ...
     'LineWidth',1,'DisplayName','仅重力基线','Visible','off');
 hD = plot3(ax3,SD(:,1),SD(:,2),SD(:,3),'--','Color',[0.85 0.55 0.1], ...
     'LineWidth',1,'DisplayName','仅阻力基线','Visible','off');
-hFutureTop = plot(axTop,SAll(:,1),SAll(:,2),'--','Color',[0.55 0.72 0.92], ...
-    'LineWidth',1.2,'HandleVisibility','off');
-hPlayedTop = plot(axTop,SAll(1,1),SAll(1,2),'-','Color',[0 0.35 0.85], ...
-    'LineWidth',2.2,'HandleVisibility','off');
-hGTop = plot(axTop,SG(:,1),SG(:,2),'-.','Color',[0.55 0.55 0.55], ...
-    'LineWidth',1,'Visible','off','HandleVisibility','off');
-hDTop = plot(axTop,SD(:,1),SD(:,2),'--','Color',[0.85 0.55 0.1], ...
-    'LineWidth',1,'Visible','off','HandleVisibility','off');
 
 % 观测点（两处文字偏移不同，避免互相遮挡）
 hObs = plot3(ax3,obs(:,1),obs(:,2),obs(:,3),'ko','MarkerFaceColor','k', ...
     'MarkerSize',6,'DisplayName','观测点');
 plot3(ax3,obs(2,1),obs(2,2),obs(2,3),'rs','MarkerSize',9,'LineWidth',1.5, ...
-    'HandleVisibility','off');
-plot(axTop,obs(:,1),obs(:,2),'ko','MarkerFaceColor','k','MarkerSize',6, ...
     'HandleVisibility','off');
 text(ax3,obs(1,1)+0.10,obs(1,2)-0.85,obs(1,3)+0.55,'观测 t=0.05 s', ...
     'FontName','Microsoft YaHei','FontSize',9,'Clipping','on');
@@ -107,8 +91,6 @@ Cb = 0.92*ones(size(Zb)); Cb(mod(floor((ang+pi)/(pi/4)) + (Zb>0),2)==0) = 0.04;
 hBall = surf(ax3,cfg.r0(1)+R*Xb,cfg.r0(2)+R*Yb,cfg.r0(3)+R*Zb,Cb,'EdgeColor','none', ...
     'HandleVisibility','off'); colormap(ax3,gray(64));
 hCenterLegend = plot3(ax3,nan,nan,nan,'o','MarkerSize',6,'MarkerEdgeColor','k','MarkerFaceColor','w');
-hBallTop = plot(axTop,cfg.r0(1),cfg.r0(2),'o','MarkerSize',6, ...
-    'MarkerFaceColor',[0 0.35 0.85],'MarkerEdgeColor','k','HandleVisibility','off');
 
 % 受力箭头（默认关闭；开启后按 0.25 m/N 固定比例示意）
 sc = 0.25;
@@ -117,20 +99,12 @@ hqD = quiver3(ax3,0,0,0,0,0,0,0,'Color',[0.2 0.65 0.2],'LineWidth',1.6,'HandleVi
 hqM = quiver3(ax3,0,0,0,0,0,0,0,'Color',[0.2 0.3 0.9],'LineWidth',1.6,'HandleVisibility','off');
 set([hqG hqD hqM],'Visible','off');
 
-% 俯视图：门线 x=11 与名义到达点
-plot(axTop,xPlane*[1 1],[-0.4 3.8],':','Color',[0.2 0.2 0.2],'LineWidth',1.2, ...
-    'HandleVisibility','off');
-plot(axTop,xPlane,res.prediction.yGoal,'p','MarkerSize',12,'MarkerFaceColor','y', ...
-    'MarkerEdgeColor','k','HandleVisibility','off');
-text(axTop,xPlane-3.6,res.prediction.yGoal+0.28,sprintf('门线 x=11 m；名义到达 y=%.2f m', ...
-    res.prediction.yGoal),'FontName','Microsoft YaHei','FontSize',9);
+
 
 xlabel(ax3,'x (m)'); ylabel(ax3,'y (m)'); zlabel(ax3,'z (m)');
 title(ax3,'点球飞行三维轨迹（实线已飞行，虚线模型推算）','FontName','Microsoft YaHei');
-xlabel(axTop,'x (m)'); ylabel(axTop,'y (m)');
-title(axTop,'俯视图（x-y，等比例）','FontName','Microsoft YaHei');
 
-% 共享图例：放在两图下方、控件上方；只列 6 项
+% 图例位于主图下方、控件上方
 lg = legend(ax3,[hPlayed hFuture hG hD hCenterLegend hObs], ...
     {'已飞行轨迹','未来轨迹（推算）','仅重力基线','仅阻力基线','球心','观测点'}, ...
     'Orientation','horizontal','NumColumns',6,'FontSize',9);
@@ -171,7 +145,7 @@ hFL = uicontrol(fig,'Style','text','Units','normalized','Position',[0.035 0.128 
     'String','力 (N)','FontName','Microsoft YaHei','FontSize',9,'HorizontalAlignment','left');
 uicontrol(fig,'Style','text','Units','normalized','Position',[0.035 0.015 0.94 0.085], ...
     'String',['早期观测之后为模型推算；b 是有效 Magnus 系数，球皮图案不表示真实自旋。' ...
-    ' 视野下拉只改变显示范围，不改变数据；受力箭头默认关闭，开启后按 0.25 m/N 固定比例仅作示意。'], ...
+    ' 鼠标拖动可旋转主图；视野下拉只改变显示范围，不改变数据；受力箭头默认关闭，开启后按 0.25 m/N 固定比例仅作示意。'], ...
     'FontName','Microsoft YaHei','FontSize',9,'HorizontalAlignment','left');
 applyView(1);
 playing = false; speed = 0.1; t0 = 0; tClock = tic; timerH = [];
@@ -180,6 +154,7 @@ if ~isExport
     timerH = timer('ExecutionMode','fixedSpacing','Period',0.04,'BusyMode','drop', ...
         'TimerFcn',@cbTick,'Name','PenaltyViewPlayback');
     set(fig,'DeleteFcn',@(~,~)stopTimer(timerH));
+    rotate3d(fig,'on');
     fprintf('[penalty_view] 交互界面就绪：T=%.9f s，y=%.6f m，z=%.6f m。\n', ...
         pNom.tCross,pNom.y,pNom.z);
     return;
@@ -225,7 +200,7 @@ ver.theta = theta;
 ver.effectiveMagnusCoefficient = struct('bx',cfg.bx,'by',theta(5),'bz',theta(6),'unit','1/s');
 ver.baselines = struct('gravityV0',thetaG(1:3),'dragV0Cd',thetaD([1 2 3 4]));
 ver.forceArrowScale_mPerN = sc;
-ver.viewLayout = '3D+XY'; ver.predictionPanel = false;
+ver.viewLayout = '3D'; ver.predictionPanel = false; ver.topViewPanel = false;
 ver.viewRanges = struct('full',struct('x',[-0.4 11.6],'y',[-0.4 3.8],'z',[0 3]), ...
     'zoom',struct('x',[7 11.6],'y',[1.3 3.7],'z',[1.2 2.8]));
 ver.viewUsedExport = 'full';
@@ -245,15 +220,12 @@ fprintf('[penalty_view] export 完成：观测误差 %.3g m，终点误差 %.3g 
     function updateFrame(tNow)
         tNow = min(max(tNow,0),tAll(end)); sNow = deval(pNom.sol,tNow)';
         set(hBall,'XData',sNow(1)+R*Xb,'YData',sNow(2)+R*Yb,'ZData',sNow(3)+R*Zb);
-        set(hBallTop,'XData',sNow(1),'YData',sNow(2));
         % 过去实线：到 tNow 为止，末点追加当前点；未来虚线：从当前点到终点，不重复覆盖
         k = find(tAll <= tNow + 1e-12,1,'last'); if isempty(k), k = 1; end
         Spast = [[SAll(1:k,1);sNow(1)],[SAll(1:k,2);sNow(2)],[SAll(1:k,3);sNow(3)]];
         Sfut = [[sNow(1);SAll(k+1:end,1)],[sNow(2);SAll(k+1:end,2)],[sNow(3);SAll(k+1:end,3)]];
         set(hPlayed,'XData',Spast(:,1),'YData',Spast(:,2),'ZData',Spast(:,3));
         set(hFuture,'XData',Sfut(:,1),'YData',Sfut(:,2),'ZData',Sfut(:,3));
-        set(hPlayedTop,'XData',Spast(:,1),'YData',Spast(:,2));
-        set(hFutureTop,'XData',Sfut(:,1),'YData',Sfut(:,2));
         set(hSlider,'Value',tNow);
         [~,F] = ball_rhs(tNow,sNow(:),theta,cfg);
         set(hqG,'XData',sNow(1),'YData',sNow(2),'ZData',sNow(3),'UData',sc*F.gravity(1),'VData',sc*F.gravity(2),'WData',sc*F.gravity(3));
@@ -275,8 +247,6 @@ fprintf('[penalty_view] export 完成：观测误差 %.3g m，终点误差 %.3g 
         end
         xlim(ax3,xr); ylim(ax3,yr); zlim(ax3,zr);
         pbaspect(ax3,[diff(xr) diff(yr) diff(zr)]);   % 1:1:1 单位比例，量程不被拉伸
-        xlim(axTop,xr); ylim(axTop,yr);
-        pbaspect(axTop,[diff(xr) diff(yr) 1]);        % 俯视等比例，量程保持不变
     end
 
     function cbView(src,~)
@@ -325,7 +295,7 @@ fprintf('[penalty_view] export 完成：观测误差 %.3g m，终点误差 %.3g 
 
     function cbCmp(src,~)
         onoff = 'off'; if get(src,'Value'), onoff = 'on'; end
-        set([hG hD hGTop hDTop],'Visible',onoff);  % 三维与俯视图同步
+        set([hG hD],'Visible',onoff);
     end
 
     function cbClose(~,~)

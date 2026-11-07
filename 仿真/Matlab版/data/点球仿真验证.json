@@ -76,8 +76,9 @@
     ]
   },
   "forceArrowScale_mPerN": 0.25,
-  "viewLayout": "3D+XY",
+  "viewLayout": "3D",
   "predictionPanel": false,
+  "topViewPanel": false,
   "viewRanges": {
     "full": {
       "x": [
