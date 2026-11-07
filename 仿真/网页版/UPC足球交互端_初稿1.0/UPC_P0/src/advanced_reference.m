@@ -1,6 +1,6 @@
-function reference=Mai_advanced_reference()
+function reference=advanced_reference()
 %MAI_ADVANCED_REFERENCE 独立ode45实现M4，并输出浏览器跨实现参考。
-% 运行：addpath('src'); Mai_advanced_reference();
+% 运行：addpath('src'); advanced_reference();
 % 方程依据：https://arxiv.org/html/1710.02784，式5/7/9及表1。
 % 文献非旋转Cd数据拟合；Teamgeist升力含物理插值。线性CL、斜轴推广、
 % 球壳惯量和衰减力矩明确为情景假设。不修改M0—M3主程序或团队正式结果。

@@ -1,26 +1,26 @@
-function report = Mai_p0_validate(mode)
+function report = p0_validate(mode)
 % 一次调用完成自测、主计算、配置读回及隔离性检查；不写论文。
 if nargin<1, mode='full'; end
 root=fileparts(fileparts(mfilename('fullpath')));
-tests=Mai_p0_tests();
-r=Mai_penalty(mode,[],struct('outputRoot',root));
+tests=p0_tests();
+r=penalty(mode,[],struct('outputRoot',root));
 jsonPath=fullfile(root,r.output.dataDirectory,'Mai罚球结果.json');
 loaded=jsondecode(fileread(jsonPath));
-cfg=Mai_penalty('api','config',struct('cfg',loaded.config));
-replay=Mai_penalty('api','predict',struct('theta',loaded.fit.theta,'cfg',cfg));
+cfg=penalty('api','config',struct('cfg',loaded.config));
+replay=penalty('api','predict',struct('theta',loaded.fit.theta,'cfg',cfg));
 assert(max(abs([replay.yGoal-r.prediction.yGoal,replay.zGoal-r.prediction.zGoal,replay.tGoal-r.prediction.tGoal]))<1e-10);
 observations=[1.5,.45,.44;2.96,.86,.74];
 custom=zeros(6,3);
 for j=1:6
     changed=observations; changed(j)=changed(j)+.001;
-    v=Mai_penalty('api','fit',struct('obs',changed,'cfg',cfg));
+    v=penalty('api','fit',struct('obs',changed,'cfg',cfg));
     assert(v.fit.exitflag>0&&v.fit.rmse<1e-7);
     custom(j,:)=[v.prediction.yGoal,v.prediction.zGoal,v.prediction.tGoal];
     assert(norm(custom(j,:)-[r.prediction.yGoal,r.prediction.zGoal,r.prediction.tGoal])>1e-6);
 end
 before=dir(fullfile(root,'data','验证运行'));
 stateBefore=rng;
-q=Mai_penalty('quick',[],struct('writeOutputs',false,'makeFigures',false));
+q=penalty('quick',[],struct('writeOutputs',false,'makeFigures',false));
 stateAfter=rng;
 after=dir(fullfile(root,'data','验证运行'));
 assert(isequal({before.name},{after.name})&&isequal(stateBefore,stateAfter));

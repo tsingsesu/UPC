@@ -1,7 +1,7 @@
-function result = Mai_penalty(mode, obs, options)
+function result = penalty(mode, obs, options)
 %MAI_PENALTY  FIFA点球早期观测反演、球门落点预测与不确定性评估
 %
-%   result = Mai_penalty(mode)
+%   result = penalty(mode)
 %
 %   mode = 'full'  （默认）完整Bootstrap与合成反演样本
 %   mode = 'quick' （少量样本，用于快速流程检查）
@@ -13,8 +13,8 @@ function result = Mai_penalty(mode, obs, options)
 %
 %   本文件只做实现，不在此处运行；运行与结果核验由Codex完成。
 %   修复版：输出隔离到 data/验证运行/<runId> 与 img/验证运行/<runId>。
-%   Mai_penalty('quick', [], struct('writeOutputs',false)) 只返回结果。
-%   Mai_penalty('api','config') / ('api','predict',struct('theta',theta,...))
+%   penalty('quick', [], struct('writeOutputs',false)) 只返回结果。
+%   penalty('api','config') / ('api','predict',struct('theta',theta,...))
 %   提供无文件写入的现有模型接口；不是新气动力模型。
 
 if nargin < 1 || isempty(mode)
@@ -60,9 +60,9 @@ if nargin<2 || isempty(obs)
     obs=[1.50,.45,.44;2.96,.86,.74];
 end
 validateattributes(obs,{'numeric'},{'size',[2,3],'finite','real'});
-if any(obs(:,3) < cfg.R), error('Mai_penalty:InvalidInput','观测球心低于地面接触高度 R。'); end
+if any(obs(:,3) < cfg.R), error('penalty:InvalidInput','观测球心低于地面接触高度 R。'); end
 
-fprintf('[Mai_penalty] 模式=%s，开始完整反演。\n', mode);
+fprintf('[penalty] 模式=%s，开始完整反演。\n', mode);
 
 % ---------- 1. 完整有效Magnus模型拟合（多初值核查局部解） ----------
 starts = [24, 3, 5, 0.25,  0.0,  0.0;
@@ -74,13 +74,13 @@ if ~isfinite(fitBest.sse) || fitBest.exitflag<=0
     error('完整模型的所有初值均未得到有效拟合，请检查输入与工具箱。');
 end
 thetaHat = fitBest.theta;
-fprintf('[Mai_penalty] 拟合完成：RMSE=%.6g m，退出标志=%d，边界命中=%d。\n', ...
+fprintf('[penalty] 拟合完成：RMSE=%.6g m，退出标志=%d，边界命中=%d。\n', ...
     fitBest.rmse, fitBest.exitflag, fitBest.boundaryHit);
 
 % 基准预测（x=11 球门平面）与整球越线简化平面 x=11+R 的几何敏感性
 predBase   = predictGoal(thetaHat, cfg, 11.00);
 predCenter = predictGoal(thetaHat, cfg, 11+cfg.R);
-fprintf('[Mai_penalty] 基准预测状态=%s，y=%.6g，z=%.6g。\n', ...
+fprintf('[penalty] 基准预测状态=%s，y=%.6g，z=%.6g。\n', ...
     predBase.status, predBase.yGoal, predBase.zGoal);
 
 % ---------- 2. 观测位置雅可比、参数协方差与预测协方差 ----------
@@ -136,7 +136,7 @@ for k = 1:numel(sigmas)
         noiseScenarios(k).marginal95HalfWidth_yz = 1.959964 * sqrt(max(diag(CS), 0));
     end
 end
-fprintf('[Mai_penalty] 噪声情景完成：%d 个假设噪声水平。\n', numel(sigmas));
+fprintf('[penalty] 噪声情景完成：%d 个假设噪声水平。\n', numel(sigmas));
 
 % ---------- 4. 四个基线模型 ----------
 baselines = repmat(struct('name','', 'theta',nan(1,6), 'v0',nan(1,3), ...
@@ -176,7 +176,7 @@ baselines(4) = makeBaseline('完整有效Magnus模型', thetaHat, nan(1,3), nan(
     predictPositions(thetaHat, obsT, cfg), obs, predBase);
 baselines(4).rmse = fitBest.rmse;
 baselines(4).residual = fitBest.resid;
-fprintf('[Mai_penalty] 四个基线模型完成。\n');
+fprintf('[penalty] 四个基线模型完成。\n');
 
 % ---------- 5. 参数Bootstrap（重新拟合） ----------
 if strcmp(mode, 'full'), nb = 600; else, nb = 40; end
@@ -206,7 +206,7 @@ for b = 1:nb
         bsSamples(b).status = 'fit_fail';
     end
     if mod(b, 50) == 0 || b == nb
-        fprintf('[Mai_penalty] Bootstrap 进度 %d/%d。\n', b, nb);
+        fprintf('[penalty] Bootstrap 进度 %d/%d。\n', b, nb);
     end
 end
 
@@ -255,7 +255,7 @@ if any(planeMask)
     bsSummary.goalTimeQuantiles=prctile([bsSamples(planeMask).tGoal]',[2.5,50,97.5]);
 end
 bsSummary.goalPointDenominator=sum(planeMask);
-fprintf('[Mai_penalty] Bootstrap完成：成功 %d/%d，进球稳定性频率 %.3f。\n', ...
+fprintf('[penalty] Bootstrap完成：成功 %d/%d，进球稳定性频率 %.3f。\n', ...
     bsSummary.nSuccessful, nb, bsSummary.goalStabilityFrequency);
 
 % ---------- 6. 数值验证 ----------
@@ -388,7 +388,7 @@ for k = 1:nSyn
         synSamples(k).fitStatus = 'fit_fail';
     end
     if mod(k, 25) == 0 || k == nSyn
-        fprintf('[Mai_penalty] 合成反演进度 %d/%d。\n', k, nSyn);
+        fprintf('[penalty] 合成反演进度 %d/%d。\n', k, nSyn);
     end
 end
 
@@ -510,7 +510,7 @@ for k = 1:numel(scNames)
     scenarios(k).relativeDeviation = relDev;
     scenarios(k).boundaryHit = fitS.boundaryHit;
     scenarios(k).exitflag = fitS.exitflag;
-    fprintf('[Mai_penalty] 模型情景 %d/%d：%s，状态=%s。\n', ...
+    fprintf('[penalty] 模型情景 %d/%d：%s，状态=%s。\n', ...
         k, numel(scNames), scNames{k}, predS.status);
 end
 
@@ -660,7 +660,7 @@ jsonPath = fullfile(dataDir, 'Mai罚球结果.json');
     if fid < 0, error('无法打开JSON文件。'); end
     bytesWritten = fprintf(fid, '%s', txt);
     closeStatus = fclose(fid);
-    if bytesWritten<1 || closeStatus~=0, error('Mai_penalty:JsonWrite','JSON写出失败。'); end
+    if bytesWritten<1 || closeStatus~=0, error('penalty:JsonWrite','JSON写出失败。'); end
 
 matPath = fullfile(dataDir, 'Mai罚球结果.mat');
 save(matPath, 'result');
@@ -714,9 +714,9 @@ Tns = table([noiseScenarios.sigma]', ...
     'VariableNames', {'sigma_m','yHalfWidth_m','zHalfWidth_m'});
 writetable(Tns, fullfile(dataDir, 'Mai噪声情景.csv'));
 
-fprintf('[Mai_penalty] 完成。JSON=%s，耗时=%.2f s。\n', jsonPath, result.timing.elapsedSeconds);
+fprintf('[penalty] 完成。JSON=%s，耗时=%.2f s。\n', jsonPath, result.timing.elapsedSeconds);
 else
-    fprintf('[Mai_penalty] 完成无文件输出计算，耗时=%.2f s。\n',result.timing.elapsedSeconds);
+    fprintf('[penalty] 完成无文件输出计算，耗时=%.2f s。\n',result.timing.elapsedSeconds);
 end
 end
 
@@ -1234,7 +1234,7 @@ switch lower(char(action))
         times=linspace(0,pred.eventTime,201);
         result=struct('times',times,'states',simulateAt(theta,times,cfg,cfg.odeMaxStep),'prediction',pred);
     otherwise
-        error('Mai_penalty:InvalidAction','未知纯计算动作：%s',action);
+        error('penalty:InvalidAction','未知纯计算动作：%s',action);
 end
 end
 

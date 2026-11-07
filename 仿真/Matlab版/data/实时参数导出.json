@@ -1,0 +1,102 @@
+{
+  "generatedAt": "2026-11-07 15:55:19",
+  "exportMode": "export",
+  "params": {
+    "windX": 0,
+    "windY": 0,
+    "windZ": 0,
+    "gustY": 0,
+    "gustZ": 0,
+    "gustStart": 0.16,
+    "gustDuration": 0.16,
+    "turbulence": 0,
+    "CdScale": 1,
+    "cdExponent": 0,
+    "spinScale": 1,
+    "bx": 0,
+    "spinTau": 0,
+    "density": 1.225,
+    "mode": "conditioned",
+    "speedScale": 1,
+    "yawDeg": 0,
+    "elevationDeg": 0,
+    "mass": 0.43,
+    "radius": 0.11,
+    "buoyancy": false,
+    "maxStep": 0.002
+  },
+  "status": "plane",
+  "endpoint": {
+    "t_s": 0.40050348611508624,
+    "state": [
+      11,
+      2.5994405492387216,
+      1.9670046154799856,
+      24.882014498277364,
+      3.96780265792549,
+      2.5555360605750641
+    ]
+  },
+  "edits": {
+    "time": 0.1,
+    "params": {
+      "windX": 0,
+      "windY": 0,
+      "windZ": 0,
+      "gustY": 0,
+      "gustZ": 0,
+      "gustStart": 0.16,
+      "gustDuration": 0.16,
+      "turbulence": 0,
+      "CdScale": 1,
+      "cdExponent": 0,
+      "spinScale": 1,
+      "bx": 0,
+      "spinTau": 0,
+      "density": 1.225,
+      "mode": "conditioned",
+      "speedScale": 1,
+      "yawDeg": 0,
+      "elevationDeg": 0,
+      "mass": 0.43,
+      "radius": 0.11,
+      "buoyancy": false,
+      "maxStep": 0.002
+    }
+  },
+  "referenceEndpoint": {
+    "t_s": 0.40050348611508618,
+    "state": [
+      11,
+      2.599440549238722,
+      1.9670046154799827,
+      24.882014498277385,
+      3.9678026579254917,
+      2.5555360605750614
+    ]
+  },
+  "observations": {
+    "times_s": [
+      0.05,
+      0.1
+    ],
+    "positions_m": [
+      [
+        1.5,
+        0.45,
+        0.44
+      ],
+      [
+        2.96,
+        0.86,
+        0.74
+      ]
+    ]
+  },
+  "outputs": {
+    "gif": "C:\\Users\\lhl87\\Documents\\MATLAB\\UPC\\仿真\\Matlab版\\img\\点球物理仿真.gif",
+    "png": "C:\\Users\\lhl87\\Documents\\MATLAB\\UPC\\仿真\\Matlab版\\img\\点球仿真全景.png"
+  },
+  "units": "位置 m；速度 m/s；时间 s；力 N；风箭头 0.05 m/(m/s)；力箭头 0.25 m/N",
+  "note": "参数与事件来自 penalty_scenario；历史力按当时参数采样。b 为有效 Magnus 系数，不代表已测角速度；球皮图案不表示真实自旋。"
+}

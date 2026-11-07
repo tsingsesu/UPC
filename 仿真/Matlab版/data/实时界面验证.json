@@ -1,0 +1,8 @@
+{
+  "liveEditLatency_s": 0.0165311,
+  "passed": true,
+  "singleAxes": true,
+  "causalLiveEdit": true,
+  "modeResetAndObservationConstraint": true,
+  "invalidInputRejected": true
+}
