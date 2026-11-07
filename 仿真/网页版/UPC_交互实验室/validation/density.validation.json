@@ -1,0 +1,278 @@
+{
+  "passed": true,
+  "checks": 18,
+  "version": "upc-density-1.1.0",
+  "node": "v24.22.0",
+  "tests": [
+    {
+      "name": "Automatic Scott bandwidth uses 2D sample variance and metre units",
+      "passed": true
+    },
+    {
+      "name": "Numerical bandwidth floor is explicit and only smoothing",
+      "passed": true
+    },
+    {
+      "name": "Empty, one point, and repeated noiseless samples stay degenerate",
+      "passed": true
+    },
+    {
+      "name": "Invalid data and denominator accounting fail explicitly without silent filtering",
+      "passed": true
+    },
+    {
+      "name": "Full plane normalization and observed mass retain failed-trial denominator",
+      "passed": true
+    },
+    {
+      "name": "Explicit mixture PDF agrees with direct formula and translation invariance",
+      "passed": true
+    },
+    {
+      "name": "Density and bandwidth obey metre-to-scaled-length dimensional transformation",
+      "passed": true
+    },
+    {
+      "name": "Rectangle mass is not renormalized inside a goal opening or display window",
+      "passed": true
+    },
+    {
+      "name": "Grid has shared coordinates, z-row/y-column layout, and no local normalization",
+      "passed": true
+    },
+    {
+      "name": "Wide-grid quadrature approaches the global normalized density",
+      "passed": true
+    },
+    {
+      "name": "JSON roundtrip preserves exported function, complete centers, weights and semantics",
+      "passed": true
+    },
+    {
+      "name": "Factory serializes into an isolated Worker-like context without dependencies",
+      "passed": true
+    },
+    {
+      "name": "Physical lower support truncates and normalizes every kernel without changing h or y support",
+      "passed": true
+    },
+    {
+      "name": "Truncated function JSON and standalone manual formula retain every normalizer and boundary",
+      "passed": true
+    },
+    {
+      "name": "Normal CDF independently agrees with SciPy across central and far-tail inputs",
+      "passed": true
+    },
+    {
+      "name": "KDE PDF independently agrees with SciPy normal products",
+      "passed": true
+    },
+    {
+      "name": "Rectangles agree with independent SciPy CDF and adaptive double quadrature, including tiny tails",
+      "passed": true
+    },
+    {
+      "name": "Truncated kernels independently agree with SciPy at boundary and in rectangle integrals",
+      "passed": true
+    }
+  ],
+  "independentReference": {
+    "scipyVersion": "1.16.3",
+    "method": "scipy.stats.norm cdf/sf/pdf + scipy.integrate.dblquad",
+    "cdf": [
+      4.906713927147908e-198,
+      7.61985302416047e-24,
+      6.22096057427174e-16,
+      2.8665157187919333e-7,
+      0.001349898031630093,
+      0.0013948872354922468,
+      0.15865525393145707,
+      0.5,
+      0.8413447460685429,
+      0.9986051127645078,
+      0.9986501019683699,
+      0.9999997133484281,
+      0.9999999999999993,
+      1,
+      1
+    ],
+    "density": [
+      0.6249362829099459,
+      0.6115336165703072,
+      7.23289304706663e-29,
+      1.5424401869081106e-114
+    ],
+    "masses": [
+      0.7496555661301695,
+      0.5870347062806756,
+      1.454758497840759e-9,
+      5.148137462661463e-88,
+      8.117317329297987e-114,
+      1.2620545939816144e-8
+    ],
+    "quadrature": 0.7496555661301696,
+    "quadratureErrorEstimate": 8.322848701508735e-15,
+    "supportNormalizers": [
+      0.37665202364295614,
+      0.18788575412556519,
+      0.9540745780190658
+    ],
+    "supportDensity": [
+      0,
+      1.9055769944284613,
+      1.8544159241494018,
+      0.3036120547254603
+    ],
+    "supportMasses": [
+      0.7511071942587672,
+      0.9999998838976275,
+      0,
+      0.5769506814005537
+    ],
+    "supportQuadrature": 1,
+    "supportQuadratureErrorEstimate": 8.370771079582716e-11,
+    "request": {
+      "points": [
+        {
+          "y": 0,
+          "z": 0
+        },
+        {
+          "y": 0.4,
+          "z": -0.2
+        },
+        {
+          "y": 1.1,
+          "z": 0.7
+        }
+      ],
+      "h": 0.35,
+      "cdfInputs": [
+        -30,
+        -10,
+        -8,
+        -5,
+        -3,
+        -2.99,
+        -1,
+        0,
+        1,
+        2.99,
+        3,
+        5,
+        8,
+        10,
+        30
+      ],
+      "supportZMin": 0.11,
+      "supportEvaluationPoints": [
+        [
+          0,
+          0.1
+        ],
+        [
+          0,
+          0.11
+        ],
+        [
+          0.2,
+          0.2
+        ],
+        [
+          1,
+          1
+        ]
+      ],
+      "supportRectangles": [
+        [
+          -1,
+          1,
+          -1,
+          1
+        ],
+        [
+          -3.66,
+          3.66,
+          0,
+          2.44
+        ],
+        [
+          -1,
+          1,
+          -1,
+          0.1
+        ],
+        [
+          -1,
+          1,
+          0.11,
+          0.5
+        ]
+      ],
+      "evaluationPoints": [
+        [
+          0,
+          0
+        ],
+        [
+          0.2,
+          0.1
+        ],
+        [
+          4,
+          -2
+        ],
+        [
+          -8,
+          0
+        ]
+      ],
+      "rectangles": [
+        [
+          -1,
+          1,
+          -1,
+          1
+        ],
+        [
+          -3.66,
+          3.66,
+          0,
+          2.44
+        ],
+        [
+          3,
+          3.1,
+          -0.2,
+          0.4
+        ],
+        [
+          8,
+          8.1,
+          -0.2,
+          0.4
+        ],
+        [
+          -8,
+          -7.9,
+          -0.2,
+          0.4
+        ],
+        [
+          0.01,
+          0.010001,
+          -0.01,
+          0.010001
+        ]
+      ]
+    }
+  },
+  "errors": {
+    "maxCdfAbsError": 1.1102230246251565e-16,
+    "maxDensityAbsError": 2.220446049250313e-16,
+    "maxRectangleAbsError": 1.1102230246251565e-16,
+    "maxTailRelativeError": 2.8258327626012877e-14
+  },
+  "interpretation": "Numerical KDE verification only; no model ranking, physical validation, or calibrated uncertainty coverage."
+}

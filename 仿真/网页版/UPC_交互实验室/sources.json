@@ -1,0 +1,193 @@
+{
+  "version": "flight-lab-1.0",
+  "recordedDate": "2026-11-07",
+  "scope": "Two-frame inverse prediction, enumerated constant-coefficient force combinations, conditional perturbation propagation, and virtual-reference experiments. This UI does not enable the separate legacy M4 empirical forward solver.",
+  "physics": {
+    "files": [
+      {
+        "name": "physics.js",
+        "sha256": "f50e8a4913e88a7cfdeaea9a373c63d97f2b2ceaee9405128a2af7aba0a5dfdf"
+      },
+      {
+        "name": "density.js",
+        "sha256": "cfb715f186edafd145cd2b60ca5bda3fe1adbc2d58d81f1de42e7c7dd56ff201"
+      },
+      {
+        "name": "study.js",
+        "sha256": "fccde20d3df76df81a1c76c1f77bb38bc47cd0e25517f3f846237448b329beba"
+      },
+      {
+        "name": "mapping.js",
+        "sha256": "e317ef76cf0296dac00dc45ecc39ba1b0d73b303e4451485fff46be26b8ef039"
+      }
+    ],
+    "origin": "Project MATLAB-compatible M0-M3 baseline, extended with explicit force masks in the earlier research prototype.",
+    "license": "Team project source. No separate permissive licence verified; no relicensing of underlying team materials."
+  },
+  "appearance": {
+    "method": "Original procedural Canvas 3D projection, pitch, ball and heatmap. Original HTML/CSS components.",
+    "externalAssets": [],
+    "runtimeDependencies": []
+  },
+  "standards": [
+    {
+      "title": "IFAB Laws of the Game 2026/27, Law 2",
+      "url": "https://www.theifab.com/laws/latest/the-ball/",
+      "scope": "Association football; minimum match-ball requirements. FIFA/confederation official competitions additionally require a FIFA Quality Programme mark.",
+      "values": {
+        "circumference_m": [
+          0.68,
+          0.7
+        ],
+        "radiusDerived_m": [
+          0.10822536130248885,
+          0.11140846016432673
+        ],
+        "mass_kg": [
+          0.41,
+          0.45
+        ],
+        "pressure_atmosphere": [
+          0.6,
+          1.1
+        ]
+      },
+      "reuse": "Facts and citation only; no document/images bundled.",
+      "license": "No open document licence verified."
+    }
+  ],
+  "aerodynamicEvidence": [
+    {
+      "id": "A1_Asai_Hong_2021",
+      "title": "Aerodynamics of the newly approved football for the English Premier League 2020–21 season",
+      "authors": [
+        "Takeshi Asai",
+        "Sungchan Hong"
+      ],
+      "doi": "10.1038/s41598-021-89162-y",
+      "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC8100144/",
+      "verification": "full_text_methods_results_license_read",
+      "evidenceType": "fixed_orientation_wind_tunnel",
+      "ballTypes": [
+        "Nike Flight 2020",
+        "Adidas Tsubasa 2020",
+        "Molten Pelada 2020"
+      ],
+      "conditions": {
+        "speed_m_s": [
+          7,
+          35
+        ],
+        "approximateReynoldsRange": [
+          100000,
+          500000
+        ],
+        "orientationsPerBall": 2,
+        "sampleRate_Hz": 100,
+        "durationPerSpeed_s": 10,
+        "rho_kg_m3": 1.2,
+        "radius_m": 0.11,
+        "spinCondition": "non_spinning_fixed_ball"
+      },
+      "articleLicense": "CC-BY-4.0; separately credited third-party material may differ",
+      "dataAvailability": "Article says all data are included in the publication; no separate raw machine-readable dataset verified.",
+      "codeLicense": "No code package or code license verified.",
+      "proposedUse": "Future ball-and-orientation-specific Cd(Re) scenario after data extraction and verification.",
+      "limitations": [
+        "Not a rotating Magnus calibration",
+        "2D simulations omitted lift and side force",
+        "Not validation of the UPC inverse problem"
+      ],
+      "integrationStatus": "evidence_metadata_only"
+    },
+    {
+      "id": "A2_Goff_Carre_2012",
+      "title": "Investigations into soccer aerodynamics via trajectory analysis and dust experiments",
+      "authors": [
+        "John Eric Goff",
+        "Matt J. Carré"
+      ],
+      "doi": "10.1016/j.proeng.2012.04.028",
+      "url": "https://eprints.whiterose.ac.uk/id/eprint/98035/",
+      "fullTextUrl": "https://eprints.whiterose.ac.uk/id/eprint/98035/1/1-s2.0-S1877705812016414-main.pdf",
+      "verification": "full_text_and_repository_license_read",
+      "evidenceType": "launcher_high_speed_camera_trajectory_analysis",
+      "ballTypes": [
+        "32-panel football",
+        "Teamgeist"
+      ],
+      "conditions": {
+        "launchSpeedUpperExclusive_m_s": 20,
+        "initialSpinUpperExclusive_rpm": 1700,
+        "approximateReynoldsRangeForLiftStudy": [
+          130000,
+          300000
+        ],
+        "approximateSpinParameterRange": [
+          0,
+          1
+        ],
+        "spinCondition": "pure_backspin_or_topspin"
+      },
+      "articleLicense": "CC-BY-NC-ND-3.0 according to institutional repository",
+      "dataAvailability": "No separate raw machine-readable dataset verified.",
+      "codeLicense": "No reusable code package or code license verified.",
+      "proposedUse": "Evidence for trajectory-based estimation and limitations of linear spin-lift extrapolation.",
+      "limitations": [
+        "Official case launch speed around 32 m/s exceeds these free-flight launch speeds",
+        "High spin parameter lift leveling prevents universal linear extrapolation"
+      ],
+      "integrationStatus": "evidence_metadata_only"
+    }
+  ],
+  "statisticalReferences": [
+    {
+      "title": "JCGM 101:2008",
+      "url": "https://www.bipm.org/en/doi/10.59161/jcgm101-2008",
+      "scope": "Propagation of distributions using Monte Carlo."
+    },
+    {
+      "title": "JCGM 102:2011",
+      "url": "https://www.bipm.org/en/doi/10.59161/jcgm102-2011",
+      "scope": "Multiple output quantities."
+    },
+    {
+      "title": "Probabilistic Forecasts, Calibration and Sharpness",
+      "url": "https://stat.uw.edu/research/tech-reports/probabilistic-forecasts-calibration-and-sharpness",
+      "scope": "Calibration and concentration are distinct evaluation objectives."
+    }
+  ],
+  "designReferences": [
+    {
+      "title": "WAI-ARIA Slider Pattern",
+      "url": "https://www.w3.org/WAI/ARIA/apg/patterns/slider/",
+      "applied": "Native keyboard-accessible sliders and labels; separate number inputs."
+    },
+    {
+      "title": "Material sliders",
+      "url": "https://m3.material.io/components/sliders/overview",
+      "applied": "Continuous direct manipulation and visible values."
+    },
+    {
+      "title": "Optimize Interaction to Next Paint",
+      "url": "https://web.dev/articles/optimize-inp",
+      "applied": "Move numerical work off the UI thread; throttle previews and cancel obsolete jobs."
+    }
+  ],
+  "researchReferenceReuse": "Citations and independent mathematical implementation only. No article figures, PDFs, author software, fonts, textures or models redistributed.",
+  "assumptions": {
+    "constantCd": "Inferred within the declared coefficient bounds, not a measured universal coefficient curve.",
+    "effectiveB": "s^-1 combined Magnus parameter, not measured angular speed or rpm.",
+    "noise": "Independent isotropic Gaussian coordinate error; sigma adjustable and not provided by the problem.",
+    "wind": "Given scenario; not jointly identified from two frames.",
+    "regions": "Empirical perturbation regions are initially uncalibrated. Virtual test coverage does not establish real-world coverage.",
+    "failureAccounting": "Keep all attempted trials, including fit/domain/ground/no-plane events.",
+    "sliders": "Exploration ranges, not FIFA qualification ranges or experimental confidence intervals."
+  },
+  "limits": [
+    "Only first-flight ball-center plane crossing; no collisions or bounce.",
+    "No new ball-specific wind-tunnel calibration.",
+    "The two-time inverse problem cannot freely identify every environmental parameter.",
+    "Paper-scale independent experiments remain user-controlled and are not claimed completed by software QA."
+  ]
+}
