@@ -37,6 +37,7 @@ st=control('StatusText');
 famNote=control('FamilyNote');
 assert(~isempty(strfind(get(famNote,'String'),'置信区间')), ...
     '族说明必须明确“不是置信区间”。');
+checkIntersection();
 report.singleAxes=true;
 report.fourParameters=true;
 
@@ -73,6 +74,7 @@ if sim.fit.feasible
 end
 assert(sim.fit.feasible,'温和横风候选应满足默认容差。');
 assert(norm([get(findobj(ax(1),'Tag','Observed'),'XData')]-[1.5 2.96])<1e-12,'黑色观测点不能随拟合移动。');
+checkIntersection();
 report.feasibleAfterEdit=sim.fit.feasible;
 report.rebuildFromZero=true;
 report.v0Changed=true;
@@ -162,6 +164,8 @@ invoke(control('ReplayButton'));
 assert(getappdata(f,'CurrentTime')==0,'重播必须回到 t=0。');
 assert(norm(getappdata(f,'Scenario').theta-resetSim.theta)<1e-12, ...
     '重播不应改变全程反演结果。');
+checkIntersection();
+report.goalIntersectionsSynchronized=true;
 report.replayReturnsToZero=true;
 
 % ---------- 关闭清理 timer ----------
@@ -184,6 +188,24 @@ disp(report);
     function h=control(tag)
         h=findobj(f,'Tag',tag);
         assert(isscalar(h),['缺少控件 ' tag]);
+    end
+    function checkIntersection()
+        current=getappdata(f,'Scenario');h=findobj(f,'Tag','GoalIntersection');
+        assert(isscalar(h));
+        if strcmp(current.status,'plane')
+            point=[h.XData h.YData h.ZData];
+            assert(norm(point-current.endpoint(1:3)')<1e-10,'交点须精确对应事件定位结果。');
+            assert(strcmp(h.Visible,'on'));
+            note=findall(f,'Tag','GoalIntersectionLabel');
+            assert(any(contains(string(note.String),sprintf('%.3f',current.endpoint(2))),'all'));
+        else
+            assert(strcmp(h.Visible,'off'),'提前触地时不能冒充球门交点。');
+        end
+        dots=findall(f,'Tag','FamilyGoalIntersections');
+        assert(all(abs(dots.XData-11)<1e-7),'族交点必须位于x=11平面。');
+        toggle=control('FamilyToggle');old=toggle.Value;
+        set(toggle,'Value',0);invoke(toggle);assert(strcmp(dots.Visible,'off'));
+        set(toggle,'Value',old);invoke(toggle);
     end
     function invoke(h)
         feval(h.Callback,h,[]);

@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-07 19:35:01",
+  "generatedAt": "2026-11-07 21:18:18",
   "exportMode": "demo",
   "tolerance": 0.005,
   "family": {
@@ -44,16 +44,16 @@
             0.7
           ],
           "windRange": [
-            -8,
-            8
+            -15,
+            15
           ],
           "densityRange": [
-            1.1,
-            1.35
+            0.9,
+            1.4
           ],
           "CdRange": [
-            0.15,
-            0.6
+            0.08,
+            0.8
           ],
           "classification": "球规格为官方要求；速度/气动上限为保守模型筛选，非人体或流体绝对上限。",
           "sources": [
@@ -93,7 +93,7 @@
           ]
         ],
         "exitflag": 3,
-        "elapsedSeconds": 0.0209482
+        "elapsedSeconds": 0.0203482
       },
       "endpoint": [
         11,
@@ -143,16 +143,16 @@
             0.7
           ],
           "windRange": [
-            -8,
-            8
+            -15,
+            15
           ],
           "densityRange": [
-            1.1,
-            1.35
+            0.9,
+            1.4
           ],
           "CdRange": [
-            0.15,
-            0.6
+            0.08,
+            0.8
           ],
           "classification": "球规格为官方要求；速度/气动上限为保守模型筛选，非人体或流体绝对上限。",
           "sources": [
@@ -192,7 +192,7 @@
           ]
         ],
         "exitflag": 3,
-        "elapsedSeconds": 0.0314978
+        "elapsedSeconds": 0.0341534
       },
       "endpoint": [
         11,

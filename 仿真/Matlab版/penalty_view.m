@@ -77,6 +77,20 @@ plot3(ax3,xPlane*[1 1],[-goalHW goalHW],goalH*[1 1],'-','Color',[0.12 0.12 0.12]
 plot3(ax3,xPlane*[1 1],[-goalHW goalHW],[0 0],'-','Color',[0.12 0.12 0.12], ...
     'LineWidth',1.0,'HandleVisibility','off');
 
+% 半透明门面表示x=11的门口区域，交点仍由求解器事件定位。
+patch(ax3,11*ones(1,4),[-goalHW goalHW goalHW -goalHW],[0 0 goalH goalH], ...
+    [.20 .65 .85],'FaceAlpha',.045,'EdgeColor','none','HandleVisibility','off','Tag','GoalPlane');
+hFamilyGoal=plot3(ax3,nan,nan,nan,'.','Color',[.40 .40 .40],'MarkerSize',9, ...
+    'HandleVisibility','off','Tag','FamilyGoalIntersections');
+hGoalPoint=plot3(ax3,nan,nan,nan,'d','Color',[.55 .12 .70], ...
+    'MarkerFaceColor','none','MarkerSize',18,'LineWidth',2, ...
+    'DisplayName','当前预测交点','Tag','GoalIntersection');
+hGoalCross=plot3(ax3,nan,nan,nan,'-','Color',[.55 .12 .70], ...
+    'LineWidth',1.4,'HandleVisibility','off','Tag','GoalIntersectionCross');
+hGoalText=text(ax3,0,0,0,'','FontName',fnUI,'FontSize',9, ...
+    'Color',[.45 .08 .60],'BackgroundColor','w','Margin',3,'Clipping','on', ...
+    'HandleVisibility','off','Tag','GoalIntersectionLabel');
+
 % 灰色合格族（最多画 80 条，均匀抽样）
 maxFamLines = 80;
 famLines = gobjects(maxFamLines,1);
@@ -85,7 +99,7 @@ for k = 1:maxFamLines
         'LineWidth',0.5,'HandleVisibility','off','Tag','FamilyLine');
 end
 hFamLegend = plot3(ax3,nan,nan,nan,'-','Color',[0.72 0.72 0.72], ...
-    'LineWidth',0.8,'DisplayName','灰色族（非置信区间）');
+    'LineWidth',0.8,'DisplayName','灰色族及其交点');
 
 % 已飞行 / 未来轨迹
 hPlayed = plot3(ax3,nan,nan,nan,'-','Color',[0 0.35 0.85], ...
@@ -118,6 +132,7 @@ set([hqG hqD hqM],'Visible','off');
 % demo 对比专用（平时隐藏）
 hCmp = gobjects(1,2);
 hCmpTxt = gobjects(1,2);
+hCmpGoal=gobjects(1,2);
 hCmp(1) = plot3(ax3,nan,nan,nan,'-','Color',[0 0.35 0.85],'LineWidth',2.0, ...
     'HandleVisibility','off');
 hCmp(2) = plot3(ax3,nan,nan,nan,'-','Color',[0.92 0.45 0.05],'LineWidth',2.0, ...
@@ -127,11 +142,16 @@ hCmpTxt(1) = text(ax3,0,0,0,'第 1 组全程参数','FontName',fnUI,'FontSize',9
 hCmpTxt(2) = text(ax3,0,0,0,'第 2 组全程参数','FontName',fnUI,'FontSize',9, ...
     'Color',[0.92 0.45 0.05],'FontWeight','bold','Visible','off');
 set(hCmp,'Visible','off');
+for kk=1:2
+ hCmpGoal(kk)=plot3(ax3,nan,nan,nan,'d','MarkerSize',9,'LineWidth',1.5, ...
+  'Color',hCmp(kk).Color,'MarkerFaceColor',hCmp(kk).Color, ...
+  'Visible','off','HandleVisibility','off','Tag','ComparisonGoalIntersection');
+end
 
 xlabel(ax3,'x（m，指向球门）'); ylabel(ax3,'y（m，横向）'); zlabel(ax3,'z（m，高度）');
 title(ax3,'点球全程约束反演（灰=合格参数族；蓝=已飞行；橙=未来）', ...
     'FontName',fnUI,'FontSize',11);
-lg = legend(ax3,[hFamLegend hObs hFitObs hPlayed hFuture hCur], ...
+lg = legend(ax3,[hFamLegend hObs hFitObs hPlayed hFuture hCur hGoalPoint], ...
     'Location','northwest','FontSize',8,'Box','off');
 set(lg,'AutoUpdate','off');
 
@@ -456,7 +476,29 @@ fprintf('[penalty_view] 就绪：T=%.6f s，状态 %s，最大残差 %.6f m。\n
         t = c.t(:); s = c.state;
         if size(s,1) ~= numel(t), s = s.'; end
         assert(size(s,2) >= 6,'curve 状态必须为 N×6。');
-        curveT = t; curveS = s;     % 不拼接旧轨迹
+        curveT = t; curveS = s;
+        refreshGoalIntersection();
+    end
+
+    function refreshGoalIntersection()
+        % 只标出真正到达x=11的事件；先触地的端点不是球门交点。
+        ep=sim.endpoint(:);
+        crossing=strcmp(sim.status,'plane')&&numel(ep)>=3&&all(isfinite(ep(1:3)))&&abs(ep(1)-xPlane)<1e-7;
+        if ~crossing
+            set([hGoalPoint hGoalCross hGoalText],'Visible','off');
+            set(hGoalPoint,'XData',nan,'YData',nan,'ZData',nan);
+            return;
+        end
+        color=[.55 .12 .70];note='预测交点';
+        if ~sim.fit.feasible,color=[.82 .10 .10];note='未通过筛选的候选交点';end
+        set(hGoalPoint,'XData',ep(1),'YData',ep(2),'ZData',ep(3),'Color',color,'MarkerFaceColor','none','Visible','on');
+        a=.23;
+        set(hGoalCross,'XData',ep(1)*ones(1,5), ...
+            'YData',[ep(2)-a ep(2)+a nan ep(2) ep(2)], ...
+            'ZData',[ep(3) ep(3) nan ep(3)-a ep(3)+a],'Color',color,'Visible','on');
+        set(hGoalText,'Position',[ep(1)-.65 ep(2)+.15 ep(3)+.26], ...
+            'String',sprintf('%s\n(11, %.3f, %.3f) m',note,ep(2),ep(3)), ...
+            'Color',color,'Visible','on');
     end
 
     function refreshObservations()
@@ -577,7 +619,7 @@ fprintf('[penalty_view] 就绪：T=%.6f s，状态 %s，最大残差 %.6f m。\n
             sprintf('末端（%s）：(%+.2f, %+.2f, %+.2f) m',statusChinese(sim.status),ep(1),ep(2),ep(3)), ...
             sprintf('合格状态：%s ｜ %s',feasTxt,openTxt), ...
             sprintf('当前风 (%+.2f, %+.2f, %+.2f) m/s ｜ 有效 Cd %.4f',w(1),w(2),w(3),CdNow), ...
-            '环境从出脚 t=0 起全程生效，不是突然阵风。', ...
+            '环境从出脚 t=0 起全程生效。', ...
             '灰色族为相容解的采样子集，不是置信区间。'};
         set(hInfo,'String',lines);
     end
@@ -676,9 +718,13 @@ fprintf('[penalty_view] 就绪：T=%.6f s，状态 %s，最大残差 %.6f m。\n
         else
             idx = [];
         end
+        crossings=zeros(0,3);
         for kk = 1:maxFamLines
             if kk <= familyDrawn
-                tr = family(idx(kk)).trajectory;
+                member=family(idx(kk));tr=member.trajectory;
+                if strcmp(member.status,'plane')&&abs(member.endpoint(1)-xPlane)<1e-7
+                    crossings(end+1,:)=member.endpoint(1:3)'; %#ok<AGROW>
+                end
                 if size(tr,2) >= 3
                     set(famLines(kk),'XData',tr(:,1),'YData',tr(:,2),'ZData',tr(:,3));
                 else
@@ -688,6 +734,7 @@ fprintf('[penalty_view] 就绪：T=%.6f s，状态 %s，最大残差 %.6f m。\n
                 set(famLines(kk),'XData',NaN,'YData',NaN,'ZData',NaN);
             end
         end
+        set(hFamilyGoal,'XData',crossings(:,1),'YData',crossings(:,2),'ZData',crossings(:,3));
         updateFamilyVisibility();
         updateFamilyNote();
     end
@@ -695,6 +742,7 @@ fprintf('[penalty_view] 就绪：T=%.6f s，状态 %s，最大残差 %.6f m。\n
     function updateFamilyVisibility()
         vis = 'off';
         if get(hFamilyToggle,'Value'), vis = 'on'; end
+        set(hFamilyGoal,'Visible',vis);
         for kk = 1:familyDrawn
             set(famLines(kk),'Visible',vis);
         end
@@ -773,9 +821,9 @@ fprintf('[penalty_view] 就绪：T=%.6f s，状态 %s，最大残差 %.6f m。\n
         for jj = 1:2
             selectScenario(sims{jj},ps{jj});
             if jj == 1
-                setStatus('约束轨迹簇演示：第 1 组全程参数；环境从出脚起全程生效，不是突然阵风。');
+                setStatus('约束轨迹簇演示：第 1 组全程参数；环境从出脚起全程生效。');
             else
-                setStatus('切换：另一组全程参数（第 2 组）；环境从出脚起全程生效，不是突然阵风。');
+                setStatus('切换：另一组全程参数（第 2 组）；环境从出脚起全程生效。');
             end
             for kk = 1:half
                 tNow = sim.tEnd*(kk-1)/(half-1);
@@ -787,7 +835,7 @@ fprintf('[penalty_view] 就绪：T=%.6f s，状态 %s，最大残差 %.6f m。\n
         end
 
         drawComparison(sims);
-        setStatus('约束轨迹簇对比：两组差异较大的合格全程参数（不是突然阵风）。');
+        setStatus('约束轨迹簇对比：两组差异较大的合格全程参数。');
         drawnow;
         fr = getframe(fig);
         imwrite(frame2im(fr),pngPath);
@@ -825,14 +873,18 @@ fprintf('[penalty_view] 就绪：T=%.6f s，状态 %s，最大残差 %.6f m。\n
             c = penalty_scenario('curve',simsCell{jj});
             set(hCmp(jj),'XData',c.state(:,1),'YData',c.state(:,2),'ZData',c.state(:,3));
             ep = simsCell{jj}.endpoint(:);
+            if strcmp(simsCell{jj}.status,'plane')
+                set(hCmpGoal(jj),'XData',ep(1),'YData',ep(2),'ZData',ep(3),'Visible','on');
+                set(hCmpTxt(jj),'String',sprintf('第%d组交点\n(11, %.3f, %.3f) m',jj,ep(2),ep(3)));
+            end
             set(hCmpTxt(jj),'Position',[ep(1)-.7,ep(2)+.08,ep(3)+(.20-.35*(jj-1))]);
         end
-        set([hPlayed hFuture hCur],'Visible','off');
+        set([hPlayed hFuture hCur hGoalPoint hGoalCross hGoalText],'Visible','off');
         set([hqG hqD hqM],'Visible','off');
         set(hBall,'Visible','off');
         set(hObs,'Visible','on'); set(hFitObs,'Visible','on');
         set(hCmp,'Visible','on'); set(hCmpTxt,'Visible','on');
-        set(ax3.Title,'String','约束轨迹簇对比：两组差异较大的合格全程参数（非突然阵风）');
+        set(ax3.Title,'String','约束轨迹簇对比：两组差异较大的合格全程参数');
         set(hView,'Value',2);applyView();view(ax3,-28,20);
     end
 

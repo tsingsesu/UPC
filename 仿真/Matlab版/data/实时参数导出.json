@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-07 20:23:50",
+  "generatedAt": "2026-11-07 21:18:05",
   "exportMode": "export",
   "parameters": {
     "windY": 0,
@@ -84,7 +84,7 @@
       ]
     ],
     "exitflag": 1,
-    "elapsedSeconds": 0.0188023,
+    "elapsedSeconds": 0.0178489,
     "kineticEnergy": 228.22153622982793
   },
   "endpoint": [

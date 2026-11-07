@@ -12,6 +12,7 @@
   "expandedControls": true,
   "playbackPreservedAfterEdit": true,
   "infeasibleMarkedRed": true,
+  "goalIntersectionsSynchronized": true,
   "replayReturnsToZero": true,
   "timerClearedOnClose": true
 }
