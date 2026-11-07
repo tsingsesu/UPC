@@ -9,6 +9,7 @@
   "oldHistoryNotAppended": true,
   "invalidInputRestored": true,
   "outOfRangeClamped": true,
+  "expandedControls": true,
   "playbackPreservedAfterEdit": true,
   "infeasibleMarkedRed": true,
   "replayReturnsToZero": true,

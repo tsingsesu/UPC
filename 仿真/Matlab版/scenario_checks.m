@@ -47,6 +47,16 @@ assert(~unphysical.admissibility.accepted&&any(strcmp(unphysical.admissibility.r
 f=a;f.theta(5:6)=[1.4 1.4];unphysical=penalty_inverse('propagate',f);
 assert(~unphysical.admissibility.accepted&&any(strcmp(unphysical.admissibility.reasons,'transverse_coefficient_guard')));
 report.implausibleSpeedAndForceRejected=true;
+ranges=[-15 .90 .08;15 1.40 .80;-12 1.0 .2;12 1.3 .5];
+report.expandedRangeChecks=struct([]);
+for k=1:size(ranges,1)
+ q=penalty_scenario('defaults');q.windY=ranges(k,1);q.density=ranges(k,2);q.Cd=ranges(k,3);
+ z=penalty_scenario('start',q);
+ assert(~any(strcmp(z.admissibility.reasons,'outside_declared_environment_domain')));
+ assert(z.fit.feasible==(z.fit.observationCompatible&&z.fit.physicalAdmissible));
+ report.expandedRangeChecks=[report.expandedRangeChecks;struct('windY',q.windY,'density',q.density,'Cd',q.Cd, ...
+ 'accepted',z.fit.feasible,'residual',z.fit.maxResidual,'reasons',{z.fit.rejectionReasons})];
+end
 root=fileparts(mfilename('fullpath'));fid=fopen(fullfile(root,'data','实时情景验证.json'),'w','n','UTF-8');
 fprintf(fid,'%s',jsonencode(report,'PrettyPrint',true));fclose(fid);disp(report);
 end

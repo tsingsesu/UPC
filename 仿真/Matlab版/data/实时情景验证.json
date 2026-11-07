@@ -68,5 +68,48 @@
     -0.98689332633076787
   ],
   "oldBranchRejected": true,
-  "implausibleSpeedAndForceRejected": true
+  "implausibleSpeedAndForceRejected": true,
+  "expandedRangeChecks": [
+    {
+      "windY": -15,
+      "density": 0.9,
+      "Cd": 0.08,
+      "accepted": false,
+      "residual": 0.013736129709429168,
+      "reasons": [
+        "observation_tolerance"
+      ]
+    },
+    {
+      "windY": 15,
+      "density": 1.4,
+      "Cd": 0.8,
+      "accepted": false,
+      "residual": 0.032356035374110581,
+      "reasons": [
+        "transverse_coefficient_guard",
+        "observation_tolerance"
+      ]
+    },
+    {
+      "windY": -12,
+      "density": 1,
+      "Cd": 0.2,
+      "accepted": false,
+      "residual": 0.0084110365689509248,
+      "reasons": [
+        "observation_tolerance"
+      ]
+    },
+    {
+      "windY": 12,
+      "density": 1.3,
+      "Cd": 0.5,
+      "accepted": false,
+      "residual": 0.011866230330818794,
+      "reasons": [
+        "observation_tolerance"
+      ]
+    }
+  ]
 }

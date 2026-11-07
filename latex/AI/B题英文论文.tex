@@ -5,6 +5,8 @@
 \hypersetup{colorlinks=true,linkcolor=blue,urlcolor=blue,citecolor=blue}
 \pagestyle{fancy}\fancyhf{}\fancyhead[C]{Team: TEAM NUMBER REQUIRED}\fancyfoot[C]{\thepage}
 \setlength{\headheight}{15pt}\setlength{\parskip}{5pt}\setlength{\parindent}{0pt}
+\usepackage{caption}
+\captionsetup{font=small,labelfont=bf}
 \graphicspath{{../../img/}}
 \newcommand{\R}{\mathbb R}
 \begin{document}
@@ -28,33 +30,41 @@ We use the coordinates and observations specified in Problem B~\cite{upc}. The i
 at $t_1=0.05$ s and $t_2=0.10$ s. Our primary prediction concerns the ball centre at its first forward crossing of $x=11$ m, following the problem's plane convention. A separate finite-radius check assesses passage through the opening. The model does not predict the goalkeeper's response or collisions with the posts.
 
 The requested general method must accept measured positions, estimate a trajectory, propagate uncertainty, and reject trajectories that hit the ground first or fail to reach the plane. We implement each stage explicitly. All reported uncertainty is conditional on stated noise and force assumptions; neither is fully specified by the question.
+% WORKFLOW_BEGIN
+\subsection{Objectives and solution workflow}
+We seek three outputs: a conditional point forecast, a set of physically admissible trajectories consistent with the observations, and diagnostics that distinguish observation mismatch from numerical failure. Figure~\ref{fig:workflow} connects these outputs to the physical model and inverse calculation. The central difficulty is coupling: changing an environmental profile requires re-estimating launch conditions rather than propagating a fixed launch under every profile.
+\begin{figure}[htbp]\centering
+\includegraphics[width=\linewidth]{系统与反演流程.png}
+\caption{Coordinate convention and inverse-prediction workflow. The left panel is a horizontal schematic; the right panel shows how prescribed environments, inferred launch conditions and acceptance checks produce the compatible family.}
+\label{fig:workflow}
+\end{figure}
+% WORKFLOW_END
 
-\section{Information limits and analytical baselines}
-\subsection{Why interpolation is not validation}
-After the initial position is fixed, the data contain six scalar constraints. A sufficiently flexible six-parameter model can interpolate these observations exactly, leaving no residual degrees of freedom with which to estimate noise. Further unknowns, including three-dimensional spin, variable drag, wind, and camera bias, cannot all be inferred freely.
-
-For a simple constructive demonstration, adding $\mathbf c\,t(t-t_1)(t-t_2)$ to a smooth trajectory preserves all three observed positions but changes later positions. Physical restrictions limit admissible $\mathbf c$; observations alone do not. We therefore use a reduced physical model and test departures from it separately.
-
-\subsection{Constant acceleration}
-With $h=0.05$ s and $\mathbf r(t)=\mathbf r_0+\mathbf v_0t+\tfrac12\mathbf at^2$, exact interpolation gives
-\begin{align}
-\mathbf v_0&=\frac{4\mathbf r_1-\mathbf r_2-3\mathbf r_0}{2h}
-=(30.4,9.4,6.9)\ \mathrm{m\,s^{-1}},\\
-\mathbf a&=\frac{\mathbf r_2-2\mathbf r_1+\mathbf r_0}{h^2}
-=(-16,-16,-12)\ \mathrm{m\,s^{-2}}.
-\end{align}
-The earliest positive solution of $30.4t-8t^2=11$ is $0.405008$ s, giving $(y,z)=(2.494824,1.920367)$ m. These extra digits are retained only as a reproducibility check. This acceleration is an inferred short-time average, not a force law guaranteed to remain constant.
-
-A gravity-only baseline estimates initial velocity by linear least squares after subtracting the known gravitational displacement. A drag-only baseline estimates the three velocity components and a drag coefficient. Their residuals and predictions are compared with the full model in the numerical results.
-
-\subsection{Short observation windows amplify error}
-Assume that $\mathbf r_0$ is exact and each coordinate of $\mathbf r_1,\mathbf r_2$ has independent error with standard deviation $\sigma$. The acceleration uncertainty is
-\begin{equation}
-\operatorname{sd}(a_j)=\frac{\sqrt5\,\sigma}{h^2}.
-\end{equation}
-At $\sigma=0.01$ m this is $8.94\ \mathrm{m\,s^{-2}}$. At a fixed time $t=8h=0.40$ s, quadratic interpolation has weights $(21,-48,28)$, so its coordinate uncertainty is $\sqrt{48^2+28^2}\,\sigma=55.57\sigma$. Goal-plane prediction also requires uncertain crossing time; propagating uncertainty at fixed time alone is insufficient.
 
 \section{Physical model and justified scope}
+% NOTATION_BEGIN
+\subsection{Notation and prescribed information}
+\begin{table}[H]\centering
+\caption{Notation used in the inverse problem. Prescribed scenario inputs and inferred quantities are distinguished.}
+\label{tab:notation}
+\begin{tabular}{lll}\toprule
+Symbol & Meaning & Unit or role\\\midrule
+$\mathbf r,\mathbf v$ & Ball centre and velocity & m; m s$^{-1}$\\
+$\mathbf r_i,t_i$ & Two supplied positions and times & measured inputs\\
+$\mathbf u=\mathbf v-\mathbf w$ & Velocity relative to air & m s$^{-1}$\\
+$\eta=(w_y,\rho,C_D)$ & Prescribed environment profile & scenario inputs\\
+$q=(\mathbf v_0,b_y,b_z)$ & Inferred launch and effective lift & m s$^{-1}$; s$^{-1}$\\
+$\epsilon$ & Coordinatewise observation tolerance & m\\
+$C_\perp$ & Effective transverse-force coefficient & dimensionless\\
+$t_g,y_g,z_g$ & First goal-plane crossing & s; m; m\\
+$\sigma$ & Conditional Gaussian-noise scale & m; Appendix~\ref{sec:reference}\\
+\bottomrule\end{tabular}
+\end{table}
+% NOTATION_END
+
+
+
+
 \subsection{Equations and parameters}
 Let $\mathbf u=\mathbf v-\mathbf w$ be velocity relative to air. Newton's second law is approximated by
 \begin{align}
@@ -67,7 +77,7 @@ The drag term follows the conventional quadratic force law. Wind-tunnel studies 
 
 The effective Magnus vector $\mathbf b$ has units of inverse seconds. If the lift coefficient is approximately proportional to spin parameter $R\omega/|\mathbf u|$, the transverse acceleration has this cross-product form. Thus $\mathbf b$ combines spin and aerodynamic efficiency; it is not a measurement of angular velocity. Constant $\mathbf b$ and $C_D$ are short-flight approximations, subsequently stressed rather than treated as universal laws.
 
-\begin{table}[H]\centering
+\begin{table}[htbp]\centering
 \caption{Inputs and assumptions. Search bounds are modelling choices, not measured population intervals.}
 \begin{tabular}{lll}\toprule
 Quantity & Value & Status\\\midrule
@@ -98,10 +108,35 @@ In still air the mechanical energy satisfies
 \end{equation}
 because $\mathbf v\cdot(\mathbf b\times\mathbf v)=0$. This is the appropriate dissipative balance. Ground-frame mechanical energy need not decrease monotonically when moving air performs work.
 
+\section{Information limits and analytical baselines}
+\subsection{Why interpolation is not validation}
+After the initial position is fixed, the data contain six scalar constraints. A sufficiently flexible six-parameter model can interpolate these observations exactly, leaving no residual degrees of freedom with which to estimate noise. Further unknowns, including three-dimensional spin, variable drag, wind, and camera bias, cannot all be inferred freely.
+
+For a simple constructive demonstration, adding $\mathbf c\,t(t-t_1)(t-t_2)$ to a smooth trajectory preserves all three observed positions but changes later positions. Physical restrictions limit admissible $\mathbf c$; observations alone do not. We therefore use a reduced physical model and test departures from it separately.
+
+\subsection{Constant acceleration}
+With $h=0.05$ s and $\mathbf r(t)=\mathbf r_0+\mathbf v_0t+\tfrac12\mathbf at^2$, exact interpolation gives
+\begin{align}
+\mathbf v_0&=\frac{4\mathbf r_1-\mathbf r_2-3\mathbf r_0}{2h}
+=(30.4,9.4,6.9)\ \mathrm{m\,s^{-1}},\\
+\mathbf a&=\frac{\mathbf r_2-2\mathbf r_1+\mathbf r_0}{h^2}
+=(-16,-16,-12)\ \mathrm{m\,s^{-2}}.
+\end{align}
+The earliest positive solution of $30.4t-8t^2=11$ is $0.405008$ s, giving $(y,z)=(2.494824,1.920367)$ m. These extra digits are retained only as a reproducibility check. This acceleration is an inferred short-time average, not a force law guaranteed to remain constant.
+
+A gravity-only baseline estimates initial velocity by linear least squares after subtracting the known gravitational displacement. A drag-only baseline estimates the three velocity components and a drag coefficient. Their residuals and predictions are compared with the full model in the numerical results.
+
+\subsection{Short observation windows amplify error}
+Assume that $\mathbf r_0$ is exact and each coordinate of $\mathbf r_1,\mathbf r_2$ has independent error with standard deviation $\sigma$. The acceleration uncertainty is
+\begin{equation}
+\operatorname{sd}(a_j)=\frac{\sqrt5\,\sigma}{h^2}.
+\end{equation}
+At $\sigma=0.01$ m this is $8.94\ \mathrm{m\,s^{-2}}$. At a fixed time $t=8h=0.40$ s, quadratic interpolation has weights $(21,-48,28)$, so its coordinate uncertainty is $\sqrt{48^2+28^2}\,\sigma=55.57\sigma$. Goal-plane prediction also requires uncertain crossing time; propagating uncertainty at fixed time alone is insufficient.
+
 % FULL_FLIGHT_FAMILY_BEGIN
 \section{Full-flight constrained trajectory family: primary method}
 \subsection{Coupled parameters and observation constraints}
-The same force law acts from release, $t=0$, until the first terminal event. There is no ideal initial segment and no activation of wind or drag at $0.10$ s. For this reduced extension we retain steady lateral wind $\mathbf w=(0,w_y,0)$, constant density, constant drag coefficient and constant effective transverse coefficients, with $b_x=0$. Gusts, spin decay, drag crisis and camera bias are excluded from this family; they require additional information. The later structural stress tests remain separate comparisons.
+The same force law acts from release, $t=0$, until the first terminal event. We retain steady lateral wind $\mathbf w=(0,w_y,0)$, constant density, constant drag coefficient and constant effective transverse coefficients, with $b_x=0$. Gusts, spin decay, drag crisis and camera bias are excluded from this family; they require additional information. The later structural stress tests remain separate comparisons.
 
 Let $\eta=(w_y,\rho,C_D)$ and $q=(v_{0x},v_{0y},v_{0z},b_y,b_z)$. The ideal observation equations are
 \begin{equation}
@@ -141,7 +176,7 @@ At the default tolerance the maximum transverse coefficient among accepted repre
 
 \subsection{Computed family and coupled-kick example}
 All 231 optimizations converged without parameter-bound hits. At 5 mm, 107 representatives pass the six-coordinate test. They all reach the goal plane before the ground and clear the finite-radius opening in this chosen set. Their launch speeds span 32.323--32.849 m s$^{-1}$. Plane-coordinate ranges are $y\in[2.5342,2.6812]$ m and $z\in[1.9451,1.9867]$ m. The separate extrema need not belong to the same shot, and these sampled ranges do not bound untested solutions.
-\begin{table}[H]\centering
+\begin{table}[htbp]\centering
 \caption{Tolerance screening of the same profile representatives. Ranges are sampled spreads, not uncertainty bounds.}
 \begin{tabular}{rrrr}\toprule
 $\epsilon$ (mm) & Accepted & $y_g$ (m) & $z_g$ (m)\\\midrule
@@ -150,7 +185,7 @@ $\epsilon$ (mm) & Accepted & $y_g$ (m) & $z_g$ (m)\\\midrule
 10 & 189/231 & [2.445,2.756] & [1.918,2.005] \\
 20 & 231/231 & [2.280,2.815] & [1.885,2.013] \\
 \bottomrule\end{tabular}\end{table}
-\begin{table}[H]\centering\small
+\begin{table}[htbp]\centering\small
 \caption{Two compatible full-flight solutions, selected for largest pairwise separation within the 5 mm sample. Wind is present from release in both.}
 \begin{tabular}{lrrrrrrr}\toprule
  & $w_y$ & $\rho$ & $C_D$ & $|v_0|$ & Error (mm) & $y_g$ & $z_g$\\\midrule
@@ -160,30 +195,51 @@ B & -8.0 & 1.350 & 0.3707 & 32.791 & 3.828 & 2.5342 & 1.9492 \\
 \par\smallskip\footnotesize Units: wind and speed in m s$^{-1}$; density in kg m$^{-3}$; plane coordinates in m.
 \end{table}
 The two plane crossings differ by 0.1513 m despite both meeting the same observation tolerance. Their residuals, velocity vectors, effective force coefficients and complete trajectories are retained with the numerical output. This demonstrates non-uniqueness within the stated physical family without inventing an unobserved force switch. The observed spread is modest because these are steady, reduced-force profiles refitted to the observations; complexity alone would not justify a larger or more accurate result.
-\begin{figure}[H]\centering
-\includegraphics[width=.87\linewidth]{全程约束轨迹簇.png}
-\caption{Accepted full-flight trajectories at 5 mm, with two contrasting representatives. Gray curves show selected physical possibilities, not probability density.}
+\begin{figure}[htbp]\centering
+\includegraphics[width=.98\linewidth]{观测约束与轨迹分离.png}
+\caption{The same two candidate shots satisfy all six coordinate tolerances (left), while their late-flight paths separate in the horizontal plane (right). The shaded residual band is the prescribed 5 mm tolerance. Gray paths are compatible representatives; the actual displacements are not rescaled.}
 \end{figure}
-\begin{figure}[H]\centering
+\begin{figure}[htbp]\centering
 \includegraphics[width=.76\linewidth]{全程约束球门散点.png}
 \caption{Zoomed goal-plane scatter for compatible profile representatives; color indicates prescribed $C_D$.}
 \end{figure}
 
+\begin{figure}[htbp]\centering
+\includegraphics[width=\linewidth]{参数耦合与筛选敏感性.png}
+\caption{Parameter coupling and screening: prescribed density--drag product versus inferred launch speed for three wind slices (left), wind versus effective $b_z$ for compatible representatives (middle), and accepted profile count versus coordinate tolerance (right). Counts are properties of this sampled search.}
+\label{fig:coupling}
+\end{figure}
 \subsection{Numerical evidence and interpretation of ``most likely''}
 Python independently integrated all 231 candidates using DOP853 and reproduced the acceptance decisions without disagreements; maximum plane-point difference from MATLAB was $1e-13$ m. Independent refits of the two displayed representatives also agreed. Tests additionally verify wind at release, compensating initial-velocity changes, invariance under fixed $\rho C_D$, three maximum-step settings, drag dissipation relative to air, transverse-force orthogonality, ground-event localization and the ground-frame work balance
 \begin{equation}
  \frac{d}{dt}\left(\frac12m|\mathbf v|^2+mgz\right)
  =(\mathbf F_D+\mathbf F_M)\cdot\mathbf v.
 \end{equation}
-These are numerical checks, not experimental confirmation. The earlier conditional baseline and synthetic tests below serve as additional diagnostics; their Gaussian confidence estimates must not be substituted for the bounded-error family's sampled spread.
+These are numerical checks, not experimental confirmation. The conditional calm-air model and synthetic tests in the appendices provide additional diagnostics; their Gaussian confidence estimates must not be substituted for the bounded-error family's sampled spread.
 
-Without a measurement likelihood and a probability model for the unknown environment, these data do not specify an unconditional most-likely crossing. To give the requested point estimate, we retain the calm-air maximum-likelihood reference $(11,2.60,1.97)$ m at $0.401$ s, explicitly conditional on its assumptions, alongside the compatible family. A predictive mode marginalized over nuisance parameters is not identified by these two observations alone. The interactive MATLAB view implements the same inverse model: releasing a parameter slider recomputes the entire shot and restarts its animation, while reporting fitted launch conditions and residual acceptance. It does not splice distinct shots into one trajectory.
+Without a measurement likelihood and a probability model for the unknown environment, these data do not specify an unconditional most-likely crossing. To give the requested point estimate, we retain the calm-air maximum-likelihood reference $(11,2.60,1.97)$ m at $0.401$ s, explicitly conditional on its assumptions, alongside the compatible family. A predictive mode marginalized over nuisance parameters is not identified by these two observations alone. The interactive MATLAB view implements the same inverse model: releasing a parameter slider recomputes the entire shot and restarts its animation, while reporting fitted launch conditions and residual acceptance. The interactive exploration ranges are $w_y\in[-15,15]$ m s$^{-1}$, $\rho\in[0.90,1.40]$ kg m$^{-3}$ and $C_D\in[0.08,0.80]$. These broader stress-test controls are screened by the same launch-speed and force checks; the reported family statistics use the prescribed grid stated above.
 
 % FULL_FLIGHT_FAMILY_END
 
+\section{Operational meaning, limitations and improvements}
+The nominal centre lies on the positive-$y$ side of the goal, high enough that vertical uncertainty matters. At 0.10 s, only about 0.30 s remains before the predicted crossing. The precision implied by the input decimal places must not be confused with known camera accuracy: rounding to centimetres alone would be a different error model from independent Gaussian noise of 1 cm standard deviation.
 
+The leading limitation is the short measurement interval. Additional frames could distinguish curvature changes and reduce velocity--acceleration coupling; calibrated camera error covariance and synchronized timestamps would make confidence estimates more defensible. Common camera bias, uncertain initial position, depth reconstruction and correlated coordinate errors are not captured by the independent-error scenario. For general known covariance $\Sigma$, replace $J^TJ/\sigma^2$ by $J^T\Sigma^{-1}J$.
 
+Constant effective Magnus force structure cannot resolve non-stationary wakes, abrupt gusts or force changes after the last observation. No data-driven finite bound on arbitrary future disturbances exists. Low-spin flutter and rebound require additional calibrated models. For trajectories that touch the ground before the goal, our method reports a different outcome instead of silently extrapolating below the surface.
+
+Independent implementations and synthetic validation check equations and algorithms. They do not establish that this particular football, field and camera obey the chosen model. There is no independent measured full trajectory here; experimental confirmation remains outstanding. Bounds and synthetic sampling ranges are explicit scenario choices, not universal football statistics.
+
+\section{Conclusions}
+The primary answer is a coupled full-flight inverse problem: environmental parameters and launch conditions must be inferred together under the two observation constraints. At a stated 5 mm coordinate tolerance, 107 of 231 sampled profile representatives are compatible, and two differ by 0.1513 m at the goal. These ranges demonstrate non-uniqueness but are not global bounds or probabilities. The calm-air point $(11,2.60,1.97)$ m at $0.401$ s remains a conditional reference, not a uniquely established truth or an unconditional predictive mode. Gaussian measurement-error diagnostics are reported separately. Further observations, environmental measurements and independent flight data are needed to narrow the feasible set and calibrate probabilistic forecasts.
+
+\appendix
 \section{Conditional reference: likelihood and measurement diagnostics}
+\label{sec:reference}
+
+
+
+
 \subsection{Bounded maximum likelihood}
 For a chosen $\sigma$, we minimize
 \begin{equation}
@@ -194,7 +250,7 @@ over the stated bounds using \texttt{lsqnonlin}~\cite{lsq}. Equal coordinate var
 
 The point forecast is the goal-plane image of the constrained maximum-likelihood parameter estimate. In this precise sense it is our model-conditioned ``most likely'' forecast. A mode of a marginal landing-point probability density would additionally require a probabilistic parameter model and integration over nuisance parameters; we do not claim such an unconditional mode.
 
-Observations are evaluated using fourth-order Runge--Kutta steps of $0.005$ s. Subsequent flight uses \texttt{ode45} with directional events~\cite{ode}: increasing $x-11=0$ and decreasing $z-R=0$. Event integration starts from the fitted state at $0.10$ s to avoid falsely treating launch contact as an immediate landing. Missing crossings, numerical failures, and earlier ground contacts are recorded explicitly. Applicability assumes the ball is airborne through the observation window.
+Observations are evaluated using fourth-order Runge--Kutta steps of $0.005$ s. Subsequent flight uses \texttt{ode45} with directional events~\cite{ode}: increasing $x-11=0$ and decreasing $z-R=0$. The same force law is used for observation propagation and event prediction. Missing crossings, numerical failures, and earlier ground contacts are recorded explicitly. Applicability assumes the ball is airborne through the observation window.
 
 The problem's centre-plane criterion is $|y|<3.66$, $0<z<2.44$. A stricter opening clearance is $|y|<3.66-R$ and $R\le z<2.44-R$. We also compute the centre at $x=11+R$ as a finite-size sensitivity; this is an ideal thin-plane approximation, not a detailed post-collision model.
 
@@ -222,7 +278,7 @@ The four independent starts converge to the same interior solution, with paramet
 \widehat{\boldsymbol\theta}=(30.41546,9.41672,6.90801,0.370687,-0.060326,-0.357128).
 \end{equation}
 The first three entries have units m s$^{-1}$, the fourth is dimensionless, and the last two have units s$^{-1}$. The predicted crossing is $(y_g,z_g)=(2.599441,1.967005)$ m at $0.4005035$ s. This numerical precision permits reproducibility; the answer should be reported as $(11,2.60,1.97)$ m at $0.401$ s.
-\begin{table}[H]\centering
+\begin{table}[htbp]\centering
 \caption{Observation fit and extrapolation. Tiny interpolation residuals do not demonstrate physical validity.}
 \begin{tabular}{lrrrr}\toprule
 Model & RMSE (mm) & $t_g$ (s) & $y_g$ (m) & $z_g$ (m)\\\midrule
@@ -233,10 +289,7 @@ Drag and effective Magnus & 0.000 & 0.4005 & 2.599 & 1.967 \\
 \bottomrule\end{tabular}\end{table}
 The drag-only objective is $\chi^2=1.517$ for two nominal residual degrees of freedom, corresponding to an approximate goodness-of-fit tail probability $0.468$ under the 1 cm Gaussian assumption. Thus these observations do not by themselves establish the need for the two extra transverse-force parameters at that noise level. At 2 mm noise, the same drag-only discrepancy gives $\chi^2=37.9$, making the interpretation strongly dependent on measurement quality. The more flexible model is retained as a conditional curvature-aware forecast, not declared uniquely correct by its exact fit.
 
-\begin{figure}[H]\centering
-\includegraphics[width=.78\linewidth]{罚球轨迹与观测.png}
-\caption{Nominal fitted flight from launch to the first goal-plane crossing. Only the two early positions are observations.}
-\end{figure}
+
 At the centre plane $x=11.11$ m, the finite-radius sensitivity gives $(y,z)=(2.61689,1.97822)$ m at $0.40493$ s. The additional travel shifts the centre by approximately 2.1 cm in the goal plane. The nominal shot clears the ideal opening under both conventions.
 
 \subsection{Measurement uncertainty and bootstrap stability}
@@ -249,7 +302,7 @@ The 95\% joint ellipse has semiaxes 1.212 and 1.208 m. The unscaled observation 
 
 All 600 bootstrap fits terminate successfully; 53 hit at least one parameter boundary. All reach the goal plane, but 165 fail the finite-radius opening-clearance criterion. The latter are retained in the coordinate summaries and figure. The empirical 2.5--97.5 percentile ranges of the re-estimated plane coordinates are $[1.703,3.617]$ m in $y$ and $[0.967,2.937]$ m in $z$. These are estimator resampling quantiles, not a posterior distribution for the true shot. The 72.5\% within-opening frequency is a stability diagnostic only. Boundary hits and the region extending beyond the frame are material features of the result.
 
-\begin{figure}[H]\centering
+\begin{figure}[htbp]\centering
 \includegraphics[width=.88\linewidth]{球门预测椭圆与自助散点.png}
 \caption{Goal-plane forecasts from 600 bootstrap refits with 1 cm coordinate noise. All plane crossings are retained, including forecasts outside the opening. The ellipse is the local 95\% joint confidence approximation.}
 \end{figure}
@@ -263,7 +316,7 @@ For the synthetic tests, each of 150 truth vectors is drawn independently and un
 All 150 inversions converge, with 31 boundary hits. All true trajectories reach the plane; 3 fitted trajectories instead hit the ground first. For the 147 paired plane crossings, two-coordinate RMSE is 0.727 m. The local 95\% ellipse covers 146 of those 147 true crossings (99.32\%); counting the three non-crossing forecasts as noncoverage yields 146/150 (97.33\%). Neither number proves exact 95\% calibration, especially with only 150 cases and active constraints. Opening/outside/ground classification agrees in 123/150 cases. Synthetic data obey the reference force family, so these results do not test structural correctness against real ball flight.
 
 \subsection{Structural stress cases}
-\begin{table}[H]\centering
+\begin{table}[htbp]\centering
 \caption{One-factor changes, each refitted to the same observations. Distances are relative to the nominal crossing; these are scenarios, not confidence bounds.}
 \begin{tabular}{lrrr}\toprule
 Scenario & $y_g$ (m) & $z_g$ (m) & Shift (cm)\\\midrule
@@ -277,24 +330,14 @@ b decay tau=0.5 s & 2.7135 & 1.9503 & 11.53 \\
 b decay tau=1.0 s & 2.6611 & 1.9579 & 6.23 \\
 \bottomrule\end{tabular}\end{table}
 Each stress case fits the early positions to numerical precision, yet future positions differ. The largest shift in this chosen set is about 11.5 cm for the 0.5 s decay case. Steady transverse wind has a small residual effect after refitting because the free initial velocity and force parameters absorb much of its early influence; this does not imply that an unexpected later gust is harmless. Unobserved longitudinal spin causes roughly 9 cm shifts. The stress range is illustrative and does not bound all physically possible future disturbances.
-\begin{figure}[H]\centering
+\begin{figure}[htbp]\centering
 \includegraphics[width=.9\linewidth]{模型情景预测比较.png}
 \caption{Displacement from the nominal goal-plane forecast after one-factor refitting. Units are centimetres; the selected scenarios carry no probability weights.}
 \end{figure}
 
 % VERIFIED_RESULTS_END
 
-\section{Operational meaning, limitations and improvements}
-The nominal centre lies on the positive-$y$ side of the goal, high enough that vertical uncertainty matters. At 0.10 s, only about 0.30 s remains before the predicted crossing. The precision implied by the input decimal places must not be confused with known camera accuracy: rounding to centimetres alone would be a different error model from independent Gaussian noise of 1 cm standard deviation.
-
-The leading limitation is the short measurement interval. Additional frames could distinguish curvature changes and reduce velocity--acceleration coupling; calibrated camera error covariance and synchronized timestamps would make confidence estimates more defensible. Common camera bias, uncertain initial position, depth reconstruction and correlated coordinate errors are not captured by the independent-error scenario. For general known covariance $\Sigma$, replace $J^TJ/\sigma^2$ by $J^T\Sigma^{-1}J$.
-
-Constant effective Magnus force structure cannot resolve non-stationary wakes, abrupt gusts or force changes after the last observation. No data-driven finite bound on arbitrary future disturbances exists. Low-spin flutter and rebound require additional calibrated models. For trajectories that touch the ground before the goal, our method reports a different outcome instead of silently extrapolating below the surface.
-
-Independent implementations and synthetic validation check equations and algorithms. They do not establish that this particular football, field and camera obey the chosen model. There is no independent measured full trajectory here; experimental confirmation remains outstanding. Bounds and synthetic sampling ranges are explicit scenario choices, not universal football statistics.
-
-\section{Conclusions}
-The primary answer is a coupled full-flight inverse problem: environmental parameters and launch conditions must be inferred together under the two observation constraints. At a stated 5 mm coordinate tolerance, 107 of 231 sampled profile representatives are compatible, and two differ by 0.1513 m at the goal. These ranges demonstrate non-uniqueness but are not global bounds or probabilities. The calm-air point $(11,2.60,1.97)$ m at $0.401$ s remains a conditional reference, not a uniquely established truth or an unconditional predictive mode. Gaussian measurement-error diagnostics are reported separately. Further observations, environmental measurements and independent flight data are needed to narrow the feasible set and calibrate probabilistic forecasts.
+\clearpage
 
 \begin{thebibliography}{9}
 \bibitem{upc} University Physics Competition. 2026 contest, Problem B. \url{https://www.uphysicsc.com/2026contest.html}. Accessed 7 November 2026.
@@ -306,6 +349,7 @@ The primary answer is a coupled full-flight inverse problem: environmental param
 \bibitem{nunome} H. Nunome, M. Lake, A. Georgakis and L. K. Stergioulas. Impact phase kinematics of instep kicking in soccer. \emph{Journal of Sports Sciences} 24(1), 11--22 (2006). \url{https://doi.org/10.1080/02640410400021450}.
 \end{thebibliography}
 
+\smallskip\small
 \section*{Report on the Use of AI}
 OpenAI Codex assisted with problem selection, modelling decisions, source checking, independent numerical verification and manuscript preparation. Claude Code, routed through the user's existing provider to DeepSeek \texttt{deepseek-v4-flash}, assisted with MATLAB implementation. Human team members must verify and take responsibility for all adopted content.
 

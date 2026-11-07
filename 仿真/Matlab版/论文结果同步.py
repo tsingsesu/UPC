@@ -1,4 +1,4 @@
-"""将MATLAB正式结果同步到英文论文；不包含绘图。"""
+"""将MATLAB正式结果同步到中英文论文，维护正文、附录与配图引用。"""
 from pathlib import Path
 import json
 import numpy as np
@@ -105,7 +105,7 @@ def expand(s):
 
 en=r'''\section{Full-flight constrained trajectory family: primary method}
 \subsection{Coupled parameters and observation constraints}
-The same force law acts from release, $t=0$, until the first terminal event. There is no ideal initial segment and no activation of wind or drag at $0.10$ s. For this reduced extension we retain steady lateral wind $\mathbf w=(0,w_y,0)$, constant density, constant drag coefficient and constant effective transverse coefficients, with $b_x=0$. Gusts, spin decay, drag crisis and camera bias are excluded from this family; they require additional information. The later structural stress tests remain separate comparisons.
+The same force law acts from release, $t=0$, until the first terminal event. We retain steady lateral wind $\mathbf w=(0,w_y,0)$, constant density, constant drag coefficient and constant effective transverse coefficients, with $b_x=0$. Gusts, spin decay, drag crisis and camera bias are excluded from this family; they require additional information. The later structural stress tests remain separate comparisons.
 
 Let $\eta=(w_y,\rho,C_D)$ and $q=(v_{0x},v_{0y},v_{0z},b_y,b_z)$. The ideal observation equations are
 \begin{equation}
@@ -148,27 +148,32 @@ $\epsilon$ (mm) & Accepted & $y_g$ (m) & $z_g$ (m)\\\midrule
 \end{table}
 The two plane crossings differ by @@SEPARATION@@ m despite both meeting the same observation tolerance. Their residuals, velocity vectors, effective force coefficients and complete trajectories are retained with the numerical output. This demonstrates non-uniqueness within the stated physical family without inventing an unobserved force switch. The observed spread is modest because these are steady, reduced-force profiles refitted to the observations; complexity alone would not justify a larger or more accurate result.
 \begin{figure}[H]\centering
-\includegraphics[width=.87\linewidth]{全程约束轨迹簇.png}
-\caption{Accepted full-flight trajectories at 5 mm, with two contrasting representatives. Gray curves show selected physical possibilities, not probability density.}
+\includegraphics[width=.98\linewidth]{观测约束与轨迹分离.png}
+\caption{The same two candidate shots satisfy all six coordinate tolerances (left), while their late-flight paths separate in the horizontal plane (right). The shaded residual band is the prescribed 5 mm tolerance. Gray paths are compatible representatives; the actual displacements are not rescaled.}
 \end{figure}
 \begin{figure}[H]\centering
 \includegraphics[width=.76\linewidth]{全程约束球门散点.png}
 \caption{Zoomed goal-plane scatter for compatible profile representatives; color indicates prescribed $C_D$.}
 \end{figure}
 
+\begin{figure}[htbp]\centering
+\includegraphics[width=\linewidth]{参数耦合与筛选敏感性.png}
+\caption{Parameter coupling and screening: prescribed density--drag product versus inferred launch speed for three wind slices (left), wind versus effective $b_z$ for compatible representatives (middle), and accepted profile count versus coordinate tolerance (right). Counts are properties of this sampled search.}
+\label{fig:coupling}
+\end{figure}
 \subsection{Numerical evidence and interpretation of ``most likely''}
 Python independently integrated all @@COUNT@@ candidates using DOP853 and reproduced the acceptance decisions without disagreements; maximum plane-point difference from MATLAB was $@@PYDIFF@@$ m. Independent refits of the two displayed representatives also agreed. Tests additionally verify wind at release, compensating initial-velocity changes, invariance under fixed $\rho C_D$, three maximum-step settings, drag dissipation relative to air, transverse-force orthogonality, ground-event localization and the ground-frame work balance
 \begin{equation}
  \frac{d}{dt}\left(\frac12m|\mathbf v|^2+mgz\right)
  =(\mathbf F_D+\mathbf F_M)\cdot\mathbf v.
 \end{equation}
-These are numerical checks, not experimental confirmation. The earlier conditional baseline and synthetic tests below serve as additional diagnostics; their Gaussian confidence estimates must not be substituted for the bounded-error family's sampled spread.
+These are numerical checks, not experimental confirmation. The conditional calm-air model and synthetic tests in the appendices provide additional diagnostics; their Gaussian confidence estimates must not be substituted for the bounded-error family's sampled spread.
 
 Without a measurement likelihood and a probability model for the unknown environment, these data do not specify an unconditional most-likely crossing. To give the requested point estimate, we retain the calm-air maximum-likelihood reference $(11,2.60,1.97)$ m at $0.401$ s, explicitly conditional on its assumptions, alongside the compatible family. A predictive mode marginalized over nuisance parameters is not identified by these two observations alone. The interactive MATLAB view implements the same inverse model: releasing a parameter slider recomputes the entire shot and restarts its animation, while reporting fitted launch conditions and residual acceptance. It does not splice distinct shots into one trajectory.
 '''
 zh=r'''\section{全程约束轨迹簇：主要方法}
 \subsection{耦合参数与观测约束}
-同一套受力方程从出脚 $t=0$ 一直作用到第一个终止事件。不存在理想的初始段，也不在 $0.10$ s 时才开启风或阻力。本次降阶扩展保留恒定横风 $\mathbf w=(0,w_y,0)$、恒定空气密度、恒定阻力系数和恒定有效侧向系数，固定 $b_x=0$。阵风、自旋衰减、阻力危机和相机偏差不加入本轨迹簇；这些机制需要更多信息。后面的单因素压力测试仅作独立对照。
+同一套受力方程从出脚 $t=0$ 一直作用到第一个终止事件。本次降阶扩展保留恒定横风 $\mathbf w=(0,w_y,0)$、恒定空气密度、恒定阻力系数和恒定有效侧向系数，固定 $b_x=0$。阵风、自旋衰减、阻力危机和相机偏差不加入本轨迹簇；这些机制需要更多信息。后面的单因素压力测试仅作独立对照。
 
 设 $\eta=(w_y,\rho,C_D)$，$q=(v_{0x},v_{0y},v_{0z},b_y,b_z)$。理想观测等式为
 \begin{equation}
@@ -211,21 +216,26 @@ $\epsilon$ (mm) & 通过数量 & $y_g$ (m) & $z_g$ (m)\\\midrule
 \end{table}
 两个解均满足同一观测容差，球门平面穿越点却相距 @@SEPARATION@@ m。完整残差、初速度向量、有效侧向系数和轨迹随数值结果保存。这是在明确物理族内展示非唯一性，而非人为设置最后观测后才出现的受力变化。此处离散程度较小，是因为采用恒定降阶力并重新拟合观测；模型复杂并不自动产生更大或更准确的差异。
 \begin{figure}[H]\centering
-\includegraphics[width=.87\linewidth]{全程约束轨迹簇.png}
-\caption{5 mm 容差内的全程轨迹及两个差异较大的代表。灰线表示所选物理可能性，不是概率密度。}
+\includegraphics[width=.98\linewidth]{观测约束与轨迹分离.png}
+\caption{两条候选的六坐标残差均在5 mm容差内（左），后程水平轨迹则发生分离（右）。残差浅色带为指定容差，灰线为相容代表；轨迹位移保持真实比例。}
 \end{figure}
 \begin{figure}[H]\centering
 \includegraphics[width=.76\linewidth]{全程约束球门散点.png}
 \caption{相容代表解在球门平面的局部放大散点；颜色为指定阻力系数。}
 \end{figure}
 
+\begin{figure}[htbp]\centering
+\includegraphics[width=\linewidth]{参数耦合与筛选敏感性.png}
+\caption{参数耦合与筛选：三个横风切片中的密度--阻力乘积与反求初速（左）、相容代表的横风与有效$b_z$（中）、容差与接受代表数量（右）。数量仅对应本次采样搜索。}
+\label{fig:coupling}
+\end{figure}
 \subsection{数值证据与“最可能”的含义}
 Python 使用 DOP853 独立积分全部 @@COUNT@@ 个候选，接受判定与 MATLAB 全部一致，球门点最大差异 $@@PYDIFF@@$ m；两个代表的独立重拟合亦一致。验证还覆盖出脚即有风、初速度联动、固定 $\rho C_D$ 的不变性、三档最大步长、相对空气的阻力耗散、侧向力正交性、触地定位以及地面系功与能平衡：
 \begin{equation}
  \frac{d}{dt}\left(\frac12m|\mathbf v|^2+mgz\right)
  =(\mathbf F_D+\mathbf F_M)\cdot\mathbf v.
 \end{equation}
-这些是数值检验，尚非实验确认。后面的无风条件参考模型及合成检验作为补充诊断，其高斯置信估计不能替代有界误差族的采样范围。
+这些是数值检验，尚非实验确认。附录中的无风条件参考模型及合成检验作为补充诊断，其高斯置信估计不能替代有界误差族的采样范围。
 
 若没有观测似然和未知环境的概率模型，仅凭题给信息不能定义无条件的最可能穿越点。为回应题目对点预测的要求，仍报告无风最大似然参考点 $(11,2.60,1.97)$ m、时刻 $0.401$ s，并明确其条件性，同时给出相容轨迹簇。对未知参数积分后的预测密度众数无法由这两次观测单独确定。MATLAB 交互界面采用同一反演模型：松开参数滑块后重新计算整次射门并从头播放，同时显示反求初速度及残差是否合格，不把不同射门拼成一条轨迹。
 '''
@@ -281,7 +291,7 @@ for lang,section,abstract,conclusion in [('英文',expand(en),abstract_en,conclu
     a=s.index(r'\begin{abstract}')+len(r'\begin{abstract}');b=s.index(r'\end{abstract}')
     s=s[:a]+'\n'+abstract+'\n'+s[b:]
     marker=r'\section{Conclusions}' if lang=='英文' else r'\section{结论}'
-    a=s.index(marker)+len(marker);b=s.index(r'\begin{thebibliography}',a)
+    a=s.index(marker)+len(marker);b=min(s.index(r'\begin{thebibliography}',a),s.find(r'\appendix',a) if r'\appendix' in s[a:] else len(s))
     s=s[:a]+'\n'+conclusion+'\n\n'+s[b:]
     s=s.replace('A physics-constrained estimate and its uncertainty','Full-flight inverse constraints and compatible trajectories')
     s=s.replace('一种受物理约束的估计及其不确定性','全程物理约束反演与相容轨迹簇')
@@ -292,3 +302,118 @@ for lang,section,abstract,conclusion in [('英文',expand(en),abstract_en,conclu
         s=s.replace(r'\end{thebibliography}',r'\bibitem{nunome} H. Nunome, M. Lake, A. Georgakis and L. K. Stergioulas. Impact phase kinematics of instep kicking in soccer. \emph{Journal of Sports Sciences} 24(1), 11--22 (2006). \url{https://doi.org/10.1080/02640410400021450}.'+'\n'+r'\end{thebibliography}')
     path.write_text(s,encoding='utf-8')
 print('Full-flight family, abstracts and conclusions synchronized in both languages.')
+
+# 维护论文结构；每次同步后重排，避免正文与附录顺序被生成器覆盖。
+import re
+for lang in ['英文','中文']:
+    path=ROOT/f'latex/AI/B题{lang}论文.tex';s=path.read_text(encoding='utf-8')
+    start=s.index('% FULL_FLIGHT_FAMILY_BEGIN');end=s.index('% FULL_FLIGHT_FAMILY_END')+len('% FULL_FLIGHT_FAMILY_END')
+    family_block=s[start:end];s=s[:start]+s[end:]
+    start=s.index(r'\begin{thebibliography}');tail=s[start:];s=s[:start]
+    s=re.sub(r'^\\appendix\s*$', '', s, flags=re.M)
+    headings=list(re.finditer(r'^\\section\{([^}]+)\}',s,re.M))
+    pre=s[:headings[0].start()]
+    blocks={m.group(1):s[m.start():(headings[i+1].start() if i+1<len(headings) else len(s))].strip() for i,m in enumerate(headings)}
+    if lang=='英文':
+        order=['Problem interpretation and deliverables','Physical model and justified scope','Information limits and analytical baselines','Operational meaning, limitations and improvements','Conclusions','Conditional reference: likelihood and measurement diagnostics','Additional reference-model results and verification']
+        notation=r'''% NOTATION_BEGIN
+\subsection{Notation and prescribed information}
+\begin{table}[htbp]\centering
+\caption{Notation used in the inverse problem. Prescribed scenario inputs and inferred quantities are distinguished.}
+\label{tab:notation}
+\begin{tabular}{lll}\toprule
+Symbol & Meaning & Unit or role\\\midrule
+$\mathbf r,\mathbf v$ & Ball centre and velocity & m; m s$^{-1}$\\
+$\mathbf r_i,t_i$ & Two supplied positions and times & measured inputs\\
+$\mathbf u=\mathbf v-\mathbf w$ & Velocity relative to air & m s$^{-1}$\\
+$\eta=(w_y,\rho,C_D)$ & Prescribed environment profile & scenario inputs\\
+$q=(\mathbf v_0,b_y,b_z)$ & Inferred launch and effective lift & m s$^{-1}$; s$^{-1}$\\
+$\epsilon$ & Coordinatewise observation tolerance & m\\
+$C_\perp$ & Effective transverse-force coefficient & dimensionless\\
+$t_g,y_g,z_g$ & First goal-plane crossing & s; m; m\\
+$\sigma$ & Conditional Gaussian-noise scale & m; Appendix~\ref{sec:reference}\\
+\bottomrule\end{tabular}
+\end{table}
+% NOTATION_END
+'''
+        workflow=r'''% WORKFLOW_BEGIN
+\subsection{Objectives and solution workflow}
+We seek three outputs: a conditional point forecast, a set of physically admissible trajectories consistent with the observations, and diagnostics that distinguish observation mismatch from numerical failure. Figure~\ref{fig:workflow} connects these outputs to the physical model and inverse calculation. The central difficulty is coupling: changing an environmental profile requires re-estimating launch conditions rather than propagating a fixed launch under every profile.
+\begin{figure}[htbp]\centering
+\includegraphics[width=\linewidth]{系统与反演流程.png}
+\caption{Coordinate convention and inverse-prediction workflow. The left panel is a horizontal schematic; the right panel shows how prescribed environments, inferred launch conditions and acceptance checks produce the compatible family.}
+\label{fig:workflow}
+\end{figure}
+% WORKFLOW_END
+'''
+    else:
+        order=['问题理解与交付内容','物理模型与合理范围','信息极限与解析基线','实际含义、局限与改进','结论','推断、事件检测与不确定性','数值结果与验证']
+        notation=r'''% NOTATION_BEGIN
+\subsection{符号与给定信息}
+\begin{table}[htbp]\centering
+\caption{反问题符号；区分指定情景参数与反求量。}
+\label{tab:notation}
+\begin{tabular}{lll}\toprule
+符号 & 含义 & 单位或角色\\\midrule
+$\mathbf r,\mathbf v$ & 球心位置与速度 & m；m/s\\
+$\mathbf r_i,t_i$ & 两次题给位置及时间 & 观测输入\\
+$\mathbf u=\mathbf v-\mathbf w$ & 相对空气速度 & m/s\\
+$\eta=(w_y,\rho,C_D)$ & 指定环境剖面 & 情景输入\\
+$q=(\mathbf v_0,b_y,b_z)$ & 反求初速度与有效侧力 & m/s；s$^{-1}$\\
+$\epsilon$ & 逐坐标观测容差 & m\\
+$C_\perp$ & 有效侧向力系数 & 无量纲\\
+$t_g,y_g,z_g$ & 首次球门平面穿越 & s；m；m\\
+$\sigma$ & 条件高斯误差尺度 & m；见附录\ref{sec:reference}\\
+\bottomrule\end{tabular}
+\end{table}
+% NOTATION_END
+'''
+        workflow=r'''% WORKFLOW_BEGIN
+\subsection{研究目标与求解流程}
+本文返回三个结果：条件点预测、满足观测且通过物理筛选的相容轨迹，以及区分观测不符和求解失败的诊断。图\ref{fig:workflow}将这些输出与物理模型、反演计算连接起来。关键在于参数耦合：改变环境剖面时必须重新估计出脚条件。
+\begin{figure}[htbp]\centering
+\includegraphics[width=\linewidth]{系统与反演流程.png}
+\caption{坐标约定与反演预测流程。左图为水平几何示意；右图展示指定环境、反求出脚量、接受检查与相容轨迹族之间的关系。}
+\label{fig:workflow}
+\end{figure}
+% WORKFLOW_END
+'''
+    if lang=='中文':
+        if '条件无风参考：似然与测量诊断' in blocks:order[5]='条件无风参考：似然与测量诊断'
+        if '条件参考模型的补充结果与验证' in blocks:order[6]='条件参考模型的补充结果与验证'
+    assert all(k in blocks for k in order),(lang,list(blocks))
+    for tag in ['NOTATION','WORKFLOW']:
+        for key in blocks:
+            blocks[key]=re.sub('% '+tag+r'_BEGIN.*?% '+tag+r'_END','',blocks[key],flags=re.S).strip()
+    blocks[order[0]]+='\n'+workflow
+    model=blocks[order[1]];pos=model.index('\n')
+    blocks[order[1]]=model[:pos+1]+notation+model[pos+1:]
+    blocks[order[5]]=blocks[order[5]].replace(r'\label{sec:reference}','')
+    pos=blocks[order[5]].index('\n');blocks[order[5]]=blocks[order[5]][:pos+1]+r'\label{sec:reference}'+'\n'+blocks[order[5]][pos+1:]
+    # 全程物理下的条件无风诊断作为附录保留。
+    if lang=='中文':
+        blocks[order[5]]=blocks[order[5]].replace('推断、事件检测与不确定性','条件无风参考：似然与测量诊断',1)
+        blocks[order[6]]=blocks[order[6]].replace('数值结果与验证','条件参考模型的补充结果与验证',1)
+    # 删除正文已有轨迹族所覆盖的重复三维参考轨迹图。
+    blocks[order[6]]=re.sub(r'\\begin\{figure\}.*?\\end\{figure\}',lambda m:'' if '罚球轨迹与观测.png' in m.group(0) else m.group(0),blocks[order[6]],flags=re.S)
+    main='\n\n'.join([blocks[order[0]],blocks[order[1]],blocks[order[2]],family_block,blocks[order[3]],blocks[order[4]]])
+    s=pre+main+'\n\n\\appendix\n'+blocks[order[5]]+'\n\n'+blocks[order[6]]+'\n\n'+tail
+    if lang=='中文':
+        s=s.replace(r'\graphicspath{{../../img/}}',r'\graphicspath{{../../img/中文/}}')
+    s=s.replace('[H]','[htbp]')
+    s=re.sub(r'(% NOTATION_BEGIN.*?% NOTATION_END)',lambda m:m.group(0).replace('[htbp]','[H]'),s,flags=re.S)
+    if r'\usepackage{caption}' not in s:
+        s=s.replace(r'\graphicspath',r'\usepackage{caption}'+'\n'+r'\captionsetup{font=small,labelfont=bf}'+'\n'+r'\graphicspath',1)
+    s=s.replace('The earlier conditional baseline','The conditional calm-air baseline')
+    s=s.replace(r'\begin{thebibliography}',r'\clearpage'+'\n'+r'\begin{thebibliography}') if r'\clearpage' not in s[s.index(r'\appendix'):] else s
+    s=s.replace('Event integration starts from the fitted state at $0.10$ s to avoid falsely treating launch contact as an immediate landing. ', 'The same force law is used for observation propagation and event prediction. ')
+    s=s.replace('事件积分从 $0.10$ s 处的拟合状态开始，以免把起脚触地误判为立即落地。', '观测传播与事件预测使用同一受力方程。')
+    if lang=='英文':
+        s=s.replace('It does not splice distinct shots into one trajectory.',r'The interactive exploration ranges are $w_y\in[-15,15]$ m s$^{-1}$, $\rho\in[0.90,1.40]$ kg m$^{-3}$ and $C_D\in[0.08,0.80]$. These broader stress-test controls are screened by the same launch-speed and force checks; the reported family statistics use the prescribed grid stated above.')
+    else:
+        s=s.replace('不把不同射门拼成一条轨迹。',r'交互探索范围为横风$[-15,15]$ m/s、密度$[0.90,1.40]$ kg/m$^3$及$C_D\in[0.08,0.80]$。这些宽范围情景仍接受初速度及气动力筛选；论文轨迹簇的统计仍对应前述指定网格。')
+    tag=r'\section*{Report on the Use of AI}' if lang=='英文' else r'\section*{人工智能使用报告}'
+    if r'\smallskip\small' not in s:
+        s=s.replace(tag,r'\smallskip\small'+'\n'+tag)
+    path.write_text(s,encoding='utf-8')
+print('Main narrative, notation, scientific figures and diagnostic appendices organized.')

@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-07 19:34:48",
+  "generatedAt": "2026-11-07 20:23:50",
   "exportMode": "export",
   "parameters": {
     "windY": 0,
@@ -36,16 +36,16 @@
         0.7
       ],
       "windRange": [
-        -8,
-        8
+        -15,
+        15
       ],
       "densityRange": [
-        1.1,
-        1.35
+        0.9,
+        1.4
       ],
       "CdRange": [
-        0.15,
-        0.6
+        0.08,
+        0.8
       ],
       "classification": "球规格为官方要求；速度/气动上限为保守模型筛选，非人体或流体绝对上限。",
       "sources": [
@@ -84,7 +84,7 @@
       ]
     ],
     "exitflag": 1,
-    "elapsedSeconds": 0.0255802,
+    "elapsedSeconds": 0.0188023,
     "kineticEnergy": 228.22153622982793
   },
   "endpoint": [

@@ -90,9 +90,12 @@ assert(isfinite(str2double(get(ed,'String'))),'非法输入后编辑框应显示
 set(ed,'String','1e9');   % 超范围，应被夹到上界
 invoke(ed);
 clamped=getappdata(f,'Parameters');
-assert(clamped.Cd<=0.6+1e-12 && clamped.Cd>=0.15-1e-12,'超范围输入应被夹到允许区间。');
+assert(clamped.Cd<=0.8+1e-12 && clamped.Cd>=0.08-1e-12,'超范围输入应被夹到允许区间。');
 report.invalidInputRestored=true;
 report.outOfRangeClamped=true;
+assert(get(control('Param_windY'),'Min')==-15&&get(control('Param_windY'),'Max')==15);
+assert(get(control('Param_density'),'Min')==.9&&get(control('Param_density'),'Max')==1.4);
+report.expandedControls=true;
 
 % ---------- 播放保持 ----------
 tm=timerfind('Name','PenaltyRealtimePlayback');
