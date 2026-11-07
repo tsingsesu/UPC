@@ -1,0 +1,331 @@
+{
+  "algorithm": "SHA256",
+  "scope": "All delivered files except this manifest; paths relative to package root",
+  "files": [
+    {
+      "path": "data/交付验收.json",
+      "bytes": 1701,
+      "sha256": "21224afe5e9f91b2b0cfc354e9f5efa8c9bc0750a3e1b672ee4cf7b9c1ca242b"
+    },
+    {
+      "path": "data/基准快照/Mai罚球结果.json",
+      "bytes": 504449,
+      "sha256": "275e37c9cdc73789d5fdd9de5434041ed55bfac0b2ce54589aa362b226ec9e96"
+    },
+    {
+      "path": "data/基准快照/本机原版独立复核.json",
+      "bytes": 1153,
+      "sha256": "ec4b3df8c7009064b5fab255da9e82397ce98a36bd5c138afc8218239b1251cb"
+    },
+    {
+      "path": "data/基准快照/来源清单.json",
+      "bytes": 2089,
+      "sha256": "4421839b79d8f96bb7c170a5862744cd4eed93ae80bfea236657428c0cf08409"
+    },
+    {
+      "path": "data/基准快照/独立复核结果.json",
+      "bytes": 1237,
+      "sha256": "c81f5dc596db6fc1abbb1558aa8988fde39927e5956ff473e41239bc85f8958d"
+    },
+    {
+      "path": "data/示例/M4_Teamgeist正向情景.json",
+      "bytes": 1226,
+      "sha256": "cb264e3eae45c48b02bf19d272dbb4b5aa05eabc7765ff90f3bc419b8e1f14f4"
+    },
+    {
+      "path": "data/示例/M4_衰减与预设风.json",
+      "bytes": 1195,
+      "sha256": "af463e7e2288cad690d643a08eae6db1a5d36c9f42edc91b71c80381dfabfeb6"
+    },
+    {
+      "path": "data/示例/修改第一帧横向坐标.json",
+      "bytes": 895,
+      "sha256": "8ad917156800e56d6ea299c0dd6f32d94881435fc78cd684c998d5b22ae4bb93"
+    },
+    {
+      "path": "data/示例/官方M3.json",
+      "bytes": 895,
+      "sha256": "7073fd6b387505fda02a575f15112ac48d6ca884fcc143a0d8fd9288684a0769"
+    },
+    {
+      "path": "data/资料/参数来源.json",
+      "bytes": 6105,
+      "sha256": "87481dbf4df8689b21948bc3267c60fdb42ef893eb4fe02516497ca84be68447"
+    },
+    {
+      "path": "data/资料/气动力来源.json",
+      "bytes": 15156,
+      "sha256": "2a797f1bc0e79cc83607f2348c6b62553fabeac9cffb588b8030abb196b6f23d"
+    },
+    {
+      "path": "data/资料/软件与许可.json",
+      "bytes": 3585,
+      "sha256": "a2c3115415cc1c59a65b6f66506207ceac76d5120b18504d58798597c1bc54c5"
+    },
+    {
+      "path": "data/验证基准/M4跨实现对照.json",
+      "bytes": 18421,
+      "sha256": "a0656790445ef249b61b06412ac57702110fa4f7d9e1739f42fd68a18110beaa"
+    },
+    {
+      "path": "data/验证基准/浏览器Bootstrap样本.csv",
+      "bytes": 71565,
+      "sha256": "486491bf0ac6bee71d10817c508bf71717dd881f92c11260de6e1cf406459a89"
+    },
+    {
+      "path": "data/验证基准/浏览器内核测试.json",
+      "bytes": 10434,
+      "sha256": "d9f158497e797152b8cc2bbacf4dac2efacf81457b4c47827c23cf03bf2a8597"
+    },
+    {
+      "path": "data/验证基准/浏览器对照.json",
+      "bytes": 44295,
+      "sha256": "b8760ad317de799240c7ce2e740a8e88cc8ad06499f9a7f63cfc7ebf3118e93f"
+    },
+    {
+      "path": "data/验证基准/浏览器鲁棒性样本.csv",
+      "bytes": 62205,
+      "sha256": "d5e4e44a8b649eb4a5a49d4debc9273f372f42f2ad7cebf6d6a77240319392e7"
+    },
+    {
+      "path": "data/验证基准/浏览器鲁棒性验证.json",
+      "bytes": 1472987,
+      "sha256": "6b68abfe88d2161f5e3b840ae6959cb635ea9f697994d02dba6a594ffe505ebc"
+    },
+    {
+      "path": "data/验证基准/浏览器鲁棒性验证.schema.json",
+      "bytes": 4875,
+      "sha256": "e936ee34691160f764e0075668859907c32f9c302b20d1e6f043bf1a8be4cd84"
+    },
+    {
+      "path": "data/验证基准/空气物性测试.json",
+      "bytes": 1771,
+      "sha256": "2080b4588e043141388f71cedffdfaf8d1f8296116860e1d39eca867e8cb27cb"
+    },
+    {
+      "path": "data/验证基准/网页验收.json",
+      "bytes": 7781,
+      "sha256": "44b7799b33ae3208d4d9f2cf49685a341c255d2a2a0bbe67c0fdc46dfc3681fe"
+    },
+    {
+      "path": "data/验证基准/高级模型测试.json",
+      "bytes": 3178,
+      "sha256": "f886266b5fec338ce82de0aea5586d004e731299e5c0f8937ac697359f23c815"
+    },
+    {
+      "path": "data/验证运行/20261107T115635_full_tp99707eb1_fdd0_49be_af74_8b633a98c808/Mai合成反演样本.csv",
+      "bytes": 51959,
+      "sha256": "a5884348d091a27abfb2d9eac8cd06845ba1a3764733884c731f79b6cebee01a"
+    },
+    {
+      "path": "data/验证运行/20261107T115635_full_tp99707eb1_fdd0_49be_af74_8b633a98c808/Mai噪声情景.csv",
+      "bytes": 203,
+      "sha256": "cd53b855e1a2029cc5f5c52599b6c453c45827ddfcb5b94bd0d3dd45b696e8fa"
+    },
+    {
+      "path": "data/验证运行/20261107T115635_full_tp99707eb1_fdd0_49be_af74_8b633a98c808/Mai拟合残差.csv",
+      "bytes": 209,
+      "sha256": "ccb240491f9a7ae074edeb7713f2f9760c55e1b5bce6602a01bfb67dcc2a7ae7"
+    },
+    {
+      "path": "data/验证运行/20261107T115635_full_tp99707eb1_fdd0_49be_af74_8b633a98c808/Mai模型偏差情景.csv",
+      "bytes": 1055,
+      "sha256": "6f4b1fa8f31bf2630406f815d84b8dc282bf6e20fbadb0a2fb5f0b840fcc5d08"
+    },
+    {
+      "path": "data/验证运行/20261107T115635_full_tp99707eb1_fdd0_49be_af74_8b633a98c808/Mai罚球结果.json",
+      "bytes": 551591,
+      "sha256": "1ed09ebf2a6c81534297943f87b3a9ddbf5937e05260be787a66c442f8d4b64f"
+    },
+    {
+      "path": "data/验证运行/20261107T115635_full_tp99707eb1_fdd0_49be_af74_8b633a98c808/Mai罚球结果.mat",
+      "bytes": 111640,
+      "sha256": "21088c718e3864467895ed111aaf83cfcc4ba7ce0634dfd5c0be943866a9d2c1"
+    },
+    {
+      "path": "data/验证运行/20261107T115635_full_tp99707eb1_fdd0_49be_af74_8b633a98c808/Mai自助样本.csv",
+      "bytes": 129670,
+      "sha256": "cbb8d6395ea7ec75000ae50aacda2a1e10af1122b508173d105d2ec225855c05"
+    },
+    {
+      "path": "data/验证运行/20261107T115635_full_tp99707eb1_fdd0_49be_af74_8b633a98c808/P0验收.json",
+      "bytes": 2603,
+      "sha256": "a378f7fcd420cce658618908d34fff57a3387775af14514b51d1acf111932b88"
+    },
+    {
+      "path": "data/验证运行/20261107T115635_full_tp99707eb1_fdd0_49be_af74_8b633a98c808/独立复核结果.json",
+      "bytes": 1152,
+      "sha256": "85f580351fdf0d19e52d0035c2866eda82f38bebfe6b64cb02fddde4351cdce0"
+    },
+    {
+      "path": "img/交互端12帧演示.png",
+      "bytes": 488212,
+      "sha256": "ca9f333879fe9848c92424ef0cc5e80b3fb954fd3b28379d4b95e3dea29437c0"
+    },
+    {
+      "path": "img/网页真实自旋.png",
+      "bytes": 229734,
+      "sha256": "ca4f06885aeaaec3c94fb24bcd988b16f23e71a7c1a5aa6dd9c3a5321ebd8a27"
+    },
+    {
+      "path": "img/网页首版.png",
+      "bytes": 205172,
+      "sha256": "f0ccb40ce6fac7d73384aeaa52c61adc39fd29596c7f4d79dd0bacd041e7a78b"
+    },
+    {
+      "path": "img/验证运行/20261107T115635_full_tp99707eb1_fdd0_49be_af74_8b633a98c808/Mai噪声水平与边际区间半宽.png",
+      "bytes": 74775,
+      "sha256": "bc8adc23cd17e30060f58454f6be19259da3f80df643a0b52fe6489999293267"
+    },
+    {
+      "path": "img/验证运行/20261107T115635_full_tp99707eb1_fdd0_49be_af74_8b633a98c808/Mai模型情景预测比较.png",
+      "bytes": 69178,
+      "sha256": "07010295cb575025cd2acaea171c5ffc8185d40ce8e7545b75a36c401a456ba7"
+    },
+    {
+      "path": "img/验证运行/20261107T115635_full_tp99707eb1_fdd0_49be_af74_8b633a98c808/Mai球门预测椭圆与自助散点.png",
+      "bytes": 88608,
+      "sha256": "b28162c72ffb2812f878dc9d6f3c4e36c2e135bda5419218f74a6aa090fdf375"
+    },
+    {
+      "path": "img/验证运行/20261107T115635_full_tp99707eb1_fdd0_49be_af74_8b633a98c808/Mai罚球轨迹与观测.png",
+      "bytes": 98489,
+      "sha256": "4688eb6444c5b1769f75d8870da17de8c7e06bb6812cb5e66e600d842304a172"
+    },
+    {
+      "path": "index.html",
+      "bytes": 389,
+      "sha256": "6aa5e22ecefb4ca56e4ae6ffd349b9ad0c8b901dc86385b3e0c6c6756256ac2f"
+    },
+    {
+      "path": "latex/knowledge/三维资源与许可.md",
+      "bytes": 4559,
+      "sha256": "82a5caffcaf11967993ff9f0dbdb906e8f9e6da7beff89e51013d655cfa3d42c"
+    },
+    {
+      "path": "latex/knowledge/实现与验证记录.md",
+      "bytes": 18741,
+      "sha256": "fc299f5671c93fe118566f0fc3b9943663477b840634fe302db64f74d757ace7"
+    },
+    {
+      "path": "latex/knowledge/方程与统计口径.md",
+      "bytes": 19392,
+      "sha256": "ea110108ec51c755e303ac1698adeea4436a5b15a93d9254d59dc919f656f27d"
+    },
+    {
+      "path": "latex/knowledge/气动力证据与接入决策.md",
+      "bytes": 11587,
+      "sha256": "2f2e42e531ebccf3f89917b591a98009cc3b242b94cafa2f8124be4d4e816016"
+    },
+    {
+      "path": "latex/knowledge/规则与规格核验.md",
+      "bytes": 7366,
+      "sha256": "b1e410e9528c6626e91bd293cccf73b7da0379834c3e5a360e01a0db3b47bb1a"
+    },
+    {
+      "path": "latex/knowledge/论文配套交互端说明.md",
+      "bytes": 2718,
+      "sha256": "1bd72e6fb5d32b9b7e4f593755cd8249c05b07b4f17818228cd3d323ff7d5584"
+    },
+    {
+      "path": "src/Mai_advanced_reference.m",
+      "bytes": 6036,
+      "sha256": "3fc6ed2addaacc1187fe16f7db7051c350c335a254814e7795c6b5cfafa09f5f"
+    },
+    {
+      "path": "src/Mai_p0_tests.m",
+      "bytes": 6921,
+      "sha256": "ceacea339116eb76b8abb520e2fe99c3ecb2023d9d4dc52d7576074143971231"
+    },
+    {
+      "path": "src/Mai_p0_validate.m",
+      "bytes": 2435,
+      "sha256": "fcdf53f823310a61f39c84cee2d6b52233203014d5de384f6c34dd911479d2c7"
+    },
+    {
+      "path": "src/Mai_penalty.m",
+      "bytes": 51634,
+      "sha256": "b80ef52f470e1bdabdde95818a4a47ffea851316922475b1916e8da6b7661a6c"
+    },
+    {
+      "path": "src/Mai_web_reference.m",
+      "bytes": 5412,
+      "sha256": "adfa8b80b9b21435261bc48c65bbca96a749e43bf162bf947138c0ddf31b36e0"
+    },
+    {
+      "path": "src/Mai复现结果.ps1",
+      "bytes": 1404,
+      "sha256": "b6449fde1d99b6cc68af428e68beca81003a9f8e24cc1b9655cd7f18ca016520"
+    },
+    {
+      "path": "src/Mai独立复核.py",
+      "bytes": 5819,
+      "sha256": "d344cb7e8b3168457f094628a7a1b2cf93422b47d643ef0b0962ab214e30d325"
+    },
+    {
+      "path": "src/requirements-validation.txt",
+      "bytes": 102,
+      "sha256": "c856d96249a8db8893e6792aeac018641ae4b14344b4a0ec0b0eb781dfaa16ca"
+    },
+    {
+      "path": "src/web/advanced.js",
+      "bytes": 15473,
+      "sha256": "e9ae85c79f77a6d7b61e0306c49ef1717bc3f71c0898109ef83f00846b70b498"
+    },
+    {
+      "path": "src/web/advanced.test.cjs",
+      "bytes": 9354,
+      "sha256": "c94d44df366ab5ed0c240bba0fd8d8ce27954d1fcc3222f1cf1b863f3bc39814"
+    },
+    {
+      "path": "src/web/app.js",
+      "bytes": 47241,
+      "sha256": "2db762e7aca9f2001b9ee857e6dfb8c9bf891337fd2a7e9a61a83e6a1d6b0c7b"
+    },
+    {
+      "path": "src/web/browser.test.cjs",
+      "bytes": 11933,
+      "sha256": "855670780f62eaccaf5f9de0f704a2da878dae5e93a18c368a08561cc1dc6409"
+    },
+    {
+      "path": "src/web/environment.js",
+      "bytes": 1605,
+      "sha256": "f5b767ff0d832981380d101d277411fb740c8ce59932df3ce0ce922476fe0de9"
+    },
+    {
+      "path": "src/web/environment.test.cjs",
+      "bytes": 560,
+      "sha256": "5d31015b715bcce54bddb262ca160440065f804f346ebcb5a320c9906d855af8"
+    },
+    {
+      "path": "src/web/index.html",
+      "bytes": 12375,
+      "sha256": "076270b9339ff5d1006d3288738fe0d60ffeb1e4a0116584ad164b6f78f623fb"
+    },
+    {
+      "path": "src/web/physics.js",
+      "bytes": 25228,
+      "sha256": "72182f7ba205aaf9317a9524b31154520fb498af5d67599be0d5bc5d1da4a409"
+    },
+    {
+      "path": "src/web/physics.test.cjs",
+      "bytes": 11182,
+      "sha256": "de69b46c7e0fc3d3c9d20b2d0fc833d262051fbb59f06925be1ddf230db5fb67"
+    },
+    {
+      "path": "src/web/robustness.test.cjs",
+      "bytes": 18202,
+      "sha256": "475da9aacde410b5b658f02cddef9c441ee436ca416e837489a4470d348e04df"
+    },
+    {
+      "path": "src/web/style.css",
+      "bytes": 10431,
+      "sha256": "b876fb18717a618c8b59c8399d1e18d36a074509ac16381965ddd5b531f87769"
+    },
+    {
+      "path": "使用说明.md",
+      "bytes": 8451,
+      "sha256": "16cd47b2da61a9ff2e4c9852857d2838b17e75b3ff8220868173fe560278396a"
+    }
+  ]
+}

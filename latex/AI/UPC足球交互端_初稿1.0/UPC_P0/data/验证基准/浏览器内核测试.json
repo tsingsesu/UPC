@@ -1,0 +1,368 @@
+{
+  "schemaVersion": "1.0",
+  "codeVersion": "upc-p0-js-1.0.0",
+  "scope": "Numerical verification of selected equations, not experimental confirmation.",
+  "node": "v24.22.0",
+  "platform": "win32",
+  "checks": [
+    {
+      "name": "V08 MATLAB eight-case cross implementation",
+      "passed": true,
+      "elapsedMs": 69,
+      "evidence": {
+        "matlabVersion": "25.2.0.2998904 (R2025b)",
+        "comparisons": [
+          {
+            "id": "inverse_M0",
+            "eventError": {
+              "y": 3.0343505486030153e-10,
+              "z": 1.0914114056959079e-10,
+              "t": 2.3212931576921392e-11
+            },
+            "positionError": 5.515854439863688e-10,
+            "observationError": 1.8385692968081457e-10
+          },
+          {
+            "id": "inverse_M1",
+            "eventError": {
+              "y": 1.4699352846037073e-13,
+              "z": 7.149836278586008e-14,
+              "t": 4.96269692007445e-14
+            },
+            "positionError": 1.9539925233402755e-14,
+            "observationError": 1.7763568394002505e-15
+          },
+          {
+            "id": "inverse_M2",
+            "eventError": {
+              "y": 5.502895916720263e-10,
+              "z": 2.545060606706784e-9,
+              "t": 1.0608907641262988e-9
+            },
+            "positionError": 1.363863866288284e-8,
+            "observationError": 5.215130549629521e-10
+          },
+          {
+            "id": "inverse_M3",
+            "eventError": {
+              "y": 1.780797731498751e-13,
+              "z": 7.083222897108499e-14,
+              "t": 7.532863222081687e-14
+            },
+            "positionError": 5.329070518200751e-15,
+            "observationError": 4.440892098500626e-16
+          },
+          {
+            "id": "fixed_initial_M0",
+            "eventError": {
+              "y": 3.771649659256582e-12,
+              "z": 1.3282708266615373e-12,
+              "t": 3.9873659929412497e-13
+            },
+            "positionError": 0,
+            "observationError": 0
+          },
+          {
+            "id": "fixed_initial_M2",
+            "eventError": {
+              "y": 9.281464485866309e-14,
+              "z": 6.084022174945858e-14,
+              "t": 3.735900477863652e-14
+            },
+            "positionError": 0,
+            "observationError": 0
+          },
+          {
+            "id": "fixed_initial_M3",
+            "eventError": {
+              "y": 1.7630341631047486e-13,
+              "z": 6.639133687258436e-14,
+              "t": 7.532863222081687e-14
+            },
+            "positionError": 0,
+            "observationError": 0
+          },
+          {
+            "id": "wind_y_plus3_M3",
+            "eventError": {
+              "y": 1.2989609388114332e-12,
+              "z": 7.362999099314038e-13,
+              "t": 3.0991875732411245e-13
+            },
+            "positionError": 0,
+            "observationError": 0
+          }
+        ]
+      }
+    },
+    {
+      "name": "V08 four force cases, SI and sign",
+      "passed": true,
+      "elapsedMs": 0,
+      "evidence": [
+        {
+          "id": "nominal_initial",
+          "maxError": 1.7763568394002505e-15
+        },
+        {
+          "id": "wind_y_plus3_initial",
+          "maxError": 8.881784197001252e-16
+        },
+        {
+          "id": "zero_relative_speed",
+          "maxError": 0
+        },
+        {
+          "id": "zero_effective_magnus",
+          "maxError": 1.7763568394002505e-15
+        }
+      ]
+    },
+    {
+      "name": "V01 gravity exact trajectory and event",
+      "passed": true,
+      "elapsedMs": 2,
+      "evidence": {
+        "maxPositionError": 2.9025670755800093e-12
+      }
+    },
+    {
+      "name": "V02 one-dimensional quadratic drag exact solution",
+      "passed": true,
+      "elapsedMs": 6,
+      "evidence": {
+        "maxError": 4.39648317751562e-12
+      }
+    },
+    {
+      "name": "V03 energy budget matches integrated aerodynamic power",
+      "passed": true,
+      "elapsedMs": 4,
+      "evidence": {
+        "energyWorkError_J": 0.000030326363770427633
+      }
+    },
+    {
+      "name": "V04/V05 Magnus perpendicular, zero relative velocity and parallel b",
+      "passed": true,
+      "elapsedMs": 1,
+      "evidence": null
+    },
+    {
+      "name": "V06 event states and initial takeoff",
+      "passed": true,
+      "elapsedMs": 30,
+      "evidence": null
+    },
+    {
+      "name": "V07 three independent integration step sizes",
+      "passed": true,
+      "elapsedMs": 7,
+      "evidence": {
+        "changes": [
+          {
+            "step": 0.004,
+            "position": 1.24283866601288e-11,
+            "time": 9.313105842068126e-13
+          },
+          {
+            "step": 0.002,
+            "position": 1.0445767426034937e-12,
+            "time": 0
+          }
+        ]
+      }
+    },
+    {
+      "name": "M1 algebra regression and all six observation edits truly refit",
+      "passed": true,
+      "elapsedMs": 112,
+      "evidence": {
+        "goalChanges_m": [
+          0.058935201456048886,
+          0.2057758608785002,
+          0.20949349061823508,
+          0.03258734381578249,
+          0.12355313864202801,
+          0.1253359499337743
+        ]
+      }
+    },
+    {
+      "name": "identifiability diagnostics and synthetic same-model recovery",
+      "passed": true,
+      "elapsedMs": 49,
+      "evidence": {
+        "cases": [
+          {
+            "theta": [
+              28,
+              4,
+              6,
+              0.2,
+              0.1,
+              -0.2
+            ],
+            "goalError": 6.55599621880358e-14
+          },
+          {
+            "theta": [
+              35,
+              6,
+              8,
+              0.45,
+              -0.2,
+              -0.4
+            ],
+            "goalError": 2.1868857395626282e-15
+          },
+          {
+            "theta": [
+              24,
+              3,
+              5,
+              0.3,
+              0.2,
+              0.1
+            ],
+            "goalError": 3.259464296564761e-14
+          }
+        ]
+      }
+    },
+    {
+      "name": "V10 seeded bootstrap reproducibility and complete accounting",
+      "passed": true,
+      "elapsedMs": 600,
+      "evidence": {
+        "sampleCount": 24,
+        "summary": {
+          "total": 24,
+          "completed": 24,
+          "reached": 24,
+          "crossed_goal_plane": 24,
+          "ground_before_goal": 0,
+          "no_crossing_within_horizon": 0,
+          "invalid_input": 0,
+          "fit_failed": 0,
+          "integration_failed": 0,
+          "outside_model_domain": 0,
+          "cancelled": 0,
+          "centerInside": 21,
+          "clearanceInside": 19,
+          "boundaryHit": 4,
+          "arrivalFraction": 1,
+          "centerInsideFractionOfArrivals": 0.875,
+          "clearanceInsideFractionOfArrivals": 0.7916666666666666,
+          "denominators": {
+            "arrivalFraction": 24,
+            "centerInsideFractionOfArrivals": 24,
+            "clearanceInsideFractionOfArrivals": 24,
+            "conditionalEllipse": 24
+          },
+          "arrivalTimeQuantiles": [
+            0.3725817747918193,
+            0.40383086380735067,
+            0.4240897459186384
+          ],
+          "yQuantiles": [
+            1.837171760592464,
+            2.5402119644049836,
+            3.621578395639518
+          ],
+          "zQuantiles": [
+            1.1182434652468602,
+            1.9949720796776198,
+            2.6834933187266152
+          ],
+          "conditionalEllipse": {
+            "mean": [
+              2.5922445031356256,
+              1.9594116335111373
+            ],
+            "covariance": [
+              [
+                0.3001978149992804,
+                -0.022540791925816758
+              ],
+              [
+                -0.022540791925816758,
+                0.1667846791486441
+              ]
+            ],
+            "axes": [
+              1.3493797429104897,
+              0.9884752739344295
+            ],
+            "angle": 2.9786608762362263,
+            "chiSquareScale": 5.991464547,
+            "interpretation": "到达样本条件下的bootstrap经验协方差描述椭圆（高斯参考尺度5.991）；不是后验95%区域，未验证覆盖率",
+            "denominator": 24
+          },
+          "interpretation": "围绕拟合模型生成独立高斯坐标噪声并重拟合；频率是该算法与噪声假设下的稳定性，不是现实进球概率"
+        }
+      }
+    },
+    {
+      "name": "deterministic scenario has 12 entries and no probability ellipse",
+      "passed": true,
+      "elapsedMs": 183,
+      "evidence": {
+        "summary": {
+          "total": 12,
+          "completed": 12,
+          "reached": 12,
+          "crossed_goal_plane": 12,
+          "ground_before_goal": 0,
+          "no_crossing_within_horizon": 0,
+          "invalid_input": 0,
+          "fit_failed": 0,
+          "integration_failed": 0,
+          "outside_model_domain": 0,
+          "cancelled": 0,
+          "centerInside": 12,
+          "clearanceInside": 11,
+          "boundaryHit": 0,
+          "arrivalFraction": 1,
+          "centerInsideFractionOfArrivals": 1,
+          "clearanceInsideFractionOfArrivals": 0.9166666666666666,
+          "denominators": {
+            "arrivalFraction": 12,
+            "centerInsideFractionOfArrivals": 12,
+            "clearanceInsideFractionOfArrivals": 12,
+            "conditionalEllipse": 12
+          },
+          "arrivalTimeQuantiles": null,
+          "yQuantiles": null,
+          "zQuantiles": null,
+          "conditionalEllipse": null,
+          "interpretation": "逐坐标正负扰动的12个确定性情景；频率和范围不具现实概率含义"
+        }
+      }
+    },
+    {
+      "name": "worker serialization and JSON roundtrip",
+      "passed": true,
+      "elapsedMs": 30,
+      "evidence": null
+    },
+    {
+      "name": "incompatible observations distinguish optimizer success from explanation",
+      "passed": true,
+      "elapsedMs": 12,
+      "evidence": {
+        "rmse_m": 15.88792578089591,
+        "compatibility": {
+          "flag": "incompatible_with_declared_noise",
+          "maxAbsResidual_m": 34.746387186033644,
+          "threshold_m": 0.05,
+          "rule": "max absolute coordinate residual > 5 * declared sigma",
+          "isFormalStatisticalTest": false
+        },
+        "boundaryHit": true
+      }
+    }
+  ],
+  "passed": true,
+  "elapsedMs": 1105
+}

@@ -1,0 +1,93 @@
+{
+  "schemaVersion": "1.0",
+  "model": "M4",
+  "mode": "forward",
+  "initial": [
+    0,
+    0,
+    0.11
+  ],
+  "observations": [
+    {
+      "t": 0.05,
+      "position": [
+        1.5,
+        0.45,
+        0.44
+      ]
+    },
+    {
+      "t": 0.1,
+      "position": [
+        2.96,
+        0.86,
+        0.74
+      ]
+    }
+  ],
+  "m": 0.43,
+  "R": 0.11,
+  "rho": 1.225,
+  "g": 9.80665,
+  "wind": [
+    0,
+    0,
+    0
+  ],
+  "sigma": 0.01,
+  "h": 0.001,
+  "fitH": 0.005,
+  "horizon": 2,
+  "goalX": 11,
+  "goalHalfWidth": 3.66,
+  "goalHeight": 2.44,
+  "velocity": [
+    30.4,
+    9.4,
+    6.9
+  ],
+  "Cd": 0.3,
+  "b": [
+    0,
+    0,
+    0
+  ],
+  "constantAcceleration": [
+    -16,
+    -16,
+    -12
+  ],
+  "omega": [
+    0,
+    0,
+    50
+  ],
+  "quaternion": [
+    1,
+    0,
+    0,
+    0
+  ],
+  "spinDecayTau": "infinite",
+  "kappa": 0.6666666666666666,
+  "dragModel": "paper2018",
+  "ballType": "Teamgeist",
+  "liftModel": "teamgeist2018",
+  "liftSlope": 0.8,
+  "mu": 0.0000181,
+  "windShear": [
+    0,
+    0,
+    0
+  ],
+  "gustAmplitude": [
+    0,
+    0,
+    0
+  ],
+  "gustPeriod": 1,
+  "metadata": {
+    "units": "SI",
+    "purpose": "Hypothetical forward scenario, not identification of the competition ball or spin"
+  }
+}

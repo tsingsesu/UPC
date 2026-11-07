@@ -1,0 +1,49 @@
+{
+  "repository": "tsingsesu/UPC",
+  "ref": "849f45a8e830d45348239c68cccd9f92dce3986d",
+  "files": [
+    {
+      "path": "src/Mai_penalty.m",
+      "gitBlobSha": "5797d832a5719a63bc380e7620ccf84d4386fcb4",
+      "sha256": "8d84b22001991b9ffc5bfb273723533a20d1cd9ecd9675c0da75f0c1d1f6a05e"
+    },
+    {
+      "path": "src/Mai独立复核.py",
+      "gitBlobSha": "a2a2e1de2a39c2ee039cb11caabecb4ae4e315cf",
+      "sha256": "b6bcc64efe332167e5e00b59b6002ba58490bf4a5f3239489dbd15e605e91150"
+    },
+    {
+      "path": "src/Mai复现结果.ps1",
+      "gitBlobSha": "2e43ceaa6b6e7d436369db444ac3bf4430de166a",
+      "sha256": "23bb0e56a05a094cb00ac354be4894eab499e8323f2ca6e7b0b14dfe05859b3c"
+    },
+    {
+      "path": "latex/knowledge/B题建模与验证.md",
+      "gitBlobSha": "522515c1dd1e729b21629d778d2b7e5ad8d34cde",
+      "sha256": "e7aab49a760cdc26ef2dedd66897a18bfb37c8025399910388db2ff2ce5afcbf"
+    },
+    {
+      "path": "data/派生数据/Mai罚球结果.json",
+      "gitBlobSha": "c023ac7dafdfb64f29a94346723484cc8bcd51ab",
+      "sha256": "f6d4679da5fd347a0fa2bde0f8ca502945646b7c80d70d0a7dd7bea122106cdb"
+    },
+    {
+      "path": "data/派生数据/独立复核结果.json",
+      "gitBlobSha": "e66e605555bb03a6091bf7f1df3bc21b9b7de335",
+      "sha256": "c81f5dc596db6fc1abbb1558aa8988fde39927e5956ff473e41239bc85f8958d"
+    }
+  ],
+  "hashScope": "files 中的哈希均对应未修改的上游原文，不是本交付的修复代码或脱敏快照。",
+  "deliveryTransform": {
+    "file": "Mai罚球结果.json",
+    "originalSHA256": "f6d4679da5fd347a0fa2bde0f8ca502945646b7c80d70d0a7dd7bea122106cdb",
+    "deliveredSHA256": "275e37c9cdc73789d5fdd9de5434041ed55bfac0b2ce54589aa362b226ec9e96",
+    "modifiedFields": [
+      "$.figures[0]",
+      "$.figures[1]",
+      "$.figures[2]",
+      "$.figures[3]"
+    ],
+    "change": "仅将上游个人绝对图路径改为文件名占位相对路径；不含原图。重排JSON空白；科学数值未改变。原字节文件留在内部工作区，不随包分发。"
+  }
+}

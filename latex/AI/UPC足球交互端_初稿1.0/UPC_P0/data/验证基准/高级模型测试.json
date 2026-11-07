@@ -1,0 +1,76 @@
+{
+  "passed": true,
+  "count": 16,
+  "tests": [
+    "M0-M3 delegation unchanged",
+    "P0 comparisons and bootstrap remain available with advanced fields",
+    "M4 forward only and malformed input",
+    "Gravity analytic with no aerodynamic terms",
+    "Constant world spin gives analytic scalar-first quaternion",
+    "Exponential spin decay, angular momentum and quaternion phase",
+    "Magnus work is zero in air frame; zero spin and parallel axis limits",
+    "Zero relative speed produces no aerodynamic force or NaN",
+    "Preset shear and sinusoidal gust feed relative velocity",
+    "Paper2018 Table 1 equation 5 independent numeric check",
+    "Teamgeist spin correction and lift equation 9",
+    "Domain exits stop with explicit status and no claimed goal",
+    "First-flight ground event and unavailable post-event observations",
+    "Mechanical plus rotational energy closes drag and torque work",
+    "Worker serialization retains complete advanced implementation",
+    "Independent MATLAB ode45 13-state comparison across five scenarios"
+  ],
+  "crossImplementation": [
+    {
+      "id": "constant_linear",
+      "status": "crossed_goal_plane",
+      "timeError_s": 3.735900477863652e-14,
+      "positionError_m": 2.5579538487363607e-13,
+      "velocityError_m_s": 4.263256414560601e-13,
+      "omegaError_rad_s": 0,
+      "quaternionError": 2.4402880827167905e-8,
+      "referenceMethod": "independently encoded 13-state ode45; rtol 1e-11, atol 1e-12, maxStep .002s"
+    },
+    {
+      "id": "teamgeist2018",
+      "status": "crossed_goal_plane",
+      "timeError_s": 4.331535130575048e-13,
+      "positionError_m": 3.806288617624887e-12,
+      "velocityError_m_s": 5.481837206389173e-12,
+      "omegaError_rad_s": 0,
+      "quaternionError": 2.549726541012376e-8,
+      "referenceMethod": "independently encoded 13-state ode45; rtol 1e-11, atol 1e-12, maxStep .002s"
+    },
+    {
+      "id": "brazuca_nonspinning_drag_linear_lift",
+      "status": "crossed_goal_plane",
+      "timeError_s": 2.938205234670477e-13,
+      "positionError_m": 2.0259349753359857e-12,
+      "velocityError_m_s": 3.020472760795201e-12,
+      "omegaError_rad_s": 0,
+      "quaternionError": 2.9229635156724498e-8,
+      "referenceMethod": "independently encoded 13-state ode45; rtol 1e-11, atol 1e-12, maxStep .002s"
+    },
+    {
+      "id": "decay_shear_gust",
+      "status": "crossed_goal_plane",
+      "timeError_s": 2.1088686352754848e-13,
+      "positionError_m": 1.4872547637878597e-12,
+      "velocityError_m_s": 2.114086683491223e-12,
+      "omegaError_rad_s": 7.066347507134196e-12,
+      "quaternionError": 6.562991816672081e-9,
+      "referenceMethod": "independently encoded 13-state ode45; rtol 1e-11, atol 1e-12, maxStep .002s"
+    },
+    {
+      "id": "outside_initial_domain",
+      "status": "outside_model_domain",
+      "timeError_s": 0,
+      "positionError_m": 0,
+      "velocityError_m_s": 0,
+      "omegaError_rad_s": 0,
+      "quaternionError": 0,
+      "referenceMethod": "independently encoded 13-state ode45; rtol 1e-11, atol 1e-12, maxStep .002s"
+    }
+  ],
+  "nodeVersion": "v24.22.0",
+  "physicalValidation": "not independently experimentally validated"
+}

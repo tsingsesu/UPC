@@ -1,0 +1,247 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "UPC synthetic robustness report 1.0",
+  "type": "object",
+  "required": [
+    "schemaVersion",
+    "artifactKind",
+    "provenance",
+    "design",
+    "sameModel",
+    "mismatch",
+    "bootstrap",
+    "checks",
+    "passed"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": "1.0"
+    },
+    "artifactKind": {
+      "const": "synthetic_robustness_validation"
+    },
+    "provenance": {
+      "type": "object",
+      "required": [
+        "coreSHA256",
+        "generator",
+        "realExperimentalValidation"
+      ],
+      "properties": {
+        "coreSHA256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "realExperimentalValidation": {
+          "const": false
+        }
+      }
+    },
+    "sameModel": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/group"
+        },
+        {
+          "properties": {
+            "sampleCount": {
+              "const": 60
+            },
+            "samples": {
+              "minItems": 60,
+              "maxItems": 60
+            }
+          }
+        }
+      ]
+    },
+    "mismatch": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/group"
+        },
+        {
+          "properties": {
+            "sampleCount": {
+              "const": 30
+            },
+            "samples": {
+              "minItems": 30,
+              "maxItems": 30
+            }
+          }
+        }
+      ]
+    },
+    "bootstrap": {
+      "type": "object",
+      "required": [
+        "sampleCount",
+        "samples",
+        "summary",
+        "finiteSampleFrequencyAudit"
+      ],
+      "properties": {
+        "sampleCount": {
+          "const": 200
+        },
+        "samples": {
+          "type": "array",
+          "minItems": 200,
+          "maxItems": 200
+        }
+      }
+    },
+    "checks": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "name",
+          "passed"
+        ],
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "passed": {
+            "type": "boolean"
+          }
+        }
+      }
+    },
+    "passed": {
+      "type": "boolean"
+    }
+  },
+  "$defs": {
+    "group": {
+      "type": "object",
+      "required": [
+        "name",
+        "sampleCount",
+        "seed",
+        "summary",
+        "samples"
+      ],
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "sampleCount": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "seed": {
+          "type": "integer"
+        },
+        "summary": {
+          "type": "object"
+        },
+        "samples": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/sample"
+          }
+        }
+      }
+    },
+    "sample": {
+      "type": "object",
+      "required": [
+        "id",
+        "group",
+        "seed",
+        "trueTheta",
+        "trueWind_m_s",
+        "observations",
+        "noise_m",
+        "truthStatus",
+        "estimateStatus",
+        "fitOk",
+        "boundaryHit",
+        "errors"
+      ],
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "group": {
+          "type": "string"
+        },
+        "seed": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 4294967295
+        },
+        "trueTheta": {
+          "type": "array",
+          "minItems": 6,
+          "maxItems": 6,
+          "items": {
+            "type": "number"
+          }
+        },
+        "trueWind_m_s": {
+          "type": "array",
+          "minItems": 3,
+          "maxItems": 3,
+          "items": {
+            "type": "number"
+          }
+        },
+        "noise_m": {
+          "type": "array",
+          "minItems": 6,
+          "maxItems": 6,
+          "items": {
+            "type": "number"
+          }
+        },
+        "observations": {
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 2
+        },
+        "truthStatus": {
+          "type": "string"
+        },
+        "estimateStatus": {
+          "type": "string"
+        },
+        "fitOk": {
+          "type": "boolean"
+        },
+        "boundaryHit": {
+          "type": "boolean"
+        },
+        "errors": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "object",
+              "required": [
+                "y_m",
+                "z_m",
+                "time_s"
+              ],
+              "properties": {
+                "y_m": {
+                  "type": "number"
+                },
+                "z_m": {
+                  "type": "number"
+                },
+                "time_s": {
+                  "type": "number"
+                }
+              }
+            }
+          ]
+        }
+      }
+    }
+  }
+}
