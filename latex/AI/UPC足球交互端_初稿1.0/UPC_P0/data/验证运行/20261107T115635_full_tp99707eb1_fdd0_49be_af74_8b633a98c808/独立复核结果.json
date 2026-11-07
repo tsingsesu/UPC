@@ -1,0 +1,44 @@
+{
+  "passed": true,
+  "scipyVersion": "1.16.3",
+  "numpyVersion": "2.3.4",
+  "method": "independent DOP853 from t=0 + bounded least_squares",
+  "theta": [
+    30.415459092651854,
+    9.416724781408751,
+    6.908014180608467,
+    0.37068700770184293,
+    -0.06032564404998467,
+    -0.35712778152675906
+  ],
+  "goalTime_s": 0.4005034861158984,
+  "goalXYZ_m": [
+    11.0,
+    2.5994405492131674,
+    1.9670046154708227
+  ],
+  "matlabDifferenceYZ_m": [
+    -2.5407231873941782e-11,
+    -9.033884751374899e-12
+  ],
+  "matlabDifferenceTime_s": 8.030243137113757e-13,
+  "maxObservationResidual_m": 7.904787935331115e-14,
+  "energyBalanceMaxResidual_J": 1.1368683772161603e-13,
+  "eventTests": {
+    "downwardAtGround": {
+      "status": "ground",
+      "eventTime": 0.0
+    },
+    "earlyContact": {
+      "status": "ground",
+      "eventTime": 0.009552564312577491
+    },
+    "stationaryAtGround": {
+      "status": "ground",
+      "eventTime": 0.0
+    },
+    "upwardLaunch": "passed",
+    "noForwardCrossing": "passed"
+  },
+  "scope": "仅数值验证；静风、常Cd、bx=0、无b衰减。不是实验确认。"
+}
